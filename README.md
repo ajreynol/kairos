@@ -7,9 +7,9 @@ the goals, the correctness argument, and how it is compared with
 
 **Status: milestone 2 (CpcMini) in progress.** `kairos-eoc` generates
 Kairos programs with machine-checked proofs that they compute Logos's
-functions (`Kairos/Gen/Programs.lean`). It currently covers 27 of CpcMini's 57
-programs. Not yet supported: datatype declarations, `Proof` patterns (the
-rules) and the checker's state machine. The hand-written runtime the
+functions (`Kairos/Gen/Programs.lean`). It currently covers 36 of CpcMini's 57
+programs, including the five rules and `__eo_typeof`; what remains is the
+checker's state machine. The hand-written runtime the
 generated code builds on is in `Kairos/Runtime/`; `Kairos/Proto/` holds the
 prototype and the golden output the generator was written against (see
 [docs/prototype.md](docs/prototype.md)).

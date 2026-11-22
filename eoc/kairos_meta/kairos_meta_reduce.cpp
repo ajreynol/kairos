@@ -63,6 +63,10 @@ std::string str(const Expr& e)
 
 std::string indent(size_t n) { return std::string(n, ' '); }
 
+using Sort = KairosMetaReduce::Sort;
+/** Terms and proofs are ids in Kairos. */
+bool isIdSort(Sort s) { return s == Sort::TERM || s == Sort::PROOF; }
+
 std::string kindToString(Kind k)
 {
   std::stringstream ss;
@@ -156,13 +160,31 @@ const std::map<std::string, CtorInfo>& ctorTable()
       {"String", {"string", {"N:List Nat"}, "decode_string_inv", ""}},
       {"Binary", {"binary", {"N:Int", "N:Int"}, "decode_binary_inv", ""}},
       {"USort", {"usort", {"N:Nat"}, "decode_usort_inv", ""}},
+      {"DatatypeType",
+       {"datatypeType", {"N:List Nat", "N:DatatypeDecl"}, "decode_datatypeType_inv", ""}},
+      {"DatatypeTypeRef", {"datatypeTypeRef", {"N:List Nat"}, "decode_datatypeTypeRef_inv", ""}},
+      {"DtCons",
+       {"dtCons", {"N:List Nat", "N:DatatypeDecl", "N:Nat"}, "decode_dtCons_inv", ""}},
+      {"DtSel",
+       {"dtSel", {"N:List Nat", "N:DatatypeDecl", "N:Nat", "N:Nat"}, "decode_dtSel_inv", ""}},
+      {"DtcAppType", {"dtcAppType", {"I", "I"}, "decode_dtcAppType_inv", "intern_dtcAppType"}},
   };
   return t;
 }
 
 }  // namespace
 
-KairosMetaReduce::KairosMetaReduce(State& s) : MetaReducePlugin(s) {}
+KairosMetaReduce::KairosMetaReduce(State& s) : MetaReducePlugin(s)
+{
+  // As LeanMetaReduce's constructor: these decide how types and constructors
+  // are classified, hence the case layout Logos's definitions have.
+  d_typeToMetaKind["$eo_Term"] = MetaKind::EUNOIA;
+  d_typeToMetaKind["$eo_Proof"] = MetaKind::PROOF;
+  d_typeToMetaKind["$eo_Rule"] = MetaKind::CHECKER_RULE;
+  d_typeToMetaKind["$eo_Cmd"] = MetaKind::CHECKER_CMD;
+  d_prefixToMetaKind["r"] = MetaKind::CHECKER_RULE;
+  d_prefixToMetaKind["cmd"] = MetaKind::CHECKER_CMD;
+}
 
 KairosMetaReduce::~KairosMetaReduce() {}
 
@@ -235,6 +257,19 @@ KairosMetaReduce::ArgInfo KairosMetaReduce::argInfo(const Expr& t)
     a.sort = Sort::TERM;
     a.kType = "Id";
     a.lType = "Term";
+  }
+  else if (k == MetaKind::PROOF)
+  {
+    a.sort = Sort::PROOF;
+    a.kType = "Id";
+    a.lType = "Proof";
+  }
+  else if (k == MetaKind::EO_EMBED)
+  {
+    // datatype declarations: Logos values on both sides
+    a.sort = Sort::NATIVE;
+    a.kType = getEmbedTypeName(getEmbedTypeApp(t));
+    a.lType = a.kType;
   }
   else if (k == MetaKind::SMT_BUILTIN)
   {
@@ -380,6 +415,10 @@ bool KairosMetaReduce::checkPattern(const Expr& e, Prog& p)
   {
     return checkPattern(e[0], p) && checkPattern(e[1], p);
   }
+  if (k == Kind::FUNCTION_TYPE && e.getNumChildren() == 2)
+  {
+    return checkPattern(e[0], p) && checkPattern(e[1], p);
+  }
   if (k == Kind::APPLY_OPAQUE && isEmbedCons(e[0]))
   {
     std::string cname;
@@ -437,8 +476,36 @@ bool KairosMetaReduce::checkBody(const Expr& e, Sort expect, Prog& p)
   {
     return true;
   }
+  if (expect == Sort::PROOF)
+  {
+    if (k == Kind::APPLY_OPAQUE && getName(e[0]) == "$eo_pf" && e.getNumChildren() == 2)
+    {
+      return checkBody(e[1], Sort::TERM, p);
+    }
+    p.why = "a proof that is not (pf F)";
+    return false;
+  }
   if (expect == Sort::NATIVE)
   {
+    if (isProgramApp(e))
+    {
+      std::string cname = getName(e[0]);
+      p.callees.insert(cname);
+      auto it = d_progs.find(cname);
+      if (it == d_progs.end() || !it->second.pure)
+      {
+        p.why = "a native-sorted call of " + cname;
+        return false;
+      }
+      for (size_t i = 1; i < e.getNumChildren(); i++)
+      {
+        if (!checkBody(e[i], Sort::NATIVE, p))
+        {
+          return false;
+        }
+      }
+      return true;
+    }
     if (k == Kind::APPLY_OPAQUE)
     {
       std::string sname = getName(e[0]);
@@ -645,6 +712,17 @@ void KairosMetaReduce::checkSupported(Prog& p)
         p.supported = false;
         return;
       }
+      if (p.args[j - 1].sort == Sort::PROOF)
+      {
+        const Expr& q = hd[j];
+        if (!(q.getKind() == Kind::APPLY_OPAQUE && getName(q[0]) == "$eo_pf"
+              && q.getNumChildren() == 2 && checkPattern(q[1], p)))
+        {
+          p.supported = false;
+          p.why = "a proof pattern that is not (pf F)";
+          return;
+        }
+      }
     }
     if (!checkBody(p.def[i][1], Sort::TERM, p))
     {
@@ -710,10 +788,17 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
   {
     implicitArgs << " {" << argNames[i] << " : " << p.args[i].kType << "}";
     kArgs << " " << argNames[i];
-    if (p.args[i].sort == Sort::TERM)
+    if (isIdSort(p.args[i].sort))
     {
       validHyps << " → " << argNames[i] << " < σ.size";
-      decArgs << " (σ.decode " << argNames[i] << ")";
+      if (p.args[i].sort == Sort::PROOF)
+      {
+        decArgs << " (Proof.pf (σ.decode " << argNames[i] << "))";
+      }
+      else
+      {
+        decArgs << " (σ.decode " << argNames[i] << ")";
+      }
       termArgs.push_back(argNames[i]);
     }
     else
@@ -733,7 +818,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     for (size_t i = 0; i < nargs; i++)
     {
       calls << " {" << argNames[i] << " : " << p.args[i].kType << "}";
-      if (p.args[i].sort == Sort::TERM)
+      if (isIdSort(p.args[i].sort))
       {
         calls << " {A" << i + 1 << " : Term}";
       }
@@ -741,13 +826,20 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     std::stringstream lhsArgs;
     for (size_t i = 0; i < nargs; i++)
     {
-      if (p.args[i].sort == Sort::TERM)
+      if (isIdSort(p.args[i].sort))
       {
         calls << "\n    (p" << i + 1 << " : Fact.term " << argNames[i] << " A" << i + 1
               << " ∈ Γ)";
         valid << " (hΓ.valid p" << i + 1 << ")";
         rw << (rw.str().empty() ? "" : ", ") << "hΓ.dec p" << i + 1;
-        lhsArgs << " A" << i + 1;
+        if (p.args[i].sort == Sort::PROOF)
+        {
+          lhsArgs << " (Proof.pf A" << i + 1 << ")";
+        }
+        else
+        {
+          lhsArgs << " A" << i + 1;
+        }
       }
       else
       {
@@ -766,6 +858,47 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     }
   }
 
+  // fuel 0
+  std::string zero = "    " + field + " := fun _";
+  for (size_t i = 0; i < termArgs.size(); i++)
+  {
+    zero += " _";
+  }
+  zero += " => by simp only [" + kf + "]; exact Ok.throw";
+  if (p.lifted)
+  {
+    codeOut << "/-- Lifted: Logos computes it on decoded arguments. -/\n";
+    codeOut << "def " << kf << " : Nat";
+    for (size_t i = 0; i < nargs; i++)
+    {
+      codeOut << " → " << p.args[i].kType;
+    }
+    codeOut << " → K Id\n  | 0";
+    for (size_t i = 0; i < nargs; i++)
+    {
+      codeOut << ", _";
+    }
+    codeOut << " => throw .fuel\n  | _ + 1";
+    for (const std::string& a : argNames)
+    {
+      codeOut << ", " << a;
+    }
+    codeOut << " => withStore fun σ => internTerm (" << f << decArgs.str() << ")\n\n";
+    steps << "theorem step" << f << " {n : Nat} (ih : Spec n) : " << sf << " (n + 1) := by\n"
+          << "  intro σ";
+    for (const std::string& a : argNames)
+    {
+      steps << " " << a;
+    }
+    steps << " hI";
+    for (size_t i = 0; i < termArgs.size(); i++)
+    {
+      steps << " _";
+    }
+    steps << "\n  simp only [" << kf << "]\n  apply Sim.withStore\n  exact Sim.lift hI\n\n";
+    return zero;
+  }
+
   // --- matchers, and the program text by alternative ---
   std::stringstream kbody;   // the program's n+1 case body
   std::stringstream proof;   // the step proof
@@ -780,7 +913,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
   std::map<std::string, std::string> argValid;
   for (size_t i = 0; i < nargs; i++)
   {
-    if (p.args[i].sort == Sort::TERM)
+    if (isIdSort(p.args[i].sort))
     {
       argValid[argNames[i]] = "h" + std::to_string(i + 1);
       proof << " h" << i + 1;
@@ -818,6 +951,14 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
   // compile a body expression; see the Scope invariants above
   std::function<std::string(const Expr&, Scope&, Out&, bool)> compileTerm;
   std::function<std::string(const Expr&, Scope&, Out&, std::vector<std::string>&)> compileNative;
+  // a proof argument: the id of its formula
+  auto compileProof = [&](const Expr& e, Scope& sc, Out& out) -> std::string {
+    if (e.getKind() == Kind::PARAM)
+    {
+      return sc.vars.at(cleanSmtId(str(e))).name;
+    }
+    return compileTerm(e[1], sc, out, false);
+  };
 
   // emit a computation either as the final expression or as a step binding a
   // fresh id
@@ -935,6 +1076,15 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     {
       return sc.vars.at(cleanSmtId(str(e))).name;
     }
+    if (isProgramApp(e))
+    {
+      std::string s = "(" + d_progs.at(getName(e[0])).lname;
+      for (size_t i = 1; i < e.getNumChildren(); i++)
+      {
+        s += " " + compileNative(e[i], sc, out, rewrites);
+      }
+      return s + ")";
+    }
     std::string name = nativeName(e);
     if (e.getNumChildren() == 2)
     {
@@ -1047,18 +1197,22 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         {
           ops.push_back(compileTerm(e[i], sc, out, false));
         }
+        else if (q.args[i - 1].sort == Sort::PROOF)
+        {
+          ops.push_back(compileProof(e[i], sc, out));
+        }
         else
         {
           ops.push_back(compileNative(e[i], sc, out, rws));
         }
       }
       emitRewrites(rws, sc, out);
-      std::string code = "k" + q.lname + " n";
+      std::string code = "k" + q.lname + " kfuel";
       std::string prf = "C" + q.lname + " ih " + sc.hI + " " + sc.hG;
       for (size_t i = 0; i < ops.size(); i++)
       {
         code += " " + ops[i];
-        if (q.args[i].sort == Sort::TERM)
+        if (isIdSort(q.args[i].sort))
         {
           prf += " " + memProof(sc.gamma, ops[i]);
         }
@@ -1072,7 +1226,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         const Prog& q = d_progs.at("$eo_mk_apply");
         std::string a = compileTerm(e[0], sc, out, false);
         std::string b = compileTerm(e[1], sc, out, false);
-        r = finish("k" + q.lname + " n " + a + " " + b,
+        r = finish("k" + q.lname + " kfuel " + a + " " + b,
                    "C" + q.lname + " ih " + sc.hI + " " + sc.hG + " " + memProof(sc.gamma, a)
                        + " " + memProof(sc.gamma, b),
                    sc, out, final);
@@ -1189,18 +1343,22 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         {
           ops.push_back(compileTerm(e[i], sc, out, false));
         }
+        else if (q.args[i].sort == Sort::PROOF)
+        {
+          ops.push_back(compileProof(e[i], sc, out));
+        }
         else
         {
           ops.push_back(compileNative(e[i], sc, out, rws));
         }
       }
       emitRewrites(rws, sc, out);
-      std::string code = "k" + q.lname + " n";
+      std::string code = "k" + q.lname + " kfuel";
       std::string prf = "C" + q.lname + " ih " + sc.hI + " " + sc.hG;
       for (size_t i = 0; i < ops.size(); i++)
       {
         code += " " + ops[i];
-        if (q.args[i].sort == Sort::TERM)
+        if (isIdSort(q.args[i].sort))
         {
           prf += " " + memProof(sc.gamma, ops[i]);
         }
@@ -1242,7 +1400,13 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     {
       if (alt.kind == Alt::CASE && hd[i + 1].getKind() == Kind::PARAM)
       {
-        vars[cleanSmtId(str(hd[i + 1]))] = {argNames[i], p.args[i].sort == Sort::TERM};
+        vars[cleanSmtId(str(hd[i + 1]))] = {argNames[i], isIdSort(p.args[i].sort)};
+      }
+      // (pf F): F is the argument itself
+      if (alt.kind == Alt::CASE && p.args[i].sort == Sort::PROOF
+          && hd[i + 1][1].getKind() == Kind::PARAM)
+      {
+        vars[cleanSmtId(str(hd[i + 1][1]))] = {argNames[i], true};
       }
     }
     // constrained positions
@@ -1255,7 +1419,10 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     {
       for (size_t i = 0; i < nargs; i++)
       {
-        if (hd[i + 1].getKind() != Kind::PARAM)
+        bool isVar = hd[i + 1].getKind() == Kind::PARAM
+                     || (p.args[i].sort == Sort::PROOF
+                         && hd[i + 1][1].getKind() == Kind::PARAM);
+        if (!isVar)
         {
           cpos.push_back(i);
         }
@@ -1360,6 +1527,67 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         sp = lp;
         return;
       }
+      if (k == Kind::FUNCTION_TYPE)
+      {
+        // (-> A B) is Apply (Apply FunType A) B
+        auto nameOf = [&](const Expr& c) {
+          return c.getKind() == Kind::PARAM ? cleanSmtId(str(c))
+                                            : "kp" + std::to_string(fresh++);
+        };
+        std::string g = "kp" + std::to_string(fresh++);
+        std::string ft = "kp" + std::to_string(fresh++);
+        std::string na = nameOf(e[0]), nb = nameOf(e[1]);
+        std::string v2 = "v" + std::to_string(vk++);
+        std::string v3 = "v" + std::to_string(vk++);
+        views.push_back(v2);
+        views.push_back(v3);
+        mdef << "σ.app " << x << " fun " << g << " " << nb << " => σ.app " << g << " fun " << ft
+             << " " << na << " => σ.leaf " << ft << " .FunType (";
+        closeParens += ")";
+        std::string wg = "w" + std::to_string(fresh++), wb = "w" + std::to_string(fresh++);
+        std::string wft = "w" + std::to_string(fresh++), wa = "w" + std::to_string(fresh++);
+        someLines.push_back("obtain ⟨" + g + ", " + nb + ", " + v + ", h⟩ := app_some h");
+        someLines.push_back("have " + wg + " := valid_of_view (j := " + g + ") hI " + wx + " " + v
+                            + " (by simp [Node.children])");
+        someLines.push_back("have " + wb + " := valid_of_view (j := " + nb + ") hI " + wx + " " + v
+                            + " (by simp [Node.children])");
+        someLines.push_back("obtain ⟨" + ft + ", " + na + ", " + v2 + ", h⟩ := app_some h");
+        someLines.push_back("have " + wft + " := valid_of_view (j := " + ft + ") hI " + wg + " "
+                            + v2 + " (by simp [Node.children])");
+        someLines.push_back("have " + wa + " := valid_of_view (j := " + na + ") hI " + wg + " "
+                            + v2 + " (by simp [Node.children])");
+        someLines.push_back("obtain ⟨" + v3 + ", h⟩ := leaf_some h");
+        ofViews.push_back("app_of_view " + v);
+        ofViews.push_back("app_of_view " + v2);
+        ofViews.push_back("leaf_of_view " + v3);
+        std::string eg = "e" + std::to_string(fresh++), eb = "e" + std::to_string(fresh++);
+        std::string eft = "e" + std::to_string(fresh++), ea = "e" + std::to_string(fresh++);
+        noneLines.push_back("obtain ⟨" + g + ", " + nb + ", " + v + ", " + eg + ", " + eb
+                            + "⟩ := decode_apply_inv hI " + ex);
+        noneLines.push_back("obtain ⟨" + ft + ", " + na + ", " + v2 + ", " + eft + ", " + ea
+                            + "⟩ := decode_apply_inv hI " + eg);
+        noneLines.push_back("have " + v3 + " := decode_leaf_inv (n := .FunType) (d := σ.decode) hI rfl "
+                            + eft);
+        std::string lpa, spa, lpb, spb;
+        auto child = [&](const Expr& c, const std::string& nm, const std::string& w,
+                         const std::string& ec, std::string& lpc, std::string& spc) {
+          if (c.getKind() == Kind::PARAM)
+          {
+            bound.push_back({nm, "Id", true, w});
+            lpc = nm;
+            spc = "(σ.decode " + nm + ")";
+          }
+          else
+          {
+            walk(c, nm, w, ec, lpc, spc);
+          }
+        };
+        child(e[0], na, wa, ea, lpa, spa);
+        child(e[1], nb, wb, eb, lpb, spb);
+        lp = "(Term.Apply (Term.Apply Term.FunType " + lpa + ") " + lpb + ")";
+        sp = "(Term.Apply (Term.Apply Term.FunType " + spa + ") " + spb + ")";
+        return;
+      }
       std::string cname = "Apply";
       size_t fstart = 0;
       if (k == Kind::APPLY_OPAQUE)
@@ -1399,7 +1627,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       ofViews.push_back(ci.prim + "_of_view " + v);
       // none direction: invert
       std::vector<std::string> eqs;
-      if (ci.prim == "app" || ci.prim == "var")
+      if (ci.prim == "app" || ci.prim == "var" || ci.prim == "dtcAppType")
       {
         std::string e1 = "e" + std::to_string(fresh++);
         std::string e2 = "e" + std::to_string(fresh++);
@@ -1479,7 +1707,8 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         std::string ex = "eq" + std::to_string(i + 1);
         eqHyps.push_back(ex);
         std::string lp, sp;
-        walk(hd[i + 1], argNames[i], argValid[argNames[i]], ex, lp, sp);
+        Expr pat = p.args[i].sort == Sort::PROOF ? hd[i + 1][1] : hd[i + 1];
+        walk(pat, argNames[i], argValid[argNames[i]], ex, lp, sp);
         lpats.push_back(lp);
         spats.push_back(sp);
       }
@@ -1510,7 +1739,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     }
     for (size_t i = 0; i < nargs; i++)
     {
-      if (p.args[i].sort == Sort::TERM)
+      if (isIdSort(p.args[i].sort))
       {
         sl << "\n    (" << argValid[argNames[i]] << " : " << argNames[i] << " < σ.size)";
       }
@@ -1737,7 +1966,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       proof << pin << (cnt == 1 ? "have " : "obtain ") << pat << " := " << mname << "_some hI";
       for (size_t i = 0; i < nargs; i++)
       {
-        if (p.args[i].sort == Sort::TERM)
+        if (isIdSort(p.args[i].sort))
         {
           proof << " " << argValid[argNames[i]];
         }
@@ -1808,7 +2037,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
   {
     codeOut << ", _";
   }
-  codeOut << " => throw .fuel\n  | n + 1";
+  codeOut << " => throw .fuel\n  | kfuel + 1";
   for (const std::string& a : argNames)
   {
     codeOut << ", " << a;
@@ -1825,15 +2054,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
   }
   codeOut << " withStore fun σ =>\n" << kbody.str() << "\n";
   steps << proof.str() << "\n";
-  // fuel 0
-  std::string z = "    " + field + " := fun";
-  z += " _";
-  for (size_t i = 0; i < termArgs.size(); i++)
-  {
-    z += " _";
-  }
-  z += " => by simp only [" + kf + "]; exact Ok.throw";
-  return z;
+  return zero;
 }
 
 void KairosMetaReduce::finalize()
@@ -1864,11 +2085,52 @@ void KairosMetaReduce::finalize()
   {
     analyze(d_progs[n]);
   }
+  // programs over native values only are Logos's own functions to Kairos
   for (const std::string& n : d_names)
   {
-    checkSupported(d_progs[n]);
+    Prog& p = d_progs[n];
+    bool allNative = p.ret.sort == Sort::NATIVE;
+    for (const ArgInfo& a : p.args)
+    {
+      allNative &= (a.sort == Sort::NATIVE);
+    }
+    if (allNative && p.why.empty())
+    {
+      p.pure = true;
+    }
   }
-  // a program calling an unsupported one is unsupported
+  // a program whose types are supported but whose body is not can be
+  // lifted: Logos computes it on decoded arguments
+  auto liftable = [&](const Prog& p) {
+    if (p.ret.sort != Sort::TERM || !p.why.empty())
+    {
+      return false;
+    }
+    for (const ArgInfo& a : p.args)
+    {
+      if (a.sort == Sort::OTHER)
+      {
+        return false;
+      }
+    }
+    return true;
+  };
+  for (const std::string& n : d_names)
+  {
+    Prog& p = d_progs[n];
+    if (p.pure)
+    {
+      continue;
+    }
+    bool typesOk = liftable(p);
+    checkSupported(p);
+    if (!p.supported && typesOk)
+    {
+      p.supported = true;
+      p.lifted = true;
+    }
+  }
+  // a program calling an unsupported one is lifted, or unsupported
   bool changed = true;
   while (changed)
   {
@@ -1876,7 +2138,7 @@ void KairosMetaReduce::finalize()
     for (const std::string& n : d_names)
     {
       Prog& p = d_progs[n];
-      if (!p.supported)
+      if (!p.supported || p.lifted || p.pure)
       {
         continue;
       }
@@ -1885,8 +2147,17 @@ void KairosMetaReduce::finalize()
         auto it = d_progs.find(c);
         if (it == d_progs.end() || !it->second.supported)
         {
-          p.supported = false;
-          p.why = "calls " + c;
+          std::string why = "calls " + c;
+          p.why.clear();
+          if (liftable(p))
+          {
+            p.lifted = true;
+          }
+          else
+          {
+            p.supported = false;
+          }
+          p.why = why;
           changed = true;
           break;
         }
@@ -1928,23 +2199,34 @@ void KairosMetaReduce::finalize()
     {
       allTerms &= (a.sort == Sort::TERM);
     }
-    if (p.recursive && allTerms)
+    if (p.recursive && allTerms && !p.lifted)
     {
       p.cached = true;
       p.pid = pid++;
     }
   }
 
-  std::stringstream matchers, code, specs, calls, steps, sem, zero, succ, skipped;
+  std::stringstream matchers, code, specs, calls, steps, sem, zero, succ, skipped, lifted;
+  size_t npure = 0, nlifted = 0;
   std::vector<std::string> fields;
   size_t nsupp = 0;
   for (const std::string& n : d_names)
   {
     Prog& p = d_progs[n];
+    if (p.pure)
+    {
+      npure++;
+      continue;
+    }
     if (!p.supported)
     {
       skipped << "  " << p.lname << ": " << p.why << "\n";
       continue;
+    }
+    if (p.lifted)
+    {
+      lifted << "  " << p.lname << ": " << p.why << "\n";
+      nlifted++;
     }
     nsupp++;
     zero << emitProgram(p, matchers, code, specs, calls, steps) << "\n";
@@ -1982,14 +2264,16 @@ void KairosMetaReduce::finalize()
   std::stringstream outText;
   outText << "-- This file is auto-generated by scripts/generate.sh (kairos-eoc) from the\n"
           << "-- signature of the pinned Logos. Do not edit.\n"
-          << "import Kairos.Runtime.Prog\n\n"
+          << "import Kairos.Runtime.Lift\n\n"
           << "set_option linter.unusedVariables false\n"
           << "set_option linter.unusedSimpArgs false\n"
 
           << "set_option maxHeartbeats 4000000\n\n"
           << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n"
-          << "/-! Generated " << nsupp << " of " << d_names.size() << " programs. Left out:\n"
-          << skipped.str() << "-/\n\n"
+          << "/-! Generated " << nsupp << " of " << d_names.size() << " programs (" << nlifted
+          << " lifted); " << npure << " over native values are Logos's own. Left out:\n"
+          << skipped.str() << "\nLifted (Logos computes them on decoded arguments):\n"
+          << lifted.str() << "-/\n\n"
           << "/-- Cached programs, by id, with their Logos meaning. -/\n"
           << "def sem : Sem\n" << sem.str() << "  | _, _ => none\n\n"
           << "macro \"kside\" : tactic => `(tactic| all_goals try (kdis; done))\n\n"

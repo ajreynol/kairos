@@ -5,7 +5,8 @@
 #
 # KairosMetaReduce::analyze reproduces LeanMetaReduce::finalizeProgram's case
 # layout (macro arguments, stuck guards, default case), and define/
-# defineProgram reproduce lean-meta's: the generated proofs rewrite with the
+# defineProgram and the constructor's meta-kind registrations reproduce
+# lean-meta's: the generated proofs rewrite with the
 # equation lemmas of Logos's definitions, which that layout numbers. Port any
 # upstream change to them.
 ETHOS_COMMIT=e9b1306d46aaf6ef811adfa4c4e964e2aa94dcdb

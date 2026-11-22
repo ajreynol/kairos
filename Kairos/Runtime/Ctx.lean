@@ -130,6 +130,12 @@ theorem intern_uconst {i : Nat} {T : Id} {U : Term} (hI : Inv sem σ) (hΓ : Ctx
   (intern_sim hI (by simp [Node.children, hΓ.valid hT])).congr
     (by simp [Node.toTerm, hΓ.dec hT])
 
+theorem intern_dtcAppType {a b : Id} {A B : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
+    (ha : Fact.term a A ∈ Γ) (hb : Fact.term b B ∈ Γ) :
+    Sim sem σ (intern (.DtcAppType a b)) (.DtcAppType A B) :=
+  (intern_sim hI (by simp [Node.children, hΓ.valid ha, hΓ.valid hb])).congr
+    (by simp [Node.toTerm, hΓ.dec ha, hΓ.dec hb])
+
 /-- A cached program: the cache is sound for `sem`, so a hit is correct. -/
 theorem cached_ctx {p : Nat} {args : List Id} {body : K Id} {t : Term}
     (hI : Inv sem σ) (hargs : ∀ a ∈ args, a < σ.size)

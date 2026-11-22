@@ -67,6 +67,35 @@ hands its parts to the rest of the matcher. They inline to nested matches. -/
   | .UConst i T => k i T
   | _ => none
 
+@[inline] def datatypeType {α : Type} (σ : Store) (x : Id)
+    (k : List Nat → DatatypeDecl → Option α) : Option α :=
+  match σ.view x with
+  | .DatatypeType s dd => k s dd
+  | _ => none
+
+@[inline] def datatypeTypeRef {α : Type} (σ : Store) (x : Id) (k : List Nat → Option α) :
+    Option α :=
+  match σ.view x with
+  | .DatatypeTypeRef s => k s
+  | _ => none
+
+@[inline] def dtCons {α : Type} (σ : Store) (x : Id)
+    (k : List Nat → DatatypeDecl → Nat → Option α) : Option α :=
+  match σ.view x with
+  | .DtCons s dd i => k s dd i
+  | _ => none
+
+@[inline] def dtSel {α : Type} (σ : Store) (x : Id)
+    (k : List Nat → DatatypeDecl → Nat → Nat → Option α) : Option α :=
+  match σ.view x with
+  | .DtSel s dd i j => k s dd i j
+  | _ => none
+
+@[inline] def dtcAppType {α : Type} (σ : Store) (x : Id) (k : Id → Id → Option α) : Option α :=
+  match σ.view x with
+  | .DtcAppType a b => k a b
+  | _ => none
+
 /-- The `Stuck` pattern, which is id 0. -/
 @[inline] def stuck {α : Type} (x : Id) (k : Option α) : Option α :=
   if x = 0 then k else none
@@ -161,6 +190,38 @@ theorem uconst_some {α : Type} {x : Id} {k : Nat → Id → Option α} {r : α}
   · rename_i i T hv; exact ⟨i, T, hv, h⟩
   · simp at h
 
+theorem datatypeType_some {α : Type} {x : Id} {k : List Nat → DatatypeDecl → Option α} {r : α}
+    (h : σ.datatypeType x k = some r) :
+    ∃ s dd, σ.view x = .DatatypeType s dd ∧ k s dd = some r := by
+  unfold datatypeType at h; split at h
+  · rename_i s dd hv; exact ⟨s, dd, hv, h⟩
+  · simp at h
+
+theorem datatypeTypeRef_some {α : Type} {x : Id} {k : List Nat → Option α} {r : α}
+    (h : σ.datatypeTypeRef x k = some r) : ∃ s, σ.view x = .DatatypeTypeRef s ∧ k s = some r := by
+  unfold datatypeTypeRef at h; split at h
+  · rename_i s hv; exact ⟨s, hv, h⟩
+  · simp at h
+
+theorem dtCons_some {α : Type} {x : Id} {k : List Nat → DatatypeDecl → Nat → Option α} {r : α}
+    (h : σ.dtCons x k = some r) : ∃ s dd i, σ.view x = .DtCons s dd i ∧ k s dd i = some r := by
+  unfold dtCons at h; split at h
+  · rename_i s dd i hv; exact ⟨s, dd, i, hv, h⟩
+  · simp at h
+
+theorem dtSel_some {α : Type} {x : Id} {k : List Nat → DatatypeDecl → Nat → Nat → Option α}
+    {r : α} (h : σ.dtSel x k = some r) :
+    ∃ s dd i j, σ.view x = .DtSel s dd i j ∧ k s dd i j = some r := by
+  unfold dtSel at h; split at h
+  · rename_i s dd i j hv; exact ⟨s, dd, i, j, hv, h⟩
+  · simp at h
+
+theorem dtcAppType_some {α : Type} {x : Id} {k : Id → Id → Option α} {r : α}
+    (h : σ.dtcAppType x k = some r) : ∃ a b, σ.view x = .DtcAppType a b ∧ k a b = some r := by
+  unfold dtcAppType at h; split at h
+  · rename_i a b hv; exact ⟨a, b, hv, h⟩
+  · simp at h
+
 theorem stuck_some {α : Type} {x : Id} {k : Option α} {r : α}
     (h : Store.stuck x k = some r) : x = 0 ∧ k = some r := by
   unfold Store.stuck at h; split at h
@@ -198,6 +259,25 @@ theorem usort_of_view {α : Type} {x : Id} {i : Nat} {k : Nat → Option α}
 
 theorem uconst_of_view {α : Type} {x T : Id} {i : Nat} {k : Nat → Id → Option α}
     (hv : σ.view x = .UConst i T) : σ.uconst x k = k i T := by simp [uconst, hv]
+
+theorem datatypeType_of_view {α : Type} {x : Id} {s : List Nat} {dd : DatatypeDecl}
+    {k : List Nat → DatatypeDecl → Option α} (hv : σ.view x = .DatatypeType s dd) :
+    σ.datatypeType x k = k s dd := by simp [datatypeType, hv]
+
+theorem datatypeTypeRef_of_view {α : Type} {x : Id} {s : List Nat} {k : List Nat → Option α}
+    (hv : σ.view x = .DatatypeTypeRef s) : σ.datatypeTypeRef x k = k s := by
+  simp [datatypeTypeRef, hv]
+
+theorem dtCons_of_view {α : Type} {x : Id} {s : List Nat} {dd : DatatypeDecl} {i : Nat}
+    {k : List Nat → DatatypeDecl → Nat → Option α} (hv : σ.view x = .DtCons s dd i) :
+    σ.dtCons x k = k s dd i := by simp [dtCons, hv]
+
+theorem dtSel_of_view {α : Type} {x : Id} {s : List Nat} {dd : DatatypeDecl} {i j : Nat}
+    {k : List Nat → DatatypeDecl → Nat → Nat → Option α} (hv : σ.view x = .DtSel s dd i j) :
+    σ.dtSel x k = k s dd i j := by simp [dtSel, hv]
+
+theorem dtcAppType_of_view {α : Type} {x a b : Id} {k : Id → Id → Option α}
+    (hv : σ.view x = .DtcAppType a b) : σ.dtcAppType x k = k a b := by simp [dtcAppType, hv]
 
 theorem stuck_of_zero {α : Type} {k : Option α} : Store.stuck 0 k = k := by simp [Store.stuck]
 
@@ -266,6 +346,37 @@ theorem decode_uconst_inv (hI : Inv sem σ) {x : Id} {i : Nat} {T : Term}
   cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
   obtain ⟨rfl, h⟩ := h
   exact ⟨_, rfl, h⟩
+
+theorem decode_datatypeType_inv (hI : Inv sem σ) {x : Id} {s : List Nat} {dd : DatatypeDecl}
+    (h : σ.decode x = .DatatypeType s dd) : σ.view x = .DatatypeType s dd := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_datatypeTypeRef_inv (hI : Inv sem σ) {x : Id} {s : List Nat}
+    (h : σ.decode x = .DatatypeTypeRef s) : σ.view x = .DatatypeTypeRef s := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_dtCons_inv (hI : Inv sem σ) {x : Id} {s : List Nat} {dd : DatatypeDecl} {i : Nat}
+    (h : σ.decode x = .DtCons s dd i) : σ.view x = .DtCons s dd i := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_dtSel_inv (hI : Inv sem σ) {x : Id} {s : List Nat} {dd : DatatypeDecl} {i j : Nat}
+    (h : σ.decode x = .DtSel s dd i j) : σ.view x = .DtSel s dd i j := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_dtcAppType_inv (hI : Inv sem σ) {x : Id} {A B : Term}
+    (h : σ.decode x = .DtcAppType A B) :
+    ∃ a b, σ.view x = .DtcAppType a b ∧ σ.decode a = A ∧ σ.decode b = B := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  exact ⟨_, _, rfl, h.1, h.2⟩
 
 theorem decode_stuck_inv (hI : Inv sem σ) {x : Id} (hx : x < σ.size)
     (h : σ.decode x = .Stuck) : x = 0 :=

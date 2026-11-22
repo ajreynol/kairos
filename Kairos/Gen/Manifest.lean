@@ -5,11 +5,13 @@ namespace Kairos.Gen
 
 /-- Declarations of the compiled signature, counted by meta-kind. -/
 def declKinds : List (String × Nat) := [
-  ("CHECKER_EMBED", 12)
+  ("CHECKER_CMD", 4)
+, ("CHECKER_EMBED", 12)
+, ("CHECKER_RULE", 5)
 , ("EO_EMBED", 6)
-, ("EUNOIA", 45)
+, ("EUNOIA", 32)
 , ("SMT", 18)
-, ("SMT_BUILTIN", 15)
+, ("SMT_BUILTIN", 19)
 , ("SMT_EMBED", 16)
 , ("SMT_MAP", 2)
 , ("SMT_SEQ", 2)
@@ -19,7 +21,7 @@ def declKinds : List (String × Nat) := [
 
 /-- Programs of the compiled signature, with their number of cases. -/
 def programs : List (String × Nat) := [
-  ("generated", 27)
+  ("generated", 36)
 , ("total", 57)
 ]
 

@@ -44,6 +44,8 @@ class KairosMetaReduce : public MetaReducePlugin
   enum class Sort
   {
     TERM,
+    /** A Logos `Proof`; in Kairos, the id of its formula. */
+    PROOF,
     NATIVE,
     OTHER
   };
@@ -88,6 +90,10 @@ class KairosMetaReduce : public MetaReducePlugin
     bool recursive = false;
     bool cached = false;
     size_t pid = 0;
+    /** Over native values only: Kairos calls Logos's function. */
+    bool pure = false;
+    /** Not compiled yet: Kairos runs Logos's function on decoded arguments. */
+    bool lifted = false;
   };
 
  protected:
