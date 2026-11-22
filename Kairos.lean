@@ -1,0 +1,1 @@
+import Kairos.Gen.Manifest

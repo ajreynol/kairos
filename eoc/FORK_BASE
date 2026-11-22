@@ -1,0 +1,9 @@
+# The upstream files Kairos's stage is forked from, and the Ethos commit they
+# were taken at. scripts/fork-drift.sh diffs them between this commit and the
+# Ethos commit the current Logos pin uses, so that upstream changes can be
+# reviewed and ported. Update this file when a port is done.
+#
+# Milestone 1: the stage is still a stub; the fork itself lands in milestone 2.
+ETHOS_COMMIT=e9b1306d46aaf6ef811adfa4c4e964e2aa94dcdb
+plugins/lean_meta/lean_meta_reduce.cpp 662ed42c4fa3b340c6ad74acc71856fa998bb114ceed14ff3d9ca1412d2fad90
+plugins/lean_meta/lean_meta_reduce.h 7ad5a592655cc9e3d98f8a52ddfa8f92b288309abb62213ca99e57e56fe31d1f
