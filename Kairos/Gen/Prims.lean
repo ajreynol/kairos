@@ -7,508 +7,94 @@ set_option linter.unusedVariables false
 namespace Kairos
 open Eo Store SmtEval
 
-variable {sem : Sem} {σ : Store} {Γ : List Fact}
-
 @[inline] def Store.m_UOp {α : Type} (σ : Store) (x : Id) (k : UserOp → Option α) : Option α :=
   match σ.view x with
   | .UOp f1 => k f1
   | _ => none
-
-theorem m_UOp_some {α : Type} {x : Id} {k : UserOp → Option α} {r : α}
-    (h : σ.m_UOp x k = some r) : ∃ f1, σ.view x = .UOp f1 ∧ k f1 = some r := by
-  unfold Store.m_UOp at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_UOp_of_view {α : Type} {x : Id} {f1 : UserOp} {k : UserOp → Option α}
-    (hv : σ.view x = .UOp f1) : σ.m_UOp x k = k f1 := by
-  simp [Store.m_UOp, hv]
-
-theorem decode_UOp_inv (hI : Inv sem σ) {x : Id} {F1 : UserOp}
-    (h : σ.decode x = .UOp F1) :
-    σ.view x = .UOp F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.UOp.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
 
 @[inline] def Store.m_UOp1 {α : Type} (σ : Store) (x : Id) (k : UserOp1 → Id → Option α) : Option α :=
   match σ.view x with
   | .UOp1 f1 f2 => k f1 f2
   | _ => none
 
-theorem m_UOp1_some {α : Type} {x : Id} {k : UserOp1 → Id → Option α} {r : α}
-    (h : σ.m_UOp1 x k = some r) : ∃ f1 f2, σ.view x = .UOp1 f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_UOp1 at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_UOp1_of_view {α : Type} {x : Id} {f1 : UserOp1} {f2 : Id} {k : UserOp1 → Id → Option α}
-    (hv : σ.view x = .UOp1 f1 f2) : σ.m_UOp1 x k = k f1 f2 := by
-  simp [Store.m_UOp1, hv]
-
-theorem decode_UOp1_inv (hI : Inv sem σ) {x : Id} {F1 : UserOp1} {F2 : Term}
-    (h : σ.decode x = .UOp1 F1 F2) :
-    ∃ f2, σ.view x = .UOp1 F1 f2 ∧ σ.decode f2 = F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.UOp1.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  subst e1
-  exact ⟨f2, rfl, e2⟩
-
-theorem intern_UOp1 (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : UserOp1} {f2 : Id} {F2 : Term}
-    (p2 : Fact.term f2 F2 ∈ Γ) :
-    Sim sem σ (intern (.UOp1 f1 f2)) (.UOp1 f1 F2) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p2])).congr
-    (by simp [Node.toTerm, hΓ.dec p2])
-
 @[inline] def Store.m_UOp2 {α : Type} (σ : Store) (x : Id) (k : UserOp2 → Id → Id → Option α) : Option α :=
   match σ.view x with
   | .UOp2 f1 f2 f3 => k f1 f2 f3
   | _ => none
-
-theorem m_UOp2_some {α : Type} {x : Id} {k : UserOp2 → Id → Id → Option α} {r : α}
-    (h : σ.m_UOp2 x k = some r) : ∃ f1 f2 f3, σ.view x = .UOp2 f1 f2 f3 ∧ k f1 f2 f3 = some r := by
-  unfold Store.m_UOp2 at h; split at h
-  · rename_i f1 f2 f3 hv; exact ⟨f1, f2, f3, hv, h⟩
-  · simp at h
-
-theorem m_UOp2_of_view {α : Type} {x : Id} {f1 : UserOp2} {f2 : Id} {f3 : Id} {k : UserOp2 → Id → Id → Option α}
-    (hv : σ.view x = .UOp2 f1 f2 f3) : σ.m_UOp2 x k = k f1 f2 f3 := by
-  simp [Store.m_UOp2, hv]
-
-theorem decode_UOp2_inv (hI : Inv sem σ) {x : Id} {F1 : UserOp2} {F2 : Term} {F3 : Term}
-    (h : σ.decode x = .UOp2 F1 F2 F3) :
-    ∃ f2 f3, σ.view x = .UOp2 F1 f2 f3 ∧ σ.decode f2 = F2 ∧ σ.decode f3 = F3 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.UOp2.injEq] at h
-  rename_i f1 f2 f3
-  obtain ⟨e1, e2, e3⟩ := h
-  subst e1
-  exact ⟨f2, f3, rfl, e2, e3⟩
-
-theorem intern_UOp2 (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : UserOp2} {f2 : Id} {F2 : Term} {f3 : Id} {F3 : Term}
-    (p2 : Fact.term f2 F2 ∈ Γ)
-    (p3 : Fact.term f3 F3 ∈ Γ) :
-    Sim sem σ (intern (.UOp2 f1 f2 f3)) (.UOp2 f1 F2 F3) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p2, hΓ.valid p3])).congr
-    (by simp [Node.toTerm, hΓ.dec p2, hΓ.dec p3])
 
 @[inline] def Store.m_UOp3 {α : Type} (σ : Store) (x : Id) (k : UserOp3 → Id → Id → Id → Option α) : Option α :=
   match σ.view x with
   | .UOp3 f1 f2 f3 f4 => k f1 f2 f3 f4
   | _ => none
 
-theorem m_UOp3_some {α : Type} {x : Id} {k : UserOp3 → Id → Id → Id → Option α} {r : α}
-    (h : σ.m_UOp3 x k = some r) : ∃ f1 f2 f3 f4, σ.view x = .UOp3 f1 f2 f3 f4 ∧ k f1 f2 f3 f4 = some r := by
-  unfold Store.m_UOp3 at h; split at h
-  · rename_i f1 f2 f3 f4 hv; exact ⟨f1, f2, f3, f4, hv, h⟩
-  · simp at h
-
-theorem m_UOp3_of_view {α : Type} {x : Id} {f1 : UserOp3} {f2 : Id} {f3 : Id} {f4 : Id} {k : UserOp3 → Id → Id → Id → Option α}
-    (hv : σ.view x = .UOp3 f1 f2 f3 f4) : σ.m_UOp3 x k = k f1 f2 f3 f4 := by
-  simp [Store.m_UOp3, hv]
-
-theorem decode_UOp3_inv (hI : Inv sem σ) {x : Id} {F1 : UserOp3} {F2 : Term} {F3 : Term} {F4 : Term}
-    (h : σ.decode x = .UOp3 F1 F2 F3 F4) :
-    ∃ f2 f3 f4, σ.view x = .UOp3 F1 f2 f3 f4 ∧ σ.decode f2 = F2 ∧ σ.decode f3 = F3 ∧ σ.decode f4 = F4 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.UOp3.injEq] at h
-  rename_i f1 f2 f3 f4
-  obtain ⟨e1, e2, e3, e4⟩ := h
-  subst e1
-  exact ⟨f2, f3, f4, rfl, e2, e3, e4⟩
-
-theorem intern_UOp3 (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : UserOp3} {f2 : Id} {F2 : Term} {f3 : Id} {F3 : Term} {f4 : Id} {F4 : Term}
-    (p2 : Fact.term f2 F2 ∈ Γ)
-    (p3 : Fact.term f3 F3 ∈ Γ)
-    (p4 : Fact.term f4 F4 ∈ Γ) :
-    Sim sem σ (intern (.UOp3 f1 f2 f3 f4)) (.UOp3 f1 F2 F3 F4) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p2, hΓ.valid p3, hΓ.valid p4])).congr
-    (by simp [Node.toTerm, hΓ.dec p2, hΓ.dec p3, hΓ.dec p4])
-
 @[inline] def Store.m_Boolean {α : Type} (σ : Store) (x : Id) (k : native_Bool → Option α) : Option α :=
   match σ.view x with
   | .Boolean f1 => k f1
   | _ => none
-
-theorem m_Boolean_some {α : Type} {x : Id} {k : native_Bool → Option α} {r : α}
-    (h : σ.m_Boolean x k = some r) : ∃ f1, σ.view x = .Boolean f1 ∧ k f1 = some r := by
-  unfold Store.m_Boolean at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_Boolean_of_view {α : Type} {x : Id} {f1 : native_Bool} {k : native_Bool → Option α}
-    (hv : σ.view x = .Boolean f1) : σ.m_Boolean x k = k f1 := by
-  simp [Store.m_Boolean, hv]
-
-theorem decode_Boolean_inv (hI : Inv sem σ) {x : Id} {F1 : native_Bool}
-    (h : σ.decode x = .Boolean F1) :
-    σ.view x = .Boolean F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.Boolean.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
 
 @[inline] def Store.m_Numeral {α : Type} (σ : Store) (x : Id) (k : native_Int → Option α) : Option α :=
   match σ.view x with
   | .Numeral f1 => k f1
   | _ => none
 
-theorem m_Numeral_some {α : Type} {x : Id} {k : native_Int → Option α} {r : α}
-    (h : σ.m_Numeral x k = some r) : ∃ f1, σ.view x = .Numeral f1 ∧ k f1 = some r := by
-  unfold Store.m_Numeral at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_Numeral_of_view {α : Type} {x : Id} {f1 : native_Int} {k : native_Int → Option α}
-    (hv : σ.view x = .Numeral f1) : σ.m_Numeral x k = k f1 := by
-  simp [Store.m_Numeral, hv]
-
-theorem decode_Numeral_inv (hI : Inv sem σ) {x : Id} {F1 : native_Int}
-    (h : σ.decode x = .Numeral F1) :
-    σ.view x = .Numeral F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.Numeral.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
-
 @[inline] def Store.m_Rational {α : Type} (σ : Store) (x : Id) (k : native_Rat → Option α) : Option α :=
   match σ.view x with
   | .Rational f1 => k f1
   | _ => none
-
-theorem m_Rational_some {α : Type} {x : Id} {k : native_Rat → Option α} {r : α}
-    (h : σ.m_Rational x k = some r) : ∃ f1, σ.view x = .Rational f1 ∧ k f1 = some r := by
-  unfold Store.m_Rational at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_Rational_of_view {α : Type} {x : Id} {f1 : native_Rat} {k : native_Rat → Option α}
-    (hv : σ.view x = .Rational f1) : σ.m_Rational x k = k f1 := by
-  simp [Store.m_Rational, hv]
-
-theorem decode_Rational_inv (hI : Inv sem σ) {x : Id} {F1 : native_Rat}
-    (h : σ.decode x = .Rational F1) :
-    σ.view x = .Rational F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.Rational.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
 
 @[inline] def Store.m_String {α : Type} (σ : Store) (x : Id) (k : native_String → Option α) : Option α :=
   match σ.view x with
   | .String f1 => k f1
   | _ => none
 
-theorem m_String_some {α : Type} {x : Id} {k : native_String → Option α} {r : α}
-    (h : σ.m_String x k = some r) : ∃ f1, σ.view x = .String f1 ∧ k f1 = some r := by
-  unfold Store.m_String at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_String_of_view {α : Type} {x : Id} {f1 : native_String} {k : native_String → Option α}
-    (hv : σ.view x = .String f1) : σ.m_String x k = k f1 := by
-  simp [Store.m_String, hv]
-
-theorem decode_String_inv (hI : Inv sem σ) {x : Id} {F1 : native_String}
-    (h : σ.decode x = .String F1) :
-    σ.view x = .String F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.String.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
-
 @[inline] def Store.m_Binary {α : Type} (σ : Store) (x : Id) (k : native_Int → native_Int → Option α) : Option α :=
   match σ.view x with
   | .Binary f1 f2 => k f1 f2
   | _ => none
-
-theorem m_Binary_some {α : Type} {x : Id} {k : native_Int → native_Int → Option α} {r : α}
-    (h : σ.m_Binary x k = some r) : ∃ f1 f2, σ.view x = .Binary f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_Binary at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_Binary_of_view {α : Type} {x : Id} {f1 : native_Int} {f2 : native_Int} {k : native_Int → native_Int → Option α}
-    (hv : σ.view x = .Binary f1 f2) : σ.m_Binary x k = k f1 f2 := by
-  simp [Store.m_Binary, hv]
-
-theorem decode_Binary_inv (hI : Inv sem σ) {x : Id} {F1 : native_Int} {F2 : native_Int}
-    (h : σ.decode x = .Binary F1 F2) :
-    σ.view x = .Binary F1 F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.Binary.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  subst e1
-  subst e2
-  exact rfl
 
 @[inline] def Store.m_Apply {α : Type} (σ : Store) (x : Id) (k : Id → Id → Option α) : Option α :=
   match σ.view x with
   | .Apply f1 f2 => k f1 f2
   | _ => none
 
-theorem m_Apply_some {α : Type} {x : Id} {k : Id → Id → Option α} {r : α}
-    (h : σ.m_Apply x k = some r) : ∃ f1 f2, σ.view x = .Apply f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_Apply at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_Apply_of_view {α : Type} {x : Id} {f1 : Id} {f2 : Id} {k : Id → Id → Option α}
-    (hv : σ.view x = .Apply f1 f2) : σ.m_Apply x k = k f1 f2 := by
-  simp [Store.m_Apply, hv]
-
-theorem decode_Apply_inv (hI : Inv sem σ) {x : Id} {F1 : Term} {F2 : Term}
-    (h : σ.decode x = .Apply F1 F2) :
-    ∃ f1 f2, σ.view x = .Apply f1 f2 ∧ σ.decode f1 = F1 ∧ σ.decode f2 = F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.Apply.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  exact ⟨f1, f2, rfl, e1, e2⟩
-
-theorem intern_Apply (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : Id} {F1 : Term} {f2 : Id} {F2 : Term}
-    (p1 : Fact.term f1 F1 ∈ Γ)
-    (p2 : Fact.term f2 F2 ∈ Γ) :
-    Sim sem σ (intern (.Apply f1 f2)) (.Apply F1 F2) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p1, hΓ.valid p2])).congr
-    (by simp [Node.toTerm, hΓ.dec p1, hΓ.dec p2])
-
 @[inline] def Store.m_Var {α : Type} (σ : Store) (x : Id) (k : Id → Id → Option α) : Option α :=
   match σ.view x with
   | .Var f1 f2 => k f1 f2
   | _ => none
-
-theorem m_Var_some {α : Type} {x : Id} {k : Id → Id → Option α} {r : α}
-    (h : σ.m_Var x k = some r) : ∃ f1 f2, σ.view x = .Var f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_Var at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_Var_of_view {α : Type} {x : Id} {f1 : Id} {f2 : Id} {k : Id → Id → Option α}
-    (hv : σ.view x = .Var f1 f2) : σ.m_Var x k = k f1 f2 := by
-  simp [Store.m_Var, hv]
-
-theorem decode_Var_inv (hI : Inv sem σ) {x : Id} {F1 : Term} {F2 : Term}
-    (h : σ.decode x = .Var F1 F2) :
-    ∃ f1 f2, σ.view x = .Var f1 f2 ∧ σ.decode f1 = F1 ∧ σ.decode f2 = F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.Var.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  exact ⟨f1, f2, rfl, e1, e2⟩
-
-theorem intern_Var (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : Id} {F1 : Term} {f2 : Id} {F2 : Term}
-    (p1 : Fact.term f1 F1 ∈ Γ)
-    (p2 : Fact.term f2 F2 ∈ Γ) :
-    Sim sem σ (intern (.Var f1 f2)) (.Var F1 F2) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p1, hΓ.valid p2])).congr
-    (by simp [Node.toTerm, hΓ.dec p1, hΓ.dec p2])
 
 @[inline] def Store.m_DatatypeType {α : Type} (σ : Store) (x : Id) (k : native_String → DatatypeDecl → Option α) : Option α :=
   match σ.view x with
   | .DatatypeType f1 f2 => k f1 f2
   | _ => none
 
-theorem m_DatatypeType_some {α : Type} {x : Id} {k : native_String → DatatypeDecl → Option α} {r : α}
-    (h : σ.m_DatatypeType x k = some r) : ∃ f1 f2, σ.view x = .DatatypeType f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_DatatypeType at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_DatatypeType_of_view {α : Type} {x : Id} {f1 : native_String} {f2 : DatatypeDecl} {k : native_String → DatatypeDecl → Option α}
-    (hv : σ.view x = .DatatypeType f1 f2) : σ.m_DatatypeType x k = k f1 f2 := by
-  simp [Store.m_DatatypeType, hv]
-
-theorem decode_DatatypeType_inv (hI : Inv sem σ) {x : Id} {F1 : native_String} {F2 : DatatypeDecl}
-    (h : σ.decode x = .DatatypeType F1 F2) :
-    σ.view x = .DatatypeType F1 F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.DatatypeType.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  subst e1
-  subst e2
-  exact rfl
-
 @[inline] def Store.m_DatatypeTypeRef {α : Type} (σ : Store) (x : Id) (k : native_String → Option α) : Option α :=
   match σ.view x with
   | .DatatypeTypeRef f1 => k f1
   | _ => none
-
-theorem m_DatatypeTypeRef_some {α : Type} {x : Id} {k : native_String → Option α} {r : α}
-    (h : σ.m_DatatypeTypeRef x k = some r) : ∃ f1, σ.view x = .DatatypeTypeRef f1 ∧ k f1 = some r := by
-  unfold Store.m_DatatypeTypeRef at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_DatatypeTypeRef_of_view {α : Type} {x : Id} {f1 : native_String} {k : native_String → Option α}
-    (hv : σ.view x = .DatatypeTypeRef f1) : σ.m_DatatypeTypeRef x k = k f1 := by
-  simp [Store.m_DatatypeTypeRef, hv]
-
-theorem decode_DatatypeTypeRef_inv (hI : Inv sem σ) {x : Id} {F1 : native_String}
-    (h : σ.decode x = .DatatypeTypeRef F1) :
-    σ.view x = .DatatypeTypeRef F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.DatatypeTypeRef.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
 
 @[inline] def Store.m_DtcAppType {α : Type} (σ : Store) (x : Id) (k : Id → Id → Option α) : Option α :=
   match σ.view x with
   | .DtcAppType f1 f2 => k f1 f2
   | _ => none
 
-theorem m_DtcAppType_some {α : Type} {x : Id} {k : Id → Id → Option α} {r : α}
-    (h : σ.m_DtcAppType x k = some r) : ∃ f1 f2, σ.view x = .DtcAppType f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_DtcAppType at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_DtcAppType_of_view {α : Type} {x : Id} {f1 : Id} {f2 : Id} {k : Id → Id → Option α}
-    (hv : σ.view x = .DtcAppType f1 f2) : σ.m_DtcAppType x k = k f1 f2 := by
-  simp [Store.m_DtcAppType, hv]
-
-theorem decode_DtcAppType_inv (hI : Inv sem σ) {x : Id} {F1 : Term} {F2 : Term}
-    (h : σ.decode x = .DtcAppType F1 F2) :
-    ∃ f1 f2, σ.view x = .DtcAppType f1 f2 ∧ σ.decode f1 = F1 ∧ σ.decode f2 = F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.DtcAppType.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  exact ⟨f1, f2, rfl, e1, e2⟩
-
-theorem intern_DtcAppType (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : Id} {F1 : Term} {f2 : Id} {F2 : Term}
-    (p1 : Fact.term f1 F1 ∈ Γ)
-    (p2 : Fact.term f2 F2 ∈ Γ) :
-    Sim sem σ (intern (.DtcAppType f1 f2)) (.DtcAppType F1 F2) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p1, hΓ.valid p2])).congr
-    (by simp [Node.toTerm, hΓ.dec p1, hΓ.dec p2])
-
 @[inline] def Store.m_DtCons {α : Type} (σ : Store) (x : Id) (k : native_String → DatatypeDecl → native_Nat → Option α) : Option α :=
   match σ.view x with
   | .DtCons f1 f2 f3 => k f1 f2 f3
   | _ => none
-
-theorem m_DtCons_some {α : Type} {x : Id} {k : native_String → DatatypeDecl → native_Nat → Option α} {r : α}
-    (h : σ.m_DtCons x k = some r) : ∃ f1 f2 f3, σ.view x = .DtCons f1 f2 f3 ∧ k f1 f2 f3 = some r := by
-  unfold Store.m_DtCons at h; split at h
-  · rename_i f1 f2 f3 hv; exact ⟨f1, f2, f3, hv, h⟩
-  · simp at h
-
-theorem m_DtCons_of_view {α : Type} {x : Id} {f1 : native_String} {f2 : DatatypeDecl} {f3 : native_Nat} {k : native_String → DatatypeDecl → native_Nat → Option α}
-    (hv : σ.view x = .DtCons f1 f2 f3) : σ.m_DtCons x k = k f1 f2 f3 := by
-  simp [Store.m_DtCons, hv]
-
-theorem decode_DtCons_inv (hI : Inv sem σ) {x : Id} {F1 : native_String} {F2 : DatatypeDecl} {F3 : native_Nat}
-    (h : σ.decode x = .DtCons F1 F2 F3) :
-    σ.view x = .DtCons F1 F2 F3 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.DtCons.injEq] at h
-  rename_i f1 f2 f3
-  obtain ⟨e1, e2, e3⟩ := h
-  subst e1
-  subst e2
-  subst e3
-  exact rfl
 
 @[inline] def Store.m_DtSel {α : Type} (σ : Store) (x : Id) (k : native_String → DatatypeDecl → native_Nat → native_Nat → Option α) : Option α :=
   match σ.view x with
   | .DtSel f1 f2 f3 f4 => k f1 f2 f3 f4
   | _ => none
 
-theorem m_DtSel_some {α : Type} {x : Id} {k : native_String → DatatypeDecl → native_Nat → native_Nat → Option α} {r : α}
-    (h : σ.m_DtSel x k = some r) : ∃ f1 f2 f3 f4, σ.view x = .DtSel f1 f2 f3 f4 ∧ k f1 f2 f3 f4 = some r := by
-  unfold Store.m_DtSel at h; split at h
-  · rename_i f1 f2 f3 f4 hv; exact ⟨f1, f2, f3, f4, hv, h⟩
-  · simp at h
-
-theorem m_DtSel_of_view {α : Type} {x : Id} {f1 : native_String} {f2 : DatatypeDecl} {f3 : native_Nat} {f4 : native_Nat} {k : native_String → DatatypeDecl → native_Nat → native_Nat → Option α}
-    (hv : σ.view x = .DtSel f1 f2 f3 f4) : σ.m_DtSel x k = k f1 f2 f3 f4 := by
-  simp [Store.m_DtSel, hv]
-
-theorem decode_DtSel_inv (hI : Inv sem σ) {x : Id} {F1 : native_String} {F2 : DatatypeDecl} {F3 : native_Nat} {F4 : native_Nat}
-    (h : σ.decode x = .DtSel F1 F2 F3 F4) :
-    σ.view x = .DtSel F1 F2 F3 F4 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.DtSel.injEq] at h
-  rename_i f1 f2 f3 f4
-  obtain ⟨e1, e2, e3, e4⟩ := h
-  subst e1
-  subst e2
-  subst e3
-  subst e4
-  exact rfl
-
 @[inline] def Store.m_USort {α : Type} (σ : Store) (x : Id) (k : native_Nat → Option α) : Option α :=
   match σ.view x with
   | .USort f1 => k f1
   | _ => none
 
-theorem m_USort_some {α : Type} {x : Id} {k : native_Nat → Option α} {r : α}
-    (h : σ.m_USort x k = some r) : ∃ f1, σ.view x = .USort f1 ∧ k f1 = some r := by
-  unfold Store.m_USort at h; split at h
-  · rename_i f1 hv; exact ⟨f1, hv, h⟩
-  · simp at h
-
-theorem m_USort_of_view {α : Type} {x : Id} {f1 : native_Nat} {k : native_Nat → Option α}
-    (hv : σ.view x = .USort f1) : σ.m_USort x k = k f1 := by
-  simp [Store.m_USort, hv]
-
-theorem decode_USort_inv (hI : Inv sem σ) {x : Id} {F1 : native_Nat}
-    (h : σ.decode x = .USort F1) :
-    σ.view x = .USort F1 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.USort.injEq] at h
-  rename_i f1
-  have e1 := h
-  subst e1
-  exact rfl
-
 @[inline] def Store.m_UConst {α : Type} (σ : Store) (x : Id) (k : native_Nat → Id → Option α) : Option α :=
   match σ.view x with
   | .UConst f1 f2 => k f1 f2
   | _ => none
-
-theorem m_UConst_some {α : Type} {x : Id} {k : native_Nat → Id → Option α} {r : α}
-    (h : σ.m_UConst x k = some r) : ∃ f1 f2, σ.view x = .UConst f1 f2 ∧ k f1 f2 = some r := by
-  unfold Store.m_UConst at h; split at h
-  · rename_i f1 f2 hv; exact ⟨f1, f2, hv, h⟩
-  · simp at h
-
-theorem m_UConst_of_view {α : Type} {x : Id} {f1 : native_Nat} {f2 : Id} {k : native_Nat → Id → Option α}
-    (hv : σ.view x = .UConst f1 f2) : σ.m_UConst x k = k f1 f2 := by
-  simp [Store.m_UConst, hv]
-
-theorem decode_UConst_inv (hI : Inv sem σ) {x : Id} {F1 : native_Nat} {F2 : Term}
-    (h : σ.decode x = .UConst F1 F2) :
-    ∃ f2, σ.view x = .UConst F1 f2 ∧ σ.decode f2 = F2 := by
-  rw [decode_view' hI x] at h
-  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term.UConst.injEq] at h
-  rename_i f1 f2
-  obtain ⟨e1, e2⟩ := h
-  subst e1
-  exact ⟨f2, rfl, e2⟩
-
-theorem intern_UConst (hI : Inv sem σ) (hΓ : Ctx σ Γ) {f1 : native_Nat} {f2 : Id} {F2 : Term}
-    (p2 : Fact.term f2 F2 ∈ Γ) :
-    Sim sem σ (intern (.UConst f1 f2)) (.UConst f1 F2) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid p2])).congr
-    (by simp [Node.toTerm, hΓ.dec p2])
 
 end Kairos

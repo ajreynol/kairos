@@ -88,16 +88,6 @@ def toTerm (d : Id → Term) : Node → Term
   | .USort f1 => .USort f1
   | .UConst f1 f2 => .UConst f1 (d f2)
 
-theorem toTerm_congr {d d' : Id → Term} (n : Node)
-    (h : ∀ j ∈ n.children, d j = d' j) : n.toTerm d = n.toTerm d' := by
-  cases n <;> simp_all [toTerm, children]
-
-/-- Two nodes whose children read the same, injectively, are equal. -/
-theorem toTerm_inj {d : Id → Term} (n m : Node)
-    (hinj : ∀ a ∈ n.children, ∀ b ∈ m.children, d a = d b → a = b)
-    (h : n.toTerm d = m.toTerm d) : n = m := by
-  cases n <;> cases m <;> simp_all [toTerm, children]
-
 end Node
 
 end Kairos

@@ -5,16 +5,25 @@ refine [Logos](https://github.com/cvc5/logos). See [VISION.md](VISION.md) for
 the goals, the correctness argument, and how it is compared with
 [Pathos](https://github.com/daniel-larraz/pathos).
 
-**Status: milestone 2 (CpcMini) end to end.** For CpcMini, Logos's five-rule
-calculus, Kairos checks proofs and is proven to agree with Logos:
+**Status: full CPC.** Kairos checks proofs in the CPC calculus of the pinned
+Logos (all 616 rules), and is proven to agree with Logos:
 `Kairos.Checker.kairos_refines_logos` says that if Kairos's checker accepts a
 refutation, so does Logos's `__eo_checker_is_refutation` (Lean's standard
-axioms only). `kairos-eoc` generates the term programs and their proofs
-(`Kairos/Gen/Programs.lean`: 36 of 57 programs, 2 of them lifted, 4 over
-native values only). The checker (`Kairos/Checker/`) mirrors lean-meta's
-fixed checker template by hand; the rule dispatch, the part of the checker
-that depends on the rules, is generated (`Kairos/Gen/Dispatch.lean`). See [docs/prototype.md](docs/prototype.md)
-for the design.
+axioms only). `kairos-eoc` generates the term programs (1111 of 1140; 19 of
+them lifted, i.e. computed by Logos on decoded arguments, and listed in the
+generated file), the rule dispatch, and all their proofs. The checker's
+template part is mirrored by hand (`Kairos/Checker/`). There is no parser or
+executable yet.
+
+## Three projects
+
+Laid out like Logos (checker apart from verification):
+
+| Project | What | Needs | CI |
+| --- | --- | --- | --- |
+| `.` (`Kairos`) | the checker: code only | Logos's `Cpc` definitions | yes |
+| `verification/` (`KairosVerification`) | Kairos's proofs, up to `kairos_refines_logos` | the checker, Logos's definitions (no Mathlib) | yes |
+| `soundness/` (`KairosSoundness`) | composition with Logos's `correct___eo_is_refutation` | Logos's `verification/`, Mathlib | no; by hand |
 
 ## Layout
 
@@ -24,10 +33,10 @@ for the design.
 | `eoc/` | `kairos-eoc`, our code-generation stage, a standalone CMake project built against the pinned Ethos tree |
 | `eoc/kairos_meta/` | The stage (`kairos_meta_reduce.{h,cpp}`) and its Lean templates |
 | `eoc/FORK_BASE` | The upstream Ethos files the stage is forked from, and the commit they were forked at |
-| `Kairos/Runtime/` | The hand-written core: store, program logic, contexts of facts, matching, program primitives |
-| `Kairos/Gen/` | Generated Lean, committed, never edited by hand |
-| `Kairos/Checker/` | The checker's datatypes and functions over ids, the end-to-end theorem, a smoke test |
-| `Kairos/Proto/` | The prototype and the golden generated-style file |
+| `Kairos/Runtime/`, `Kairos/Checker/` | Hand-written code: the store, matching and program primitives; the checker's datatypes and functions |
+| `Kairos/Gen/` | Generated code, committed, never edited by hand |
+| `verification/KairosVerification/` | The proofs: the same layout, `Gen/` generated |
+| `soundness/` | The opt-in composition with Logos's soundness theorem |
 | `install/` | Regeneration, laid out like Logos's: `get-eo-compiler.sh`, `install-cpc.sh` |
 | `scripts/` | `fork-drift.sh`, `logos-rev.sh` |
 
@@ -39,7 +48,8 @@ Requirements: elan, cmake >= 3.12, a C++17 compiler, GMP headers
 ```sh
 install/get-eo-compiler.sh   # the pinned Logos, its Ethos, ethos-eoc and kairos-eoc
 install/install-cpc.sh       # regenerate Kairos/Gen/  (--check: verify only)
-lake build                   # Kairos and its proofs
+lake build                   # the checker (under a minute)
+(cd verification && lake build)   # its proofs
 ```
 
 See [install/README.md](install/README.md) for what these do and how to move

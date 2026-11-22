@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <functional>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -156,6 +157,18 @@ std::map<std::string, CtorInfo>& ctorTableRef()
   return t;
 }
 const std::map<std::string, CtorInfo>& ctorTable() { return ctorTableRef(); }
+
+/** Write a generated file, creating its directory. */
+void writeFile(const std::string& path, const std::string& text)
+{
+  std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+  std::ofstream(path) << text;
+}
+
+/** Where a generated module goes: code in the checker, proofs in the
+ * verification project. */
+const std::string kCodeDir = "kairos/Kairos/Gen/";
+const std::string kProofDir = "kairos/verification/KairosVerification/Gen/";
 
 /** A Lean guard on a native field fixed by a pattern. */
 std::string guardFor(const std::string& var, const std::string& val)
@@ -1955,7 +1968,8 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
           tl(replaceAll(l, "\n", "\n" + pind));
         }
       }
-      rules << def.str() << "\n" << thm.str() << "\n";
+      rules << def.str() << "\n";
+      d_dispatchProofs << thm.str() << "\n";
     }
     if (nrules < d_numRules)
     {
@@ -1968,7 +1982,8 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       top << " => pure 0\n";
       topThm << "  all_goals (unfold " << kf << " " << f << "; exact Sim.stuck hI)\n";
     }
-    out << rules.str() << top.str() << "\n" << topThm.str() << "\n";
+    out << rules.str() << top.str() << "\n";
+    d_dispatchProofs << topThm.str() << "\n";
     return "";
   }
 
@@ -2796,7 +2811,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       sl << "⟩ <;> " << simpViews << "\n\n";
       }
     }
-    matchers << sl.str();
+    d_matcherProofs << sl.str();
     // the _none lemma
     std::stringstream nl;
     nl << "theorem " << mname << "_none {σ : Store} (hI : Inv sem σ)";
@@ -2859,7 +2874,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       }
       nl << "] at h\n\n";
     }
-    matchers << nl.str();
+    d_matcherProofs << nl.str();
 
     // --- the program: match on the matcher ---
     std::vector<std::string> bpat;
@@ -3116,7 +3131,11 @@ void KairosMetaReduce::emitTermModules()
       }
       o << "\n";
     }
-    o << "\ntheorem toTerm_congr {d d' : Id → Term} (n : Node)\n"
+    o << "\nend Node\n\nend Kairos\n";
+    writeFile(getOutputPath(kCodeDir + "Term.lean"), o.str());
+    o.str("");
+    o << hdr << "import Kairos.Gen.Term\n\nnamespace Kairos\nopen Eo SmtEval\n\nnamespace Node\n"
+      << "\ntheorem toTerm_congr {d d' : Id → Term} (n : Node)\n"
       << "    (h : ∀ j ∈ n.children, d j = d' j) : n.toTerm d = n.toTerm d' := by\n"
       << "  cases n <;> simp_all [toTerm, children]\n\n"
       << "/-- Two nodes whose children read the same, injectively, are equal. -/\n"
@@ -3125,15 +3144,19 @@ void KairosMetaReduce::emitTermModules()
       << "    (h : n.toTerm d = m.toTerm d) : n = m := by\n"
       << "  cases n <;> cases m <;> simp_all [toTerm, children]\n\n"
       << "end Node\n\nend Kairos\n";
-    std::ofstream(getOutputPath("kairos/Kairos/Gen/Term.lean")) << o.str();
+    writeFile(getOutputPath(kProofDir + "Term.lean"), o.str());
   }
   // --- Gen/Prims.lean: one matcher primitive per constructor with fields ---
   {
-    std::stringstream o;
-    o << hdr << "import Kairos.Runtime.Match\n\nset_option linter.unusedVariables false\n\n"
+    std::stringstream c, o;
+    c << hdr << "import Kairos.Runtime.Match\n\nset_option linter.unusedVariables false\n\n"
+      << "namespace Kairos\nopen Eo Store SmtEval\n\n";
+    o << hdr << "import Kairos.Gen.Prims\nimport KairosVerification.Runtime.Match\n\n"
+      << "set_option linter.unusedVariables false\n\n"
       << "namespace Kairos\nopen Eo Store SmtEval\n\nvariable {sem : Sem} {σ : Store} {Γ : List Fact}\n\n";
-    for (const auto& [c, ts] : d_termCons)
+    for (const auto& [cn, ts] : d_termCons)
     {
+      const std::string& c_ = cn;
       if (ts.empty())
       {
         continue;
@@ -3148,12 +3171,12 @@ void KairosMetaReduce::emitTermModules()
       }
       std::string kty = join(kts, " → ") + " → Option α";
       std::string fsj = join(fs, " ");
-      std::string P = "m_" + c;
-      o << "@[inline] def Store." << P << " {α : Type} (σ : Store) (x : Id) (k : " << kty
-        << ") : Option α :=\n  match σ.view x with\n  | ." << c << " " << fsj << " => k " << fsj
+      std::string P = "m_" + c_;
+      c << "@[inline] def Store." << P << " {α : Type} (σ : Store) (x : Id) (k : " << kty
+        << ") : Option α :=\n  match σ.view x with\n  | ." << c_ << " " << fsj << " => k " << fsj
         << "\n  | _ => none\n\n";
       o << "theorem " << P << "_some {α : Type} {x : Id} {k : " << kty << "} {r : α}\n"
-        << "    (h : σ." << P << " x k = some r) : ∃ " << fsj << ", σ.view x = ." << c << " "
+        << "    (h : σ." << P << " x k = some r) : ∃ " << fsj << ", σ.view x = ." << c_ << " "
         << fsj << " ∧ k " << fsj << " = some r := by\n"
         << "  unfold Store." << P << " at h; split at h\n"
         << "  · rename_i " << fsj << " hv; exact ⟨" << join(fs, ", ") << ", hv, h⟩\n"
@@ -3163,7 +3186,7 @@ void KairosMetaReduce::emitTermModules()
       {
         o << " {" << fs[i] << " : " << kts[i] << "}";
       }
-      o << " {k : " << kty << "}\n    (hv : σ.view x = ." << c << " " << fsj << ") : σ." << P
+      o << " {k : " << kty << "}\n    (hv : σ.view x = ." << c_ << " " << fsj << ") : σ." << P
         << " x k = k " << fsj << " := by\n  simp [Store." << P << ", hv]\n\n";
       // inversion: fields of type Term are ids reading as the Logos fields
       std::vector<std::string> Fs = fieldNames(ts, "F");
@@ -3182,23 +3205,23 @@ void KairosMetaReduce::emitTermModules()
         }
         eNames.push_back("e" + std::to_string(i + 1));
       }
-      o << "theorem decode_" << c << "_inv (hI : Inv sem σ) {x : Id}";
+      o << "theorem decode_" << c_ << "_inv (hI : Inv sem σ) {x : Id}";
       for (size_t i = 0; i < ts.size(); i++)
       {
         o << " {" << Fs[i] << " : " << lts[i] << "}";
       }
-      o << "\n    (h : σ.decode x = ." << c << " " << join(Fs, " ") << ") :\n    ";
+      o << "\n    (h : σ.decode x = ." << c_ << " " << join(Fs, " ") << ") :\n    ";
       if (!ids.empty())
       {
         o << "∃ " << join(ids, " ") << ", ";
       }
-      o << "σ.view x = ." << c << " " << join(viewArgs, " ");
+      o << "σ.view x = ." << c_ << " " << join(viewArgs, " ");
       for (const std::string& d : decs)
       {
         o << " ∧ " << d;
       }
       o << " := by\n  rw [decode_view' hI x] at h\n"
-        << "  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term." << c
+        << "  cases hv : σ.view x <;> simp only [hv, Node.toTerm, reduceCtorEq, Term." << c_
         << ".injEq] at h\n  rename_i " << fsj << "\n";
       if (ts.size() == 1)
       {
@@ -3243,7 +3266,7 @@ void KairosMetaReduce::emitTermModules()
       // intern
       if (!ids.empty())
       {
-        o << "theorem intern_" << c << " (hI : Inv sem σ) (hΓ : Ctx σ Γ)";
+        o << "theorem intern_" << c_ << " (hI : Inv sem σ) (hΓ : Ctx σ Γ)";
         std::vector<std::string> mems, vals, decsR, args, targs;
         for (size_t i = 0; i < ts.size(); i++)
         {
@@ -3267,20 +3290,22 @@ void KairosMetaReduce::emitTermModules()
             targs.push_back(fs[i]);
           }
         }
-        o << " :\n    Sim sem σ (intern (." << c << " " << fsj << ")) (." << c << " "
+        o << " :\n    Sim sem σ (intern (." << c_ << " " << fsj << ")) (." << c_ << " "
           << join(targs, " ") << ") :=\n  (intern_sim hI (by simp [Node.children, "
           << join(vals, ", ") << "])).congr\n    (by simp [Node.toTerm, " << join(decsR, ", ")
           << "])\n\n";
       }
     }
     o << "end Kairos\n";
-    std::ofstream(getOutputPath("kairos/Kairos/Gen/Prims.lean")) << o.str();
+    c << "end Kairos\n";
+    writeFile(getOutputPath(kCodeDir + "Prims.lean"), c.str());
+    writeFile(getOutputPath(kProofDir + "Prims.lean"), o.str());
   }
   // --- Gen/Intern.lean: interning a Logos term ---
   {
     std::stringstream o;
     o << hdr << "import Kairos.Runtime.Prog\n\nset_option linter.unusedVariables false\n\n"
-      << "namespace Kairos\nopen Eo Store SmtEval\n\nvariable {sem : Sem} {σ : Store}\n\n"
+      << "namespace Kairos\nopen Eo Store SmtEval\n\n"
       << "/-- Intern a Logos term, bottom up. -/\ndef internTerm : Term → K Id\n";
     std::stringstream prf;
     prf << "theorem internTerm_sim : (t : Term) → ∀ {σ : Store}, Inv sem σ →\n"
@@ -3359,11 +3384,17 @@ void KairosMetaReduce::emitTermModules()
       }
       prf << "    exact intern_" << c << " " << hIc << " " << hG << " " << join(mems, " ") << "\n";
     }
-    o << "\n" << prf.str() << "\n"
+    o << "\nend Kairos\n";
+    writeFile(getOutputPath(kCodeDir + "Intern.lean"), o.str());
+    std::stringstream v;
+    v << hdr << "import Kairos.Gen.Intern\nimport KairosVerification.Runtime.Prog\n\n"
+      << "set_option linter.unusedVariables false\n\n"
+      << "namespace Kairos\nopen Eo Store SmtEval\n\nvariable {sem : Sem} {σ : Store}\n\n"
+      << prf.str() << "\n"
       << "/-- A program computed by Logos on decoded arguments. -/\n"
       << "theorem Sim.lift {t : Term} (hI : Inv sem σ) : Sim sem σ (internTerm t) t :=\n"
       << "  internTerm_sim t hI\n\nend Kairos\n";
-    std::ofstream(getOutputPath("kairos/Kairos/Gen/Intern.lean")) << o.str();
+    writeFile(getOutputPath(kProofDir + "Intern.lean"), v.str());
   }
 }
 
@@ -3633,7 +3664,7 @@ void KairosMetaReduce::finalize()
     }
   }
 
-  std::stringstream matchers, sem, skipped, lifted, body;
+  std::stringstream matchers, sem, skipped, lifted, body, codeBody;
   size_t npure = 0, nlifted = 0, ndispatch = 0, nsupp = 0, nmutual = 0;
   for (const std::string& n : d_names)
   {
@@ -3680,17 +3711,20 @@ void KairosMetaReduce::finalize()
     {
       zeros.push_back(emitProgram(d_progs[n], matchers, code, specs, calls, steps));
     }
-    body << "/-! ### " << (rec ? "Recursive component " : "") << comp.size()
-         << (comp.size() == 1 ? " program" : " programs") << ": "
-         << d_progs[comp[0]].lname << (comp.size() > 1 ? ", ..." : "") << " -/\n\n";
+    std::string title = std::string("/-! ### ") + (rec ? "Recursive component " : "")
+                        + std::to_string(comp.size())
+                        + (comp.size() == 1 ? " program" : " programs") + ": "
+                        + d_progs[comp[0]].lname + (comp.size() > 1 ? ", ..." : "") + " -/\n\n";
+    codeBody << title;
+    body << title;
     if (rec)
     {
       nmutual++;
-      body << "mutual\n\n" << code.str() << "end\n\n";
+      codeBody << "mutual\n\n" << code.str() << "end\n\n";
     }
     else
     {
-      body << code.str();
+      codeBody << code.str();
     }
     body << specs.str() << calls.str();
     std::string spec = "Spec" + std::to_string(ci);
@@ -3745,26 +3779,33 @@ void KairosMetaReduce::finalize()
     }
   }
 
-  std::stringstream outText;
-  outText << "-- This file is auto-generated by install/install-cpc.sh (kairos-eoc) from the\n"
-          << "-- signature of the pinned Logos. Do not edit.\n"
-          << "import Kairos.Runtime.Val\n\n"
-          << "set_option linter.unusedVariables false\nset_option linter.constructorNameAsVariable false\n"
-          << "set_option linter.unusedSimpArgs false\n"
-
-          << "set_option maxHeartbeats 10000000\n"
-          << "set_option maxRecDepth 100000\n\n"
-          << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n"
-          << "/-! Generated " << nsupp << " of " << d_names.size() << " programs (" << nlifted
+  const std::string hdr =
+      "-- This file is auto-generated by install/install-cpc.sh (kairos-eoc) from the\n"
+      "-- signature of the pinned Logos. Do not edit.\n";
+  const std::string opts =
+      "set_option linter.unusedVariables false\nset_option linter.constructorNameAsVariable false\n"
+      "set_option linter.unusedSimpArgs false\nset_option maxHeartbeats 10000000\n"
+      "set_option maxRecDepth 100000\n\n";
+  std::stringstream summary;
+  summary << "/-! Generated " << nsupp << " of " << d_names.size() << " programs (" << nlifted
           << " lifted); " << npure << " over native values are Logos's own. Left out:\n"
           << skipped.str() << "\nLifted (Logos computes them on decoded arguments):\n"
-          << lifted.str() << "-/\n\n"
-          << "/-- Cached programs, by id, with their Logos meaning. -/\n"
-          << "def sem : Sem\n" << sem.str() << "  | _, _ => none\n\n"
-          << "macro \"kside\" : tactic => `(tactic| all_goals try (kdis; done))\n\n"
+          << lifted.str() << "-/\n\n";
+  std::stringstream outText, proofText;
+  outText << hdr << "import Kairos.Gen.Intern\n\n" << opts
+          << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n" << summary.str()
           << "/-! ## Matchers -/\n\n" << matchers.str()
           << "/-! ## Programs, by component of the call graph (" << nmutual
-          << " recursive) -/\n\n" << body.str() << "end Kairos.Gen\n";
+          << " recursive) -/\n\n" << codeBody.str() << "end Kairos.Gen\n";
+  proofText << hdr << "import Kairos.Gen.Programs\nimport KairosVerification.Gen.Intern\n"
+            << "import KairosVerification.Runtime.Val\n\n" << opts
+            << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n"
+            << "/-- Cached programs, by id, with their Logos meaning. -/\n"
+            << "def sem : Sem\n" << sem.str() << "  | _, _ => none\n\n"
+            << "macro \"kside\" : tactic => `(tactic| all_goals try (kdis; done))\n\n"
+            << "/-! ## Matcher lemmas -/\n\n" << d_matcherProofs.str()
+            << "/-! ## Specs and proofs, by component of the call graph -/\n\n" << body.str()
+            << "end Kairos.Gen\n";
   std::string path = getOutputPath("kairos/Kairos/Gen/Programs.lean");
   {
     // the directory exists once a resource is emitted; emit the manifest
@@ -3782,16 +3823,19 @@ void KairosMetaReduce::finalize()
                                                 + ")\n, (\"total\", "
                                                 + std::to_string(d_names.size()) + ")\n"}});
   }
-  std::ofstream os(path);
-  os << outText.str();
-  std::ofstream ds(getOutputPath("kairos/Kairos/Gen/Dispatch.lean"));
-  ds << "-- This file is auto-generated by install/install-cpc.sh (kairos-eoc) from the\n"
-     << "-- signature of the pinned Logos. Do not edit.\n"
-     << "-- The rule dispatch: " << ndispatch << " programs.\n"
-     << "import Kairos.Checker.Base\n\n"
-     << "set_option linter.unusedVariables false\nset_option linter.constructorNameAsVariable false\n\n"
+  writeFile(path, outText.str());
+  writeFile(getOutputPath(kProofDir + "Programs.lean"), proofText.str());
+  std::stringstream ds, dp;
+  ds << hdr << "-- The rule dispatch: " << ndispatch << " programs.\n"
+     << "import Kairos.Checker.Base\n\n" << opts
      << "namespace Kairos.Checker\nopen Eo Kairos Store SmtEval Kairos.Gen\n\n"
      << dispatch.str() << "end Kairos.Checker\n";
+  dp << hdr << "import Kairos.Gen.Dispatch\nimport KairosVerification.Checker.Base\n\n" << opts
+     << "namespace Kairos.Checker\nopen Eo Kairos Store SmtEval Kairos.Gen\n\n"
+     << "variable {σ : Store} {Γ : List Fact}\n\n" << d_dispatchProofs.str()
+     << "end Kairos.Checker\n";
+  writeFile(getOutputPath(kCodeDir + "Dispatch.lean"), ds.str());
+  writeFile(getOutputPath(kProofDir + "Dispatch.lean"), dp.str());
 }
 
 }  // namespace ethos

@@ -13,7 +13,7 @@ Logos `β`). Term ids use `termRep`. The embedded checker types get theirs
 from the generator. Native values (Bool, Int, ...) need none: they are the
 same values on both sides.
 -/
-import Kairos.Runtime.Monad
+import KairosVerification.Runtime.Monad
 
 namespace Kairos
 open Eo Store
@@ -83,7 +83,6 @@ theorem Ctx.arg {i : Id} (hi : i < σ.size) (hΓ : Ctx σ Γ) :
   Ctx.cons (Fact.holds_term hi) hΓ
 
 /-! ## Step lemmas -/
-
 /-- Compute `t` into a fresh id, then continue knowing that it reads as `t`. -/
 theorem Sim.step {m : K Id} {k : Id → K Id} {t u : Term}
     (hΓ : Ctx σ Γ) (hm : Sim sem σ m t)

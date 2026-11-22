@@ -1,0 +1,23 @@
+name = "KairosVerification"
+version = "0.1.0"
+defaultTargets = ["KairosVerification", "KairosTest"]
+
+# The proofs that Kairos's checker computes what Logos's does. They need
+# Logos's definitions only (through Kairos's pin), not Logos's proofs, and so
+# not Mathlib. The composition with Logos's soundness theorem is in
+# ../soundness, which needs both and is not built by CI.
+[[require]]
+name = "Kairos"
+path = ".."
+
+[[lean_lib]]
+name = "KairosVerification"
+# maxHeartbeats / maxRecDepth on the command line: Lean generates the
+# equation lemmas of Logos's (imported) definitions with the command line's
+# options, not the file's, and those of __eo_typeof (heartbeats) and of the
+# many-argument rules (recursion depth) need more than the defaults.
+moreLeanArgs = ["-DwarningAsError=true", "-DmaxHeartbeats=20000000", "-DmaxRecDepth=100000"]
+
+[[lean_lib]]
+name = "KairosTest"
+roots = ["KairosVerification.Checker.Test"]

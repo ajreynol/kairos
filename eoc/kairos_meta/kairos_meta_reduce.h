@@ -144,6 +144,10 @@ class KairosMetaReduce : public MetaReducePlugin
   std::string printType(const Expr& t);
   bool isAtomicEo(const Expr& c, const std::string& cname, size_t& arity);
   void emitTermModules();
+  /** Matcher lemmas and dispatch proofs, which go to the verification
+   * project, apart from the code. */
+  std::stringstream d_matcherProofs;
+  std::stringstream d_dispatchProofs;
 };
 
 }  // namespace ethos

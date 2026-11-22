@@ -1,5 +1,5 @@
 /- A smoke test: Kairos and Logos on the same CpcMini proofs. -/
-import Kairos.Checker.Main
+import KairosVerification.Checker.Main
 
 namespace Kairos.Checker.Test
 open Eo Kairos Store SmtEval

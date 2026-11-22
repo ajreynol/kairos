@@ -22,7 +22,8 @@ was). The run:
   2. checks that the Lean it yields is Logos's committed Cpc/ and CpcMini/,
      modulo the header and module name install-sig.sh adds, so the final
      signature Kairos compiles is the one Logos's checker was compiled from;
-  3. runs kairos-eoc on Cpc's final signature and installs Kairos/Gen/.
+  3. runs kairos-eoc on Cpc's final signature and installs Kairos/Gen/ (code)
+     and verification/KairosVerification/Gen/ (its proofs).
 
 Options:
   --check          write nothing; exit 1 if Kairos/Gen/ is not what is generated
@@ -133,17 +134,24 @@ KAIROS_CALC=Cpc ETHOS_PLUGIN_OUTPUT_DIR="${OUT}" "${KAIROS_EOC}" "${STAGE}/lean-
 [ -d "${OUT}/${GEN_REL}" ] || { echo "error: kairos-eoc wrote nothing" >&2; exit 1; }
 sed -n 's/^\/-! \(Generated .*\)\. Left out:$/    \1/p' "${OUT}/${GEN_REL}/Programs.lean"
 
-DEST="${repo_root}/Kairos/Gen"
+# The generated code goes to the checker, its proofs to the verification
+# project.
+TREES=("Kairos/Gen" "verification/KairosVerification/Gen")
 if [ "${CHECK}" = "1" ]; then
-  if diff -r "${OUT}/${GEN_REL}" "${DEST}" >/dev/null 2>&1; then
-    echo "==> Kairos/Gen/ is up to date"
-    exit 0
-  fi
-  diff -r "${OUT}/${GEN_REL}" "${DEST}" | head -40 >&2 || true
-  echo "error: Kairos/Gen/ is not what install/install-cpc.sh generates" >&2
-  exit 1
+  stale=0
+  for t in "${TREES[@]}"; do
+    if ! diff -r "${OUT}/kairos/${t}" "${repo_root}/${t}" >/dev/null 2>&1; then
+      diff -r "${OUT}/kairos/${t}" "${repo_root}/${t}" | head -20 >&2 || true
+      echo "error: ${t}/ is not what install/install-cpc.sh generates" >&2
+      stale=1
+    fi
+  done
+  [ "${stale}" = "0" ] && echo "==> Kairos/Gen/ and verification/KairosVerification/Gen/ are up to date"
+  exit "${stale}"
 fi
-rm -rf "${DEST}"
-mkdir -p "$(dirname "${DEST}")"
-cp -r "${OUT}/${GEN_REL}" "${DEST}"
-echo "==> Installed Kairos/Gen/"
+for t in "${TREES[@]}"; do
+  rm -rf "${repo_root:?}/${t}"
+  mkdir -p "$(dirname "${repo_root}/${t}")"
+  cp -r "${OUT}/kairos/${t}" "${repo_root}/${t}"
+  echo "==> Installed ${t}/"
+done

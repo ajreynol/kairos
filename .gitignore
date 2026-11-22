@@ -1,3 +1,5 @@
 /.lake/
 /install/deps/
 /build/
+/verification/.lake/
+/soundness/.lake/

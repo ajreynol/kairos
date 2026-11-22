@@ -44,10 +44,11 @@ jobs:
       - name: Check the forked files against the pinned Ethos
         run: bash scripts/fork-drift.sh
 
-  build:
-    name: build
+  # The checker: code only, no proofs, no Mathlib.
+  checker:
+    name: checker
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
     permissions:
       contents: read
     steps:
@@ -59,5 +60,27 @@ jobs:
             | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Build Kairos and its proofs
+      - name: Build the checker
+        run: lake build
+
+  # Kairos's proofs: that its checker computes what Logos's does. They need
+  # Logos's definitions only. Logos's own proofs (its verification/ project,
+  # and Mathlib) are not built here, nor is ../soundness, which needs them.
+  verification:
+    name: verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Build the proofs
+        working-directory: verification
         run: lake build
