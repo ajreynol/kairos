@@ -9,7 +9,7 @@ The Kairos monad and its program logic (prototype, milestone 2a).
   computation started in `σ`: the invariant holds in `σ'`, `σ'` extends `σ`,
   and `r` is a valid id that reads as the Logos term `t`.
 -/
-import Kairos.Proto.Core
+import Kairos.Runtime.Core
 
 namespace Kairos
 open Eo Store
@@ -74,6 +74,10 @@ theorem Sim.bind {σ : Store} {m : K Id} {k : Id → K Id} {t u : Term}
 theorem Sim.pure {σ : Store} {r : Id} {t : Term} (hI : Inv sem σ) (hr : r < σ.size)
     (h : σ.decode r = t) : Sim sem σ (Pure.pure r) t :=
   Ok.pure ⟨hI, Extends.refl σ, hr, h⟩
+
+theorem Sim.congr {σ : Store} {m : K Id} {t t' : Term} (h : Sim sem σ m t) (e : t = t') :
+    Sim sem σ m t' :=
+  e ▸ h
 
 /-! ## Interning -/
 

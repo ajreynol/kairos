@@ -2,7 +2,7 @@
 Hand-written Kairos versions of CpcMini programs with their simulation proofs
 (prototype, milestone 2a). This is the shape kairos-eoc will generate.
 -/
-import Kairos.Proto.Monad
+import Kairos.Runtime.Monad
 
 namespace Kairos
 open Eo Store SmtEval
@@ -58,9 +58,6 @@ theorem mkApply_sim (hI : Inv sem σ) {f x : Id} (hf : f < σ.size) (hx : x < σ
 
 theorem mkUOp_sim (hI : Inv sem σ) (o : UserOp) : Sim sem σ (mkUOp o) (.UOp o) :=
   intern_sim hI (by simp [Node.children])
-
-theorem Sim.congr {m : K Id} {t t' : Term} (h : Sim sem σ m t) (e : t = t') : Sim sem σ m t' :=
-  e ▸ h
 
 theorem mkBin_sim (hI : Inv sem σ) (o : UserOp) {a b : Id} (ha : a < σ.size) (hb : b < σ.size) :
     Sim sem σ (mkBin o a b) (.Apply (.Apply (.UOp o) (σ.decode a)) (σ.decode b)) := by
