@@ -114,13 +114,13 @@ theorem intern_leaf {n : Node} (hI : Inv sem σ) (hn : n.children = []) :
 
 theorem intern_apply {f x : Id} {F X : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
     (hf : Fact.term f F ∈ Γ) (hx : Fact.term x X ∈ Γ) :
-    Sim sem σ (intern (.apply f x)) (.Apply F X) :=
+    Sim sem σ (intern (.Apply f x)) (.Apply F X) :=
   (intern_sim hI (by simp [Node.children, hΓ.valid hf, hΓ.valid hx])).congr
     (by simp [Node.toTerm, hΓ.dec hf, hΓ.dec hx])
 
 theorem intern_var {s T : Id} {S U : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
     (hs : Fact.term s S ∈ Γ) (hT : Fact.term T U ∈ Γ) :
-    Sim sem σ (intern (.var s T)) (.Var S U) :=
+    Sim sem σ (intern (.Var s T)) (.Var S U) :=
   (intern_sim hI (by simp [Node.children, hΓ.valid hs, hΓ.valid hT])).congr
     (by simp [Node.toTerm, hΓ.dec hs, hΓ.dec hT])
 

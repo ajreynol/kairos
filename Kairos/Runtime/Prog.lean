@@ -42,8 +42,8 @@ theorem Sim.nite {c : Bool} {mt me : K Id} {T E : Term}
 /-- Logos's `__eo_ite` on the id `c`, evaluating only the branch taken. -/
 @[inline] def k_ite (c : Id) (mt me : K Id) : K Id := withStore fun σ =>
   match σ.view c with
-  | .boolean true => mt
-  | .boolean false => me
+  | .Boolean true => mt
+  | .Boolean false => me
   | _ => pure 0
 
 theorem k_ite_sim (hI : Inv sem σ) (hΓ : Ctx σ Γ) {c : Id} {C T E : Term} {mt me : K Id}
@@ -54,7 +54,7 @@ theorem k_ite_sim (hI : Inv sem σ) (hΓ : Ctx σ Γ) {c : Id} {C T E : Term} {m
   rw [decode_view' hI c] at hd
   subst hd
   cases hv : σ.view c with
-  | boolean b =>
+  | Boolean b =>
     cases b
     · simpa [hv, Node.toTerm, __eo_ite, native_ite, native_teq] using he
     · simpa [hv, Node.toTerm, __eo_ite, native_ite, native_teq] using ht

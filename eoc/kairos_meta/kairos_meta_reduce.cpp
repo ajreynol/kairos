@@ -3,6 +3,10 @@
 #include <sstream>
 #include <vector>
 
+#include <cstdlib>
+#include <iostream>
+
+#include "linear_patterns/linear_patterns.h"
 #include "state.h"
 #include "utils.h"
 
@@ -49,8 +53,37 @@ void KairosMetaReduce::finalizeDecl(const Expr& e)
   d_declsByKind[metaKindToString(k)].insert(getName(e));
 }
 
+namespace {
+void dumpExpr(const Expr& e, size_t depth)
+{
+  std::cerr << std::string(depth * 2, ' ') << e.getKind();
+  if (e.getNumChildren() == 0)
+  {
+    std::cerr << "  " << e;
+  }
+  else if (e.getKind() == Kind::APPLY_OPAQUE || e.getKind() == Kind::APPLY)
+  {
+    std::cerr << "  head=" << e[0];
+  }
+  std::cerr << "\n";
+  for (size_t i = 0; i < e.getNumChildren(); i++)
+  {
+    dumpExpr(e[i], depth + 1);
+  }
+}
+}  // namespace
+
 void KairosMetaReduce::defineProgram(const Expr& v, const Expr& prog)
 {
+  const char* dump = std::getenv("KAIROS_DUMP");
+  if (dump != nullptr && !prog.isNull() && getName(v) == dump)
+  {
+    for (const auto& lp : LinearPattern::linearize(d_state, v, prog))
+    {
+      std::cerr << "=== " << lp.first << "\n";
+      dumpExpr(lp.second, 0);
+    }
+  }
   // A program is a list of (pattern, body) cases.
   d_programs[getName(v)] = prog.getNumChildren();
 }

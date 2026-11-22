@@ -25,64 +25,64 @@ instance : Hashable DatatypeDecl := ⟨fun _ => 0⟩
 
 /-- One level of a Logos `Term`; `Term` children are store ids. -/
 inductive Node where
-  | uop (o : UserOp)
-  | list
-  | listNil
-  | listCons
-  | bool
-  | boolean (b : Bool)
-  | numeral (n : Int)
-  | rational (q : Rat)
-  | string (s : List Nat)
-  | binary (w n : Int)
-  | type
-  | stuck
-  | apply (f x : Id)
-  | funType
-  | var (s T : Id)
-  | datatypeType (s : List Nat) (dd : DatatypeDecl)
-  | datatypeTypeRef (s : List Nat)
-  | dtcAppType (a b : Id)
-  | dtCons (s : List Nat) (dd : DatatypeDecl) (i : Nat)
-  | dtSel (s : List Nat) (dd : DatatypeDecl) (i j : Nat)
-  | usort (i : Nat)
-  | uconst (i : Nat) (T : Id)
+  | UOp (o : UserOp)
+  | __eo_List
+  | __eo_List_nil
+  | __eo_List_cons
+  | Bool
+  | Boolean (b : Bool)
+  | Numeral (n : Int)
+  | Rational (q : Rat)
+  | String (s : List Nat)
+  | Binary (w n : Int)
+  | Type
+  | Stuck
+  | Apply (f x : Id)
+  | FunType
+  | Var (s T : Id)
+  | DatatypeType (s : List Nat) (dd : DatatypeDecl)
+  | DatatypeTypeRef (s : List Nat)
+  | DtcAppType (a b : Id)
+  | DtCons (s : List Nat) (dd : DatatypeDecl) (i : Nat)
+  | DtSel (s : List Nat) (dd : DatatypeDecl) (i j : Nat)
+  | USort (i : Nat)
+  | UConst (i : Nat) (T : Id)
   deriving DecidableEq, Hashable, Inhabited
 
 namespace Node
 
 /-- The store ids a node refers to. -/
 def children : Node → List Id
-  | apply f x => [f, x]
-  | var s T => [s, T]
-  | dtcAppType a b => [a, b]
-  | uconst _ T => [T]
+  | .Apply f x => [f, x]
+  | .Var s T => [s, T]
+  | .DtcAppType a b => [a, b]
+  | .UConst _ T => [T]
   | _ => []
 
 /-- The Logos term a node stands for, given how to read its children. -/
 def toTerm (d : Id → Term) : Node → Term
-  | uop o => .UOp o
-  | list => .__eo_List
-  | listNil => .__eo_List_nil
-  | listCons => .__eo_List_cons
-  | bool => .Bool
-  | boolean b => .Boolean b
-  | numeral n => .Numeral n
-  | rational q => .Rational q
-  | string s => .String s
-  | binary w n => .Binary w n
-  | type => .Type
-  | stuck => .Stuck
-  | apply f x => .Apply (d f) (d x)
-  | funType => .FunType
-  | var s T => .Var (d s) (d T)
-  | datatypeType s dd => .DatatypeType s dd
-  | datatypeTypeRef s => .DatatypeTypeRef s
-  | dtcAppType a b => .DtcAppType (d a) (d b)
-  | dtCons s dd i => .DtCons s dd i
-  | dtSel s dd i j => .DtSel s dd i j
-  | usort i => .USort i
-  | uconst i T => .UConst i (d T)
+  | .UOp o => .UOp o
+  | .__eo_List => .__eo_List
+  | .__eo_List_nil => .__eo_List_nil
+  | .__eo_List_cons => .__eo_List_cons
+  | .Bool => .Bool
+  | .Boolean b => .Boolean b
+  | .Numeral n => .Numeral n
+  | .Rational q => .Rational q
+  | .String s => .String s
+  | .Binary w n => .Binary w n
+  | .Type => .Type
+  | .Stuck => .Stuck
+  | .Apply f x => .Apply (d f) (d x)
+  | .FunType => .FunType
+  | .Var s T => .Var (d s) (d T)
+  | .DatatypeType s dd => .DatatypeType s dd
+  | .DatatypeTypeRef s => .DatatypeTypeRef s
+  | .DtcAppType a b => .DtcAppType (d a) (d b)
+  | .DtCons s dd i => .DtCons s dd i
+  | .DtSel s dd i j => .DtSel s dd i j
+  | .USort i => .USort i
+  | .UConst i T => .UConst i (d T)
 
 theorem toTerm_congr {d d' : Id → Term} (n : Node)
     (h : ∀ j ∈ n.children, d j = d' j) : n.toTerm d = n.toTerm d' := by
@@ -112,12 +112,12 @@ namespace Store
 
 /-- The store with only `Stuck`, at id 0. -/
 def init : Store :=
-  { nodes := #[.stuck], table := (∅ : Std.HashMap Node Id).insert .stuck 0, cache := ∅ }
+  { nodes := #[.Stuck], table := (∅ : Std.HashMap Node Id).insert .Stuck 0, cache := ∅ }
 
 def size (σ : Store) : Nat := σ.nodes.size
 
 /-- The node of `i`; `Stuck` for an id that is not in the store. -/
-def view (σ : Store) (i : Id) : Node := σ.nodes[i]?.getD .stuck
+def view (σ : Store) (i : Id) : Node := σ.nodes[i]?.getD .Stuck
 
 /-- Read an id of a node array back as Logos's term. Specification only. -/
 def decodeA (nodes : Array Node) (i : Id) : Term :=
@@ -146,7 +146,7 @@ abbrev Sem := Nat → List Term → Option Term
 
 /-- The store invariant. -/
 structure Inv (sem : Sem) (σ : Store) : Prop where
-  stuck0 : σ.nodes[0]? = some .stuck
+  stuck0 : σ.nodes[0]? = some .Stuck
   wf : ∀ (i : Id) (n : Node), σ.nodes[i]? = some n → ∀ j ∈ n.children, j < i
   table : ∀ (n : Node) (i : Id), σ.table[n]? = some i ↔ σ.nodes[i]? = some n
   cache : ∀ (p : Nat) (args : List Id) (r : Id), σ.cache[(p, args)]? = some r →

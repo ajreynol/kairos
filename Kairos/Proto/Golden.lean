@@ -102,10 +102,10 @@ def m__eo_is_closed_rec_1 (σ : Store) (x1 x2 : Id) : Option Unit := Store.stuck
 def m__eo_is_closed_rec_2 (σ : Store) (x1 x2 : Id) : Option Unit := Store.stuck x2 (some ())
 
 def m__eo_is_closed_rec_3 (σ : Store) (x1 x2 : Id) : Option (Id × Id) :=
-  σ.var x1 fun s T => σ.leaf x2 .listNil (some (s, T))
+  σ.var x1 fun s T => σ.leaf x2 .__eo_List_nil (some (s, T))
 
 def m__eo_is_closed_rec_4 (σ : Store) (x1 x2 : Id) : Option (Id × Id × Id × Id) :=
-  σ.var x1 fun s T => σ.app x2 fun p0 vs => σ.app p0 fun p1 x => σ.leaf p1 .listCons
+  σ.var x1 fun s T => σ.app x2 fun p0 vs => σ.app p0 fun p1 x => σ.leaf p1 .__eo_List_cons
     (some (s, T, x, vs))
 
 def m__eo_is_closed_rec_5 (σ : Store) (x1 x2 : Id) : Option (Id × Id) :=
@@ -148,7 +148,7 @@ theorem m__eo_is_closed_rec_3_none {σ : Store} (hI : Inv sem σ) {x1 x2 : Id}
     ∀ s T, σ.decode x1 = .Var s T → σ.decode x2 = .__eo_List_nil → False := by
   intro s T e0 e1
   obtain ⟨_s, _T, v0, -, -⟩ := decode_var_inv hI e0
-  have v1 := decode_leaf_inv (n := .listNil) (d := σ.decode) hI rfl e1
+  have v1 := decode_leaf_inv (n := .__eo_List_nil) (d := σ.decode) hI rfl e1
   simp [m__eo_is_closed_rec_3, var_of_view v0, leaf_of_view v1] at h
 
 theorem m__eo_is_closed_rec_4_some {σ : Store} (hI : Inv sem σ) {x1 x2 s T x vs : Id}
@@ -178,7 +178,7 @@ theorem m__eo_is_closed_rec_4_none {σ : Store} (hI : Inv sem σ) {x1 x2 : Id}
   obtain ⟨_s, _T, v0, -, -⟩ := decode_var_inv hI e0
   obtain ⟨p0, _vs, v1, e2, -⟩ := decode_apply_inv hI e1
   obtain ⟨p1, _x, v2, e3, -⟩ := decode_apply_inv hI e2
-  have v3 := decode_leaf_inv (n := .listCons) (d := σ.decode) hI rfl e3
+  have v3 := decode_leaf_inv (n := .__eo_List_cons) (d := σ.decode) hI rfl e3
   simp [m__eo_is_closed_rec_4, var_of_view v0, app_of_view v1, app_of_view v2,
     leaf_of_view v3] at h
 
@@ -220,19 +220,19 @@ def k__eo_eq : Nat → Id → Id → K Id
     match m__eo_eq_2 σ x1 x2 with
     | some () => pure 0
     | none =>
-    intern (.boolean (knative_teq x2 x1))
+    intern (.Boolean (knative_teq x2 x1))
 
 def k__eo_and : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
   | n + 1, x1, x2 => withStore fun σ =>
     match m__eo_and_1 σ x1 x2 with
-    | some (b1, b2) => intern (.boolean (native_and b1 b2))
+    | some (b1, b2) => intern (.Boolean (native_and b1 b2))
     | none =>
     match m__eo_and_2 σ x1 x2 with
     | some (w1, n1, w2, n2) => do
-      let _t0 ← intern (.numeral w1)
-      let _t1 ← intern (.numeral w2)
-      let _t2 ← intern (.binary w1 (native_mod_total (native_binary_and w1 n1 n2) (native_int_pow2 w1)))
+      let _t0 ← intern (.Numeral w1)
+      let _t1 ← intern (.Numeral w2)
+      let _t2 ← intern (.Binary w1 (native_mod_total (native_binary_and w1 n1 n2) (native_int_pow2 w1)))
       k__eo_requires n _t0 _t1 _t2
     | none => pure 0
 
@@ -246,13 +246,13 @@ def k__eo_is_closed_rec : Nat → Id → Id → K Id
     | some () => pure 0
     | none =>
     match m__eo_is_closed_rec_3 σ x1 x2 with
-    | some (s, T) => intern (.boolean false)
+    | some (s, T) => intern (.Boolean false)
     | none =>
     match m__eo_is_closed_rec_4 σ x1 x2 with
     | some (s, T, x, vs) => do
-      let _t0 ← intern (.var s T)
+      let _t0 ← intern (.Var s T)
       let _t1 ← k__eo_eq n _t0 x
-      k_ite _t1 (intern (.boolean true)) (k__eo_is_closed_rec n _t0 vs)
+      k_ite _t1 (intern (.Boolean true)) (k__eo_is_closed_rec n _t0 vs)
     | none =>
     match m__eo_is_closed_rec_5 σ x1 x2 with
     | some (f, x) => do
@@ -260,7 +260,7 @@ def k__eo_is_closed_rec : Nat → Id → Id → K Id
       let _t1 ← k__eo_is_closed_rec n x x2
       k__eo_and n _t0 _t1
     | none =>
-    intern (.boolean true)
+    intern (.Boolean true)
 
 end
 

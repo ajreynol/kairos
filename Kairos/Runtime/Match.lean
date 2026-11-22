@@ -21,7 +21,7 @@ hands its parts to the rest of the matcher. They inline to nested matches. -/
 
 @[inline] def app {α : Type} (σ : Store) (x : Id) (k : Id → Id → Option α) : Option α :=
   match σ.view x with
-  | .apply f y => k f y
+  | .Apply f y => k f y
   | _ => none
 
 @[inline] def leaf {α : Type} (σ : Store) (x : Id) (n : Node) (k : Option α) : Option α :=
@@ -29,17 +29,17 @@ hands its parts to the rest of the matcher. They inline to nested matches. -/
 
 @[inline] def var {α : Type} (σ : Store) (x : Id) (k : Id → Id → Option α) : Option α :=
   match σ.view x with
-  | .var s T => k s T
+  | .Var s T => k s T
   | _ => none
 
 @[inline] def boolean {α : Type} (σ : Store) (x : Id) (k : Bool → Option α) : Option α :=
   match σ.view x with
-  | .boolean b => k b
+  | .Boolean b => k b
   | _ => none
 
 @[inline] def binary {α : Type} (σ : Store) (x : Id) (k : Int → Int → Option α) : Option α :=
   match σ.view x with
-  | .binary w n => k w n
+  | .Binary w n => k w n
   | _ => none
 
 /-- The `Stuck` pattern, which is id 0. -/
@@ -48,7 +48,7 @@ hands its parts to the rest of the matcher. They inline to nested matches. -/
 
 end Store
 
-theorem view_out {x : Id} (hx : ¬ x < σ.size) : σ.view x = .stuck := by
+theorem view_out {x : Id} (hx : ¬ x < σ.size) : σ.view x = .Stuck := by
   simp [view, Array.getElem?_eq_none (Nat.le_of_not_lt hx)]
 
 theorem decode_out {x : Id} (hx : ¬ x < σ.size) : σ.decode x = .Stuck := by
@@ -70,14 +70,14 @@ theorem valid_of_view (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {n : Node}
   child_valid hI hx (hv ▸ hj)
 
 theorem valid_of_app (hI : Inv sem σ) {x f y : Id} (hx : x < σ.size)
-    (hv : σ.view x = .apply f y) : f < σ.size ∧ y < σ.size :=
+    (hv : σ.view x = .Apply f y) : f < σ.size ∧ y < σ.size :=
   ⟨valid_of_view hI hx hv (by simp [Node.children]),
    valid_of_view hI hx hv (by simp [Node.children])⟩
 
 /-! ## Taking a matcher chain apart (the `_some` direction) -/
 
 theorem app_some {α : Type} {x : Id} {k : Id → Id → Option α} {r : α}
-    (h : σ.app x k = some r) : ∃ f y, σ.view x = .apply f y ∧ k f y = some r := by
+    (h : σ.app x k = some r) : ∃ f y, σ.view x = .Apply f y ∧ k f y = some r := by
   unfold app at h; split at h
   · rename_i f y hv; exact ⟨f, y, hv, h⟩
   · simp at h
@@ -89,19 +89,19 @@ theorem leaf_some {α : Type} {x : Id} {n : Node} {k : Option α} {r : α}
   · simp at h
 
 theorem var_some {α : Type} {x : Id} {k : Id → Id → Option α} {r : α}
-    (h : σ.var x k = some r) : ∃ s T, σ.view x = .var s T ∧ k s T = some r := by
+    (h : σ.var x k = some r) : ∃ s T, σ.view x = .Var s T ∧ k s T = some r := by
   unfold var at h; split at h
   · rename_i s T hv; exact ⟨s, T, hv, h⟩
   · simp at h
 
 theorem boolean_some {α : Type} {x : Id} {k : Bool → Option α} {r : α}
-    (h : σ.boolean x k = some r) : ∃ b, σ.view x = .boolean b ∧ k b = some r := by
+    (h : σ.boolean x k = some r) : ∃ b, σ.view x = .Boolean b ∧ k b = some r := by
   unfold boolean at h; split at h
   · rename_i b hv; exact ⟨b, hv, h⟩
   · simp at h
 
 theorem binary_some {α : Type} {x : Id} {k : Int → Int → Option α} {r : α}
-    (h : σ.binary x k = some r) : ∃ w n, σ.view x = .binary w n ∧ k w n = some r := by
+    (h : σ.binary x k = some r) : ∃ w n, σ.view x = .Binary w n ∧ k w n = some r := by
   unfold binary at h; split at h
   · rename_i w n hv; exact ⟨w, n, hv, h⟩
   · simp at h
@@ -115,19 +115,19 @@ theorem stuck_some {α : Type} {x : Id} {k : Option α} {r : α}
 /-! ## Running a matcher chain on a known shape (the `_none` direction) -/
 
 theorem app_of_view {α : Type} {x f y : Id} {k : Id → Id → Option α}
-    (hv : σ.view x = .apply f y) : σ.app x k = k f y := by simp [app, hv]
+    (hv : σ.view x = .Apply f y) : σ.app x k = k f y := by simp [app, hv]
 
 theorem leaf_of_view {α : Type} {x : Id} {n : Node} {k : Option α}
     (hv : σ.view x = n) : σ.leaf x n k = k := by simp [leaf, hv]
 
 theorem var_of_view {α : Type} {x s T : Id} {k : Id → Id → Option α}
-    (hv : σ.view x = .var s T) : σ.var x k = k s T := by simp [var, hv]
+    (hv : σ.view x = .Var s T) : σ.var x k = k s T := by simp [var, hv]
 
 theorem boolean_of_view {α : Type} {x : Id} {b : Bool} {k : Bool → Option α}
-    (hv : σ.view x = .boolean b) : σ.boolean x k = k b := by simp [boolean, hv]
+    (hv : σ.view x = .Boolean b) : σ.boolean x k = k b := by simp [boolean, hv]
 
 theorem binary_of_view {α : Type} {x : Id} {w n : Int} {k : Int → Int → Option α}
-    (hv : σ.view x = .binary w n) : σ.binary x k = k w n := by simp [binary, hv]
+    (hv : σ.view x = .Binary w n) : σ.binary x k = k w n := by simp [binary, hv]
 
 theorem stuck_of_zero {α : Type} {k : Option α} : Store.stuck 0 k = k := by simp [Store.stuck]
 
@@ -135,7 +135,7 @@ theorem stuck_of_zero {α : Type} {k : Option α} : Store.stuck 0 k = k := by si
 
 theorem decode_apply_inv (hI : Inv sem σ) {x : Id} {A B : Term}
     (h : σ.decode x = .Apply A B) :
-    ∃ f y, σ.view x = .apply f y ∧ σ.decode f = A ∧ σ.decode y = B := by
+    ∃ f y, σ.view x = .Apply f y ∧ σ.decode f = A ∧ σ.decode y = B := by
   rw [decode_view' hI x] at h
   cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
   exact ⟨_, _, rfl, h.1, h.2⟩
@@ -149,19 +149,19 @@ theorem decode_leaf_inv (hI : Inv sem σ) {x : Id} {n : Node} (hn : n.children =
 
 theorem decode_var_inv (hI : Inv sem σ) {x : Id} {S T : Term}
     (h : σ.decode x = .Var S T) :
-    ∃ s t, σ.view x = .var s t ∧ σ.decode s = S ∧ σ.decode t = T := by
+    ∃ s t, σ.view x = .Var s t ∧ σ.decode s = S ∧ σ.decode t = T := by
   rw [decode_view' hI x] at h
   cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
   exact ⟨_, _, rfl, h.1, h.2⟩
 
 theorem decode_boolean_inv (hI : Inv sem σ) {x : Id} {b : Bool}
-    (h : σ.decode x = .Boolean b) : σ.view x = .boolean b := by
+    (h : σ.decode x = .Boolean b) : σ.view x = .Boolean b := by
   rw [decode_view' hI x] at h
   cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
   simp [h]
 
 theorem decode_binary_inv (hI : Inv sem σ) {x : Id} {w n : Int}
-    (h : σ.decode x = .Binary w n) : σ.view x = .binary w n := by
+    (h : σ.decode x = .Binary w n) : σ.view x = .Binary w n := by
   rw [decode_view' hI x] at h
   cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
   simp [h]

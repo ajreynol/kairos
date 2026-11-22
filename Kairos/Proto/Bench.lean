@@ -16,7 +16,7 @@ open Eo Kairos Store SmtEval
 
 def k_and (a b : Id) : K Id := withStore fun σ =>
   match σ.view a, σ.view b with
-  | .boolean x, .boolean y => intern (.boolean (x && y))
+  | .Boolean x, .Boolean y => intern (.Boolean (x && y))
   | _, _ => pure 0
 
 def k_is_closed_rec : Nat → Id → Id → K Id
@@ -24,29 +24,29 @@ def k_is_closed_rec : Nat → Id → Id → K Id
   | n + 1, x, env => cached 1 [x, env] <| withStore fun σ =>
     if x = 0 ∨ env = 0 then pure 0 else
     match σ.view x, σ.view env with
-    | .var _ _, .listNil => intern (.boolean false)
-    | .var _ _, .apply g vs =>
+    | .Var _ _, .__eo_List_nil => intern (.Boolean false)
+    | .Var _ _, .Apply g vs =>
       match σ.view g with
-      | .apply c y =>
-        if σ.view c = .listCons then
-          if x = y then intern (.boolean true) else k_is_closed_rec n x vs
+      | .Apply c y =>
+        if σ.view c = .__eo_List_cons then
+          if x = y then intern (.Boolean true) else k_is_closed_rec n x vs
         else pure 1 -- unreachable for well-formed environments
-      | _ => intern (.boolean true)
-    | .apply f y, _ => do
+      | _ => intern (.Boolean true)
+    | .Apply f y, _ => do
       let a ← k_is_closed_rec n f env
       let b ← k_is_closed_rec n y env
       k_and a b
-    | _, _ => intern (.boolean true)
+    | _, _ => intern (.Boolean true)
 
 def k_is_closed (fuel : Nat) (x : Id) : K Id := do
   if x = 0 then return 0
-  let nil ← intern .listNil
+  let nil ← intern .__eo_List_nil
   k_is_closed_rec fuel x nil
 
 /-! Workloads -/
 
 def logosConst (i : Nat) : Term := .UConst i .Bool
-def kConst (i : Nat) : K Id := do let b ← intern .bool; intern (.uconst i b)
+def kConst (i : Nat) : K Id := do let b ← intern .Bool; intern (.UConst i b)
 
 /-- `(and (= a_i a_{i+1}) (and ... true))` for i from k to n-1. -/
 def logosChain (n : Nat) : Term := Id.run do
@@ -57,7 +57,7 @@ def logosChain (n : Nat) : Term := Id.run do
   return acc
 
 def kChain (n : Nat) : K Id := do
-  let mut acc ← intern (.boolean true)
+  let mut acc ← intern (.Boolean true)
   for j in [0:n] do
     let i := n - 1 - j
     let a ← kConst i
@@ -110,7 +110,7 @@ def benchClosed (d : Nat) : IO Unit := do
   IO.println s!"closed {d}"
   let (x, σ) ← time "kairos build" fun _ => pure (run .init (kDag d))
   let (r, σ) ← time "kairos k_is_closed" fun _ => pure (run σ (k_is_closed fuel x))
-  IO.println s!"    kairos result is true: {decide (σ.view r = .boolean true)}, store {σ.size} nodes"
+  IO.println s!"    kairos result is true: {decide (σ.view r = .Boolean true)}, store {σ.size} nodes"
   if d ≤ 26 then
     let t := logosDag d
     let r ← time "logos __eo_is_closed" fun _ => pure (__eo_is_closed t)

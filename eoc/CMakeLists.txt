@@ -35,7 +35,8 @@ set(ETHOS_PLUGIN_LAYER
     "${ETHOS_SOURCE_DIR}/plugins/std_plugin.cpp"
     "${ETHOS_SOURCE_DIR}/plugins/meta_reduce_plugin.cpp"
     "${ETHOS_SOURCE_DIR}/plugins/utils.cpp"
-    "${ETHOS_SOURCE_DIR}/plugins/native_layer.cpp")
+    "${ETHOS_SOURCE_DIR}/plugins/native_layer.cpp"
+    "${ETHOS_SOURCE_DIR}/plugins/linear_patterns/linear_patterns.cpp")
 
 set(KAIROS_SRC "${CMAKE_CURRENT_LIST_DIR}/kairos_meta/kairos_meta_reduce.cpp")
 

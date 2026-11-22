@@ -13,7 +13,7 @@ variable {sem : Sem} {σ : Store}
 
 theorem decode_eq_apply_iff (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {A B : Term} :
     σ.decode x = .Apply A B ↔
-      ∃ f y, σ.view x = .apply f y ∧ σ.decode f = A ∧ σ.decode y = B := by
+      ∃ f y, σ.view x = .Apply f y ∧ σ.decode f = A ∧ σ.decode y = B := by
   rw [decode_view hI hx]
   constructor
   · intro h
@@ -22,29 +22,29 @@ theorem decode_eq_apply_iff (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {A B :
   · rintro ⟨f, y, hv, rfl, rfl⟩; simp [hv, Node.toTerm]
 
 theorem decode_eq_uop_iff (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {o : UserOp} :
-    σ.decode x = .UOp o ↔ σ.view x = .uop o := by
+    σ.decode x = .UOp o ↔ σ.view x = .UOp o := by
   rw [decode_view hI hx]
   constructor
   · intro h; cases hv : σ.view x <;> simp [hv, Node.toTerm] at h; simp [h]
   · intro hv; simp [hv, Node.toTerm]
 
 theorem view_apply_valid (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {f y : Id}
-    (hv : σ.view x = .apply f y) : f < σ.size ∧ y < σ.size :=
+    (hv : σ.view x = .Apply f y) : f < σ.size ∧ y < σ.size :=
   ⟨child_valid hI hx (by simp [hv, Node.children]),
    child_valid hI hx (by simp [hv, Node.children])⟩
 
 theorem decode_of_view_apply (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {f y : Id}
-    (hv : σ.view x = .apply f y) : σ.decode x = .Apply (σ.decode f) (σ.decode y) := by
+    (hv : σ.view x = .Apply f y) : σ.decode x = .Apply (σ.decode f) (σ.decode y) := by
   rw [decode_view hI hx, hv]; rfl
 
 theorem decode_of_view_uop (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {o : UserOp}
-    (hv : σ.view x = .uop o) : σ.decode x = .UOp o := by
+    (hv : σ.view x = .UOp o) : σ.decode x = .UOp o := by
   rw [decode_view hI hx, hv]; rfl
 
 /-! ## Builders -/
 
-def mkApply (f x : Id) : K Id := intern (.apply f x)
-def mkUOp (o : UserOp) : K Id := intern (.uop o)
+def mkApply (f x : Id) : K Id := intern (.Apply f x)
+def mkUOp (o : UserOp) : K Id := intern (.UOp o)
 
 /-- `((o a) b)`. -/
 def mkBin (o : UserOp) (a b : Id) : K Id := do
@@ -76,16 +76,16 @@ theorem mkBin_sim (hI : Inv sem σ) (o : UserOp) {a b : Id} (ha : a < σ.size) (
 /-- `(o a b)`, i.e. `Apply (Apply (UOp o) a) b`. -/
 def matchBin (o : UserOp) (σ : Store) (x : Id) : Option (Id × Id) :=
   match σ.view x with
-  | .apply g b =>
+  | .Apply g b =>
     match σ.view g with
-    | .apply e a => if σ.view e = .uop o then some (a, b) else none
+    | .Apply e a => if σ.view e = .UOp o then some (a, b) else none
     | _ => none
   | _ => none
 
 /-- `(o a)`, i.e. `Apply (UOp o) a`. -/
 def matchUn (o : UserOp) (σ : Store) (x : Id) : Option Id :=
   match σ.view x with
-  | .apply e a => if σ.view e = .uop o then some a else none
+  | .Apply e a => if σ.view e = .UOp o then some a else none
   | _ => none
 
 theorem matchBin_some (hI : Inv sem σ) {o : UserOp} {x a b : Id} (hx : x < σ.size)
@@ -263,10 +263,10 @@ def k_mk_trans : Nat → Id → Id → Id → K Id
     if t1 = 0 then pure 0 else if t2 = 0 then pure 0 else
     match matchTransCons σ x with
     | some (t3, t4, tail) => k_requires t2 t3 (k_mk_trans n t1 t4 tail)
-    | none => if σ.view x = .boolean true then mkBin .eq t1 t2 else pure 0
+    | none => if σ.view x = .Boolean true then mkBin .eq t1 t2 else pure 0
 
 theorem decode_eq_boolean_iff (hI : Inv sem σ) {x : Id} (hx : x < σ.size) {b : Bool} :
-    σ.decode x = .Boolean b ↔ σ.view x = .boolean b := by
+    σ.decode x = .Boolean b ↔ σ.view x = .Boolean b := by
   rw [decode_view hI hx]
   constructor
   · intro h; cases hv : σ.view x <;> simp [hv, Node.toTerm] at h; simp [h]
@@ -284,7 +284,7 @@ theorem k_mk_trans_sim (n : Nat) :
     show Sim miniSem σ (if t1 = 0 then pure 0 else if t2 = 0 then pure 0 else
       match matchTransCons σ x with
       | some (t3, t4, tail) => k_requires t2 t3 (k_mk_trans n t1 t4 tail)
-      | none => if σ.view x = .boolean true then mkBin .eq t1 t2 else pure 0) _
+      | none => if σ.view x = .Boolean true then mkBin .eq t1 t2 else pure 0) _
     have stuck0 := Sim.pure (sem := miniSem) hI (size_pos hI) (decode_zero hI)
     -- case 1: t1 is Stuck
     by_cases z1 : t1 = 0
@@ -330,7 +330,7 @@ theorem k_mk_trans_sim (n : Nat) :
             exact matchBin_none hI hh hm2 _ _ hd.1.2
         · rename_i hm1; exact matchBin_none hI hx hm1 _ _ hd
       simp only
-      by_cases hb : σ.view x = .boolean true
+      by_cases hb : σ.view x = .Boolean true
       · -- case 4: true
         simp only [hb, ↓reduceIte]
         apply (mkBin_sim hI .eq h1 h2).congr
