@@ -3,7 +3,7 @@ What generated programs are built from, beyond interning and matching: reading
 the store, Logos's builtin `__eo_ite` and `native_ite` (lazy in Kairos),
 natives over terms, and the call-site lemmas.
 -/
-import Kairos.Runtime.Match
+import Kairos.Gen.Prims
 
 namespace Kairos
 open Eo Store SmtEval
@@ -15,6 +15,24 @@ variable {sem : Sem} {σ : Store} {Γ : List Fact}
 
 theorem Sim.withStore {f : Store → K Id} {t : Term} (h : Sim sem σ (f σ) t) :
     Sim sem σ (Kairos.withStore f) t := h
+
+/-! ## Trying a case
+
+A program tries its cases in order: `kcase (m σ args) rhs rest` runs `rhs`
+on what the matcher bound, or `rest`. Proofs split it with `kcase_sim`, which
+only sees the case at hand, however many cases follow. -/
+
+@[inline] def kcase {α β : Type} (o : Option α) (f : α → K β) (g : K β) : K β :=
+  match o with
+  | some v => f v
+  | none => g
+
+theorem kcase_sim {α : Type} {o : Option α} {f : α → K Id} {g : K Id} {t : Term}
+    (h1 : ∀ v, o = some v → Sim sem σ (f v) t) (h2 : o = none → Sim sem σ g t) :
+    Sim sem σ (kcase o f g) t := by
+  cases ho : o with
+  | some v => exact h1 v ho
+  | none => exact h2 ho
 
 /-! ## Natives over terms -/
 
@@ -91,7 +109,11 @@ theorem Sim.call3 {k : Id → Id → Id → K Id} {f : Term → Term → Term �
 
 /-- Discharge a hypothesis of a Logos equation lemma `f.eq_k`: that an earlier
 case does not match. The facts in context (decoded shapes and earlier
-matchers' failures) close it. -/
-macro "kdis" : tactic => `(tactic| first | assumption | (intros; simp_all))
+matchers' failures) close it. It leaves the main goal (a `Sim` or `SimR`)
+alone at once: `simp_all` there could unfold the program's recursive calls. -/
+macro "kdis" : tactic => `(tactic|
+  (fail_if_success (show Sim _ _ _ _)
+   fail_if_success (show SimR _ _ _ _ _)
+   first | assumption | (intros; simp_all)))
 
 end Kairos

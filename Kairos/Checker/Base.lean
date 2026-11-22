@@ -127,7 +127,7 @@ theorem k_push_proven_sim (fuel : Nat) (hI : Inv sem σ) {F : Id} {s : KState} (
     SimR stateRep sem σ (k_push_proven fuel F s) (__eo_push_proven (σ.decode F) (s.dec σ)) := by
   have hΓ := Ctx.arg hF (Ctx.cons (f := Fact.state s (s.dec σ)) ⟨hs, rfl⟩ (Ctx.nil σ))
   rw [__eo_push_proven.eq_1]
-  refine SimR.step hΓ (simR_of ((spec fuel).s__eo_is_bool_type hI hF)) fun b σ1 hI1 hΓ1 => ?_
+  refine SimR.step hΓ (simR_of ((allS__eo_is_bool_type fuel) hI hF)) fun b σ1 hI1 hΓ1 => ?_
   have hb := hΓ1.term (.head _)
   have hF1 := hΓ1.term (.tail _ (.head _))
   have hs1 := Ctx.state hΓ1 (.tail _ (.tail _ (.head _)))
@@ -157,7 +157,7 @@ theorem k_mk_premise_list_sim (fuel : Nat) {f : Id} :
     simp only [k_mk_premise_list]
     rw [__eo_mk_premise_list.eq_1]
     refine Sim.step hΓ (intern_leaf hI rfl) fun b σ1 hI1 hΓ1 => ?_
-    exact C__eo_nil (spec fuel) hI1 hΓ1 (.tail _ (.head _)) (.head _)
+    exact C__eo_nil (allS__eo_nil fuel) hI1 hΓ1 (.tail _ (.head _)) (.head _)
   | .cons n pl, σ, S, hI, hf, hS => by
     have hΓ := Ctx.arg hf (Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ))
     simp only [k_mk_premise_list]
@@ -167,7 +167,7 @@ theorem k_mk_premise_list_sim (fuel : Nat) {f : Id} :
     have hf1 := hΓ1.term (.tail _ (.head _))
     refine Sim.step hΓ1 ((k_mk_premise_list_sim fuel pl hI1 hf1.1 hS1.1).congr
       (by rw [hf1.2, hS1.2])) fun r σ2 hI2 hΓ2 => ?_
-    exact C__eo_cons (spec fuel) hI2 hΓ2 (.tail _ (.tail _ (.head _))) (.tail _ (.head _)) (.head _)
+    exact C__eo_cons (allS__eo_cons fuel) hI2 hΓ2 (.tail _ (.tail _ (.head _))) (.tail _ (.head _)) (.head _)
 
 /-! ## Checking what a step proves -/
 
@@ -185,7 +185,7 @@ theorem k_invoke_cmd_check_proven_sim (fuel : Nat) (hI : Inv sem σ) :
     have hΓ := Ctx.arg hp (Ctx.arg hF (Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ)))
     simp only [k_invoke_cmd_check_proven, KState.dec, KStateObj.dec]
     rw [__eo_invoke_cmd_check_proven.eq_1]
-    refine SimR.step hΓ (simR_of (C__eo_eq (spec fuel) hI hΓ (.tail _ (.head _)) (.head _)))
+    refine SimR.step hΓ (simR_of (C__eo_eq (allS__eo_eq fuel) hI hΓ (.tail _ (.head _)) (.head _)))
       fun e σ1 hI1 hΓ1 => ?_
     have he := hΓ1.term (.head _)
     have hF1 := hΓ1.term (.tail _ (.tail _ (.head _)))

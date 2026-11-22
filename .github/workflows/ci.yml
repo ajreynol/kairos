@@ -6,13 +6,52 @@ on:
   pull_request:
 
 jobs:
-  generate-and-build:
+  # Compiles Logos's cached CPC signature with Logos's ethos-eoc and with
+  # kairos-eoc, and fails if Logos's committed Cpc/ and CpcMini/ are not what
+  # its own pipeline produces, or if Kairos/Gen/ is not what kairos-eoc
+  # produces. Nothing from cvc5 is fetched.
+  regeneration:
+    name: regeneration
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libgmp-dev cmake
+      - name: Install the GMP development headers
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libgmp-dev
+
+      # Keyed on the Logos pin, which fixes the Ethos commit; kairos-eoc is
+      # rebuilt every time, since its sources live here.
+      - name: Restore Logos and its Eunoia compiler
+        uses: actions/cache@v4
+        with:
+          path: install/deps
+          key: eoc-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'install/get-eo-compiler.sh') }}
+
+      - name: Build the Eunoia compiler and kairos-eoc
+        run: |
+          if [ -x install/deps/eoc/ethos/build-eoc/ethos-eoc ]; then
+            bash install/get-eo-compiler.sh --skip-ethos --werror
+          else
+            bash install/get-eo-compiler.sh --werror
+          fi
+
+      - name: Check the generated Kairos against the cached signature
+        run: bash install/install-cpc.sh --check
+
+      - name: Check the forked files against the pinned Ethos
+        run: bash scripts/fork-drift.sh
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Install elan
         run: |
@@ -20,25 +59,5 @@ jobs:
             | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Cache Ethos build
-        uses: actions/cache@v4
-        with:
-          path: deps/eoc
-          key: eoc-${{ hashFiles('lake-manifest.json') }}
-
-      - name: Fetch Logos and build ethos-eoc + kairos-eoc
-        run: |
-          if [ -x deps/eoc/ethos/build-eoc/ethos-eoc ]; then
-            scripts/get-deps.sh --skip-ethos --werror
-          else
-            scripts/get-deps.sh --werror
-          fi
-
-      - name: Kairos/Gen/ is what the pinned Logos generates
-        run: scripts/generate.sh --check
-
-      - name: Fork base matches the pinned Ethos
-        run: scripts/fork-drift.sh
-
-      - name: Build Kairos
+      - name: Build Kairos and its proofs
         run: lake build

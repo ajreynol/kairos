@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Show what changed upstream, in the files listed in eoc/FORK_BASE, between
 # the Ethos commit we forked them at and the Ethos commit the current Logos
-# pin uses (deps/eoc/ethos). Run after bumping the Logos pin.
+# pin uses (install/deps/eoc/ethos). Run after bumping the Logos pin.
 #
 # Usage: scripts/fork-drift.sh
 # Exit status: 0 if nothing changed upstream, 1 if something did.
 set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=/dev/null
-. "${repo_root}/deps/env.sh"
+. "${repo_root}/install/deps/eoc-env.sh"
 
 base="$(sed -n 's/^ETHOS_COMMIT=//p' "${repo_root}/eoc/FORK_BASE")"
 files=()

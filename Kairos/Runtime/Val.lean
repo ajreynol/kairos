@@ -6,7 +6,7 @@ that stands for the Logos value `t` under `rep`. `Sim` (term ids) is the
 instance `SimR termRep`, see `SimR.of_sim`. Checker states, argument lists and
 native results (`natRep`) use the same step lemmas.
 -/
-import Kairos.Runtime.Lift
+import Kairos.Gen.Intern
 
 namespace Kairos
 open Eo Store SmtEval

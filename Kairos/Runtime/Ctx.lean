@@ -112,30 +112,6 @@ theorem intern_leaf {n : Node} (hI : Inv sem σ) (hn : n.children = []) :
     Sim sem σ (intern n) (n.toTerm (fun _ => .Stuck)) :=
   intern_ctx (Γ := []) hI (Ctx.nil σ) (by simp [hn])
 
-theorem intern_apply {f x : Id} {F X : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
-    (hf : Fact.term f F ∈ Γ) (hx : Fact.term x X ∈ Γ) :
-    Sim sem σ (intern (.Apply f x)) (.Apply F X) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid hf, hΓ.valid hx])).congr
-    (by simp [Node.toTerm, hΓ.dec hf, hΓ.dec hx])
-
-theorem intern_var {s T : Id} {S U : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
-    (hs : Fact.term s S ∈ Γ) (hT : Fact.term T U ∈ Γ) :
-    Sim sem σ (intern (.Var s T)) (.Var S U) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid hs, hΓ.valid hT])).congr
-    (by simp [Node.toTerm, hΓ.dec hs, hΓ.dec hT])
-
-theorem intern_uconst {i : Nat} {T : Id} {U : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
-    (hT : Fact.term T U ∈ Γ) :
-    Sim sem σ (intern (.UConst i T)) (.UConst i U) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid hT])).congr
-    (by simp [Node.toTerm, hΓ.dec hT])
-
-theorem intern_dtcAppType {a b : Id} {A B : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
-    (ha : Fact.term a A ∈ Γ) (hb : Fact.term b B ∈ Γ) :
-    Sim sem σ (intern (.DtcAppType a b)) (.DtcAppType A B) :=
-  (intern_sim hI (by simp [Node.children, hΓ.valid ha, hΓ.valid hb])).congr
-    (by simp [Node.toTerm, hΓ.dec ha, hΓ.dec hb])
-
 /-- A cached program: the cache is sound for `sem`, so a hit is correct. -/
 theorem cached_ctx {p : Nat} {args : List Id} {body : K Id} {t : Term}
     (hI : Inv sem σ) (hargs : ∀ a ∈ args, a < σ.size)

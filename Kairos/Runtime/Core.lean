@@ -1,101 +1,19 @@
 /-
-Prototype of the Kairos core, hand-written against Logos's CpcMini, to fix the
-shape that kairos-eoc will later generate (milestone 2a).
+The Kairos core: the store, reading ids back as Logos terms, and the store
+invariant.
 
 * A term is an `Id` into a hash-consed `Store`: `nodes[i]` is one level of a
-  Logos `Term` whose `Term` children are `Id`s smaller than `i`.
+  Logos `Term` whose `Term` children are `Id`s smaller than `i`. `Node` is
+  generated from Logos's `Term` (Kairos/Gen/Term.lean).
 * `decode` reads an `Id` back as Logos's `Term`. It is a specification
   function only; the checker never runs it.
 * `Inv` is the store invariant: id 0 is `Stuck`, children precede parents, and
   the interning table is exact (so equal ids ⇔ equal terms).
 -/
-import CpcMini.Logos
-import Std.Data.HashMap
+import Kairos.Gen.Term
 
 namespace Kairos
 open Eo
-
-abbrev Id := Nat
-
-deriving instance Hashable for UserOp
-
-/-- Datatype declarations are stored as Logos values. Their hash is coarse on
-purpose (equality decides); interning them is future work. -/
-instance : Hashable DatatypeDecl := ⟨fun _ => 0⟩
-
-/-- One level of a Logos `Term`; `Term` children are store ids. -/
-inductive Node where
-  | UOp (o : UserOp)
-  | __eo_List
-  | __eo_List_nil
-  | __eo_List_cons
-  | Bool
-  | Boolean (b : Bool)
-  | Numeral (n : Int)
-  | Rational (q : Rat)
-  | String (s : List Nat)
-  | Binary (w n : Int)
-  | Type
-  | Stuck
-  | Apply (f x : Id)
-  | FunType
-  | Var (s T : Id)
-  | DatatypeType (s : List Nat) (dd : DatatypeDecl)
-  | DatatypeTypeRef (s : List Nat)
-  | DtcAppType (a b : Id)
-  | DtCons (s : List Nat) (dd : DatatypeDecl) (i : Nat)
-  | DtSel (s : List Nat) (dd : DatatypeDecl) (i j : Nat)
-  | USort (i : Nat)
-  | UConst (i : Nat) (T : Id)
-  deriving DecidableEq, Hashable, Inhabited
-
-namespace Node
-
-/-- The store ids a node refers to. -/
-def children : Node → List Id
-  | .Apply f x => [f, x]
-  | .Var s T => [s, T]
-  | .DtcAppType a b => [a, b]
-  | .UConst _ T => [T]
-  | _ => []
-
-/-- The Logos term a node stands for, given how to read its children. -/
-def toTerm (d : Id → Term) : Node → Term
-  | .UOp o => .UOp o
-  | .__eo_List => .__eo_List
-  | .__eo_List_nil => .__eo_List_nil
-  | .__eo_List_cons => .__eo_List_cons
-  | .Bool => .Bool
-  | .Boolean b => .Boolean b
-  | .Numeral n => .Numeral n
-  | .Rational q => .Rational q
-  | .String s => .String s
-  | .Binary w n => .Binary w n
-  | .Type => .Type
-  | .Stuck => .Stuck
-  | .Apply f x => .Apply (d f) (d x)
-  | .FunType => .FunType
-  | .Var s T => .Var (d s) (d T)
-  | .DatatypeType s dd => .DatatypeType s dd
-  | .DatatypeTypeRef s => .DatatypeTypeRef s
-  | .DtcAppType a b => .DtcAppType (d a) (d b)
-  | .DtCons s dd i => .DtCons s dd i
-  | .DtSel s dd i j => .DtSel s dd i j
-  | .USort i => .USort i
-  | .UConst i T => .UConst i (d T)
-
-theorem toTerm_congr {d d' : Id → Term} (n : Node)
-    (h : ∀ j ∈ n.children, d j = d' j) : n.toTerm d = n.toTerm d' := by
-  cases n <;> simp_all [toTerm, children]
-
-/-- Two nodes whose children read the same, injectively, are equal: reading
-is injective on nodes when it is on their children. -/
-theorem toTerm_inj {d : Id → Term} (n m : Node)
-    (hinj : ∀ a ∈ n.children, ∀ b ∈ m.children, d a = d b → a = b)
-    (h : n.toTerm d = m.toTerm d) : n = m := by
-  cases n <;> cases m <;> simp_all [toTerm, children]
-
-end Node
 
 /-- Errors are resource exhaustion only: a Kairos error is never a verdict. -/
 inductive Err where

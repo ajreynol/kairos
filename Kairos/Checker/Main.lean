@@ -63,10 +63,10 @@ theorem k_assume_guard_sim (fuel : Nat) (hI : Inv sem σ) {F : Id} (hF : F < σ.
     Sim sem σ (k_assume_guard fuel F)
       (__eo_and (__eo_is_bool_type (σ.decode F)) (__eo_is_closed (σ.decode F))) := by
   have hΓ := Ctx.arg hF (Ctx.nil σ)
-  refine Sim.step hΓ ((spec fuel).s__eo_is_bool_type hI hF) fun b σ1 hI1 hΓ1 => ?_
-  refine Sim.step hΓ1 (C__eo_is_closed (spec fuel) hI1 hΓ1 (.tail _ (.head _)))
+  refine Sim.step hΓ ((allS__eo_is_bool_type fuel) hI hF) fun b σ1 hI1 hΓ1 => ?_
+  refine Sim.step hΓ1 (C__eo_is_closed (allS__eo_is_closed fuel) hI1 hΓ1 (.tail _ (.head _)))
     fun c σ2 hI2 hΓ2 => ?_
-  exact C__eo_and (spec fuel) hI2 hΓ2 (.tail _ (.head _)) (.head _)
+  exact C__eo_and (allS__eo_and fuel) hI2 hΓ2 (.tail _ (.head _)) (.head _)
 
 def k_invoke_cmd (fuel : Nat) : KState → KCmd → K KState
   | .Stuck, _ => pure .Stuck

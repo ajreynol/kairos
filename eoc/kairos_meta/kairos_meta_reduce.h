@@ -99,6 +99,11 @@ class KairosMetaReduce : public MetaReducePlugin
     bool lifted = false;
     /** The rule dispatch: emitted to Kairos/Gen/Dispatch.lean. */
     bool dispatch = false;
+    /** Its strongly connected component of the call graph, and whether that
+     * component is recursive (its programs share a `mutual` block and a
+     * fuel-indexed spec). */
+    size_t scc = 0;
+    bool sccRecursive = false;
   };
 
  protected:
@@ -127,6 +132,16 @@ class KairosMetaReduce : public MetaReducePlugin
   std::vector<std::string> d_names;
   /** Declarations seen, for the manifest. */
   std::map<std::string, size_t> d_declCount;
+  /** The constructors of Logos's Term, in order, with their field types
+   * (Logos's printing: "Term" or a native type), as lean-meta's d_termCons. */
+  std::vector<std::pair<std::string, std::vector<std::string>>> d_termCons;
+  /** The user operators by index arity, as lean-meta's d_emittedUserOps. */
+  std::map<size_t, std::vector<std::string>> d_userOps;
+  /** Index arity of each user operator (by Eunoia name). */
+  std::map<std::string, size_t> d_userOpArity;
+  std::string printType(const Expr& t);
+  bool isAtomicEo(const Expr& c, const std::string& cname, size_t& arity);
+  void emitTermModules();
 };
 
 }  // namespace ethos

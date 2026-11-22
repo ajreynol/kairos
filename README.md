@@ -28,7 +28,8 @@ for the design.
 | `Kairos/Gen/` | Generated Lean, committed, never edited by hand |
 | `Kairos/Checker/` | The checker's datatypes and functions over ids, the end-to-end theorem, a smoke test |
 | `Kairos/Proto/` | The prototype and the golden generated-style file |
-| `scripts/` | `get-deps.sh`, `generate.sh`, `fork-drift.sh`, `logos-rev.sh`, `gen-mini.sh` (development loop) |
+| `install/` | Regeneration, laid out like Logos's: `get-eo-compiler.sh`, `install-cpc.sh` |
+| `scripts/` | `fork-drift.sh`, `logos-rev.sh` |
 
 ## Building
 
@@ -36,22 +37,10 @@ Requirements: elan, cmake >= 3.12, a C++17 compiler, GMP headers
 (`libgmp-dev`), python3, curl or wget.
 
 ```sh
-lake update Cpc            # only if .lake/packages/Cpc is missing
-scripts/get-deps.sh        # Ethos at Logos's pin -> ethos-eoc; then kairos-eoc
-scripts/generate.sh        # regenerate Kairos/Gen/  (--check: verify only)
-lake build
+install/get-eo-compiler.sh   # the pinned Logos, its Ethos, ethos-eoc and kairos-eoc
+install/install-cpc.sh       # regenerate Kairos/Gen/  (--check: verify only)
+lake build                   # Kairos and its proofs
 ```
 
-`generate.sh` runs Logos's own Lean pipeline on Logos's
-`install/defs/Cpc.cached.eo`. It checks that the Lean it produces is Logos's
-committed `Cpc/` byte for byte, apart from the header Logos's
-`install-sig.sh` adds. It then runs `kairos-eoc` on the same final signature.
-So Kairos is always compiled from exactly the input Logos was.
-
-## Moving the Logos pin
-
-1. Change `rev` in `lakefile.toml`, then `lake update Cpc`.
-2. `scripts/get-deps.sh` (rebuilds `ethos-eoc` at the new Ethos commit).
-3. `scripts/fork-drift.sh`: review upstream changes to the forked files, port
-   them, and update `eoc/FORK_BASE`.
-4. `scripts/generate.sh`, then `lake build`, then commit `Kairos/Gen/`.
+See [install/README.md](install/README.md) for what these do and how to move
+the Logos pin.
