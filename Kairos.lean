@@ -1,3 +1,3 @@
 import Kairos.Gen.Manifest
 import Kairos.Gen.Programs
-import Kairos.Checker.Mini
+import Kairos.Checker.Main

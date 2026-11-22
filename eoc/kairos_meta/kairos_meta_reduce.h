@@ -47,6 +47,9 @@ class KairosMetaReduce : public MetaReducePlugin
     /** A Logos `Proof`; in Kairos, the id of its formula. */
     PROOF,
     NATIVE,
+    /** A checker state (KState) or argument list (KArgList). */
+    STATE,
+    ARGS,
     OTHER
   };
   struct ArgInfo
@@ -94,6 +97,8 @@ class KairosMetaReduce : public MetaReducePlugin
     bool pure = false;
     /** Not compiled yet: Kairos runs Logos's function on decoded arguments. */
     bool lifted = false;
+    /** The rule dispatch: emitted to Kairos/Gen/Dispatch.lean. */
+    bool dispatch = false;
   };
 
  protected:
@@ -111,7 +116,8 @@ class KairosMetaReduce : public MetaReducePlugin
                           std::ostream& code,
                           std::ostream& specs,
                           std::ostream& calls,
-                          std::ostream& steps);
+                          std::ostream& steps,
+                          std::ostream* dispatchOut = nullptr);
 
   /** Programs in the order they were defined. */
   std::vector<Expr> d_progOrder;

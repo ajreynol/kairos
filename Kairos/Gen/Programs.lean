@@ -19,8 +19,6 @@ open Eo Kairos Store SmtEval
   __eo_push_proven: a checker definition
   __eo_mk_premise_list: a checker definition
   __eo_invoke_cmd_check_proven: a checker definition
-  __eo_cmd_step_proven: a checker definition
-  __eo_cmd_step_pop_proven: a checker definition
   __eo_invoke_cmd_step_pop: a checker definition
   __eo_invoke_cmd: a checker definition
   __eo_invoke_cmd_list: a checker definition

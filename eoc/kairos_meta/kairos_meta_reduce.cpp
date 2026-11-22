@@ -264,6 +264,34 @@ KairosMetaReduce::ArgInfo KairosMetaReduce::argInfo(const Expr& t)
     a.kType = "Id";
     a.lType = "Proof";
   }
+  else if (k == MetaKind::CHECKER_RULE)
+  {
+    a.sort = Sort::NATIVE;
+    a.kType = "CRule";
+    a.lType = "CRule";
+  }
+  else if (k == MetaKind::CHECKER_EMBED)
+  {
+    std::string name = getEmbedTypeName(getEmbedTypeApp(t));
+    if (name == "CIndexList")
+    {
+      a.sort = Sort::NATIVE;
+      a.kType = name;
+      a.lType = name;
+    }
+    else if (name == "CState")
+    {
+      a.sort = Sort::STATE;
+      a.kType = "KState";
+      a.lType = name;
+    }
+    else if (name == "CArgList")
+    {
+      a.sort = Sort::ARGS;
+      a.kType = "KArgList";
+      a.lType = name;
+    }
+  }
   else if (k == MetaKind::EO_EMBED)
   {
     // datatype declarations: Logos values on both sides
@@ -769,8 +797,13 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
                                           std::ostream& codeOut,
                                           std::ostream& specs,
                                           std::ostream& calls,
-                                          std::ostream& steps)
+                                          std::ostream& steps,
+                                          std::ostream* dispatchOut)
 {
+  const bool isDispatch = (dispatchOut != nullptr);
+  // the dispatch lives above Gen.spec: it calls at a fixed fuel
+  const std::string fuelVar = isDispatch ? "fuel" : "kfuel";
+  const std::string ihVar = isDispatch ? "(spec fuel)" : "ih";
   const std::string& f = p.lname;
   const std::string kf = "k" + f;
   const std::string sf = "S" + f;
@@ -1186,6 +1219,28 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     {
       r = finish("intern " + atomNode(e), "intern_leaf " + sc.hI + " rfl", sc, out, final);
     }
+    else if (k == Kind::APPLY && isProgramApp(e) && getName(e[0]) == "$eo_state_proven_nth")
+    {
+      std::string st = sc.vars.at(cleanSmtId(str(e[1]))).name;
+      std::vector<std::string> rws;
+      std::string n = compileNative(e[2], sc, out, rws);
+      emitRewrites(rws, sc, out);
+      r = finish("k_state_proven_nth " + st + " " + n,
+                 "C_state_proven_nth " + sc.hI + " " + sc.hG + " " + memProof(sc.gamma, st) + " _",
+                 sc, out, final);
+    }
+    else if (k == Kind::APPLY && isProgramApp(e) && getName(e[0]) == "$eo_mk_premise_list")
+    {
+      std::string fx = compileTerm(e[1], sc, out, false);
+      std::vector<std::string> rws;
+      std::string pl = compileNative(e[2], sc, out, rws);
+      emitRewrites(rws, sc, out);
+      std::string st = sc.vars.at(cleanSmtId(str(e[3]))).name;
+      r = finish("k_mk_premise_list " + fuelVar + " " + fx + " " + pl + " " + st,
+                 "C_mk_premise_list " + fuelVar + " " + sc.hI + " " + sc.hG + " "
+                     + memProof(sc.gamma, fx) + " " + memProof(sc.gamma, st) + " _",
+                 sc, out, final);
+    }
     else if (k == Kind::APPLY && isProgramApp(e))
     {
       const Prog& q = d_progs.at(getName(e[0]));
@@ -1207,8 +1262,8 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         }
       }
       emitRewrites(rws, sc, out);
-      std::string code = "k" + q.lname + " kfuel";
-      std::string prf = "C" + q.lname + " ih " + sc.hI + " " + sc.hG;
+      std::string code = "k" + q.lname + " " + fuelVar;
+      std::string prf = "C" + q.lname + " " + ihVar + " " + sc.hI + " " + sc.hG;
       for (size_t i = 0; i < ops.size(); i++)
       {
         code += " " + ops[i];
@@ -1226,8 +1281,8 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         const Prog& q = d_progs.at("$eo_mk_apply");
         std::string a = compileTerm(e[0], sc, out, false);
         std::string b = compileTerm(e[1], sc, out, false);
-        r = finish("k" + q.lname + " kfuel " + a + " " + b,
-                   "C" + q.lname + " ih " + sc.hI + " " + sc.hG + " " + memProof(sc.gamma, a)
+        r = finish("k" + q.lname + " " + fuelVar + " " + a + " " + b,
+                   "C" + q.lname + " " + ihVar + " " + sc.hI + " " + sc.hG + " " + memProof(sc.gamma, a)
                        + " " + memProof(sc.gamma, b),
                    sc, out, final);
       }
@@ -1353,8 +1408,8 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
         }
       }
       emitRewrites(rws, sc, out);
-      std::string code = "k" + q.lname + " kfuel";
-      std::string prf = "C" + q.lname + " ih " + sc.hI + " " + sc.hG;
+      std::string code = "k" + q.lname + " " + fuelVar;
+      std::string prf = "C" + q.lname + " " + ihVar + " " + sc.hI + " " + sc.hG;
       for (size_t i = 0; i < ops.size(); i++)
       {
         code += " " + ops[i];
@@ -1375,6 +1430,228 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     }
     return r;
   };
+
+  if (isDispatch)
+  {
+    std::ostream& out = *dispatchOut;
+    // names: the macro arguments (the state) by their Logos names
+    std::vector<std::string> names = argNames;
+    for (size_t i = 0; i + 1 < p.macroStart; i++)
+    {
+      names[i] = cleanSmtId(str(p.def[0][0][i + 1]));
+    }
+    // patterns over checker values, printed as Lean patterns; bound
+    // variables are collected in order
+    struct DVar
+    {
+      std::string name;
+      bool isId;
+    };
+    std::function<std::string(const Expr&, std::vector<DVar>&, std::string&)> dpat;
+    // rc: the rcases pattern for the validity of an argument list
+    dpat = [&](const Expr& e, std::vector<DVar>& vs, std::string& rc) -> std::string {
+      if (e.getKind() == Kind::PARAM)
+      {
+        rc = "-";
+        return cleanSmtId(str(e));
+      }
+      std::string raw = getName(e.getKind() == Kind::APPLY_OPAQUE ? e[0] : e);
+      AlwaysAssert(raw.compare(0, 5, "$emb_") == 0) << "kairos-meta: dispatch pattern " << e;
+      std::string rest = raw.substr(5);
+      std::string pre = rest.substr(0, rest.find('.'));
+      std::string ctor = rest.substr(rest.find('.') + 1);
+      if (pre == "r")
+      {
+        std::string cname;
+        getMetaKindFor(e, cname);
+        rc = "-";
+        return "CRule." + cleanSmtId(cname);
+      }
+      std::string ty = pre == "al" ? "KArgList" : "CIndexList";
+      if (e.getKind() != Kind::APPLY_OPAQUE)
+      {
+        rc = "-";
+        return ty + "." + ctor;
+      }
+      // cons: an element and a tail
+      std::string hd;
+      if (e[1].getKind() == Kind::PARAM)
+      {
+        hd = cleanSmtId(str(e[1]));
+        vs.push_back({hd, pre == "al"});
+      }
+      else
+      {
+        AlwaysAssert(false) << "kairos-meta: dispatch element pattern " << e[1];
+      }
+      std::string rcTail;
+      std::string tl = dpat(e[2], vs, rcTail);
+      rc = pre == "al" ? "⟨w_" + hd + ", " + rcTail + "⟩" : "-";
+      return "(" + ty + "." + ctor + " " + hd + " " + tl + ")";
+    };
+    std::stringstream def, thm;
+    def << "def " << kf << " (fuel : Nat)";
+    for (size_t i = 0; i + 1 < p.macroStart; i++)
+    {
+      def << " (" << names[i] << " : " << p.args[i].kType << ")";
+    }
+    def << " :";
+    for (size_t i = p.macroStart - 1; i < nargs; i++)
+    {
+      def << " " << p.args[i].kType << " →";
+    }
+    def << " K Id\n";
+    // the theorem's binders
+    thm << "theorem " << kf << "_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ)";
+    std::vector<std::string> gamma = {"0"};
+    std::string ctx = "Ctx.stuck hI";
+    std::stringstream dec;
+    for (size_t i = 0; i < nargs; i++)
+    {
+      const std::string& a = names[i];
+      std::string h = "h" + std::to_string(i + 1);
+      switch (p.args[i].sort)
+      {
+        case Sort::STATE:
+          thm << " {" << a << " : KState} (" << h << " : " << a << ".valid σ)";
+          ctx = "Ctx.cons (f := Fact.state " + a + " (" + a + ".dec σ)) ⟨" + h + ", rfl⟩ (" + ctx + ")";
+          gamma.push_back(a);
+          dec << " (" << a << ".dec σ)";
+          break;
+        case Sort::ARGS:
+          thm << " {" << a << " : KArgList} (" << h << " : " << a << ".valid σ)";
+          dec << " (" << a << ".dec σ)";
+          break;
+        case Sort::TERM:
+          thm << " {" << a << " : Id} (" << h << " : " << a << " < σ.size)";
+          ctx = "Ctx.arg " + h + " (" + ctx + ")";
+          gamma.push_back(a);
+          dec << " (σ.decode " << a << ")";
+          break;
+        default:
+          thm << " (" << a << " : " << p.args[i].kType << ")";
+          dec << " " << a;
+          break;
+      }
+    }
+    thm << " :\n    Sim sem σ (" << kf << " fuel";
+    for (const std::string& a : names)
+    {
+      thm << " " << a;
+    }
+    thm << ")\n      (" << f << dec.str() << ") := by\n";
+    thm << "  have hΓ := " << ctx << "\n  unfold " << kf << "\n  split\n";
+    for (size_t ci = 0; ci < p.def.getNumChildren(); ci++)
+    {
+      const Expr& hd = p.def[ci][0];
+      const Expr& body = p.def[ci][1];
+      std::vector<DVar> vs;
+      std::vector<std::string> pats;
+      std::string argsRc;
+      size_t argsPos = 0;
+      bool allParams = true;
+      for (size_t i = p.macroStart; i < hd.getNumChildren(); i++)
+      {
+        std::string rc;
+        if (hd[i].getKind() == Kind::PARAM)
+        {
+          // named as the argument, which the code and the facts use
+          pats.push_back(names[i - 1]);
+          rc = "-";
+        }
+        else
+        {
+          pats.push_back(dpat(hd[i], vs, rc));
+          allParams = false;
+        }
+        if (p.args[i - 1].sort == Sort::ARGS)
+        {
+          argsRc = rc;
+          argsPos = i;
+        }
+      }
+      def << "  |";
+      for (size_t j = 0; j < pats.size(); j++)
+      {
+        def << (j ? ", " : " ") << pats[j];
+      }
+      def << " =>";
+      std::string eqName = f + ".eq_" + std::to_string(ci + 1);
+      Scope sc;
+      sc.sig = "σ";
+      sc.hI = "hI";
+      sc.hG = "hΓ";
+      sc.gamma = gamma;
+      for (size_t i = 0; i < nargs; i++)
+      {
+        if (p.args[i].sort == Sort::STATE || p.args[i].sort == Sort::TERM)
+        {
+          sc.vars[names[i]] = {names[i], p.args[i].sort == Sort::TERM};
+        }
+      }
+      // top-level parameters of this case alias the arguments
+      for (size_t i = p.macroStart; i < hd.getNumChildren(); i++)
+      {
+        if (hd[i].getKind() == Kind::PARAM)
+        {
+          sc.vars[cleanSmtId(str(hd[i]))] = {names[i - 1], p.args[i - 1].sort == Sort::TERM};
+        }
+      }
+      Out o;
+      thm << "  · ";
+      std::string pind = "    ";
+      if (!allParams)
+      {
+        if (!vs.empty())
+        {
+          thm << "rename_i";
+          for (const DVar& v : vs)
+          {
+            thm << " " << v.name;
+          }
+          thm << "\n" << pind;
+        }
+        std::string hctx = "hΓ";
+        bool anyId = false;
+        for (const DVar& v : vs)
+        {
+          sc.vars[v.name] = {v.name, v.isId};
+          if (v.isId)
+          {
+            anyId = true;
+          }
+        }
+        if (anyId)
+        {
+          thm << "obtain " << argsRc << " := h" << argsPos << "\n" << pind;
+          for (const DVar& v : vs)
+          {
+            if (v.isId)
+            {
+              hctx = "Ctx.arg w_" + v.name + " (" + hctx + ")";
+              sc.gamma.push_back(v.name);
+            }
+          }
+          thm << "have hΓb := " << hctx << "\n" << pind;
+          sc.hG = "hΓb";
+        }
+        thm << "simp only [KArgList.dec]\n" << pind;
+      }
+      thm << "rw [" << eqName << "]; kside\n";
+      compileTerm(body, sc, o, true);
+      def << " do\n";
+      for (const std::string& l : o.code)
+      {
+        def << "    " << replaceAll(l, "\n", "\n    ") << "\n";
+      }
+      for (const std::string& l : o.proof)
+      {
+        thm << pind << replaceAll(l, "\n", "\n" + pind) << "\n";
+      }
+    }
+    out << def.str() << "\n" << thm.str() << "\n";
+    return "";
+  }
 
   // --- the alternatives ---
   size_t nalts = p.alts.size();
@@ -2084,6 +2361,13 @@ void KairosMetaReduce::finalize()
   for (const std::string& n : d_names)
   {
     analyze(d_progs[n]);
+    if (n == "$eo_cmd_step_proven" || n == "$eo_cmd_step_pop_proven")
+    {
+      Prog& p = d_progs[n];
+      p.dispatch = true;
+      p.supported = true;
+      p.why.clear();
+    }
   }
   // programs over native values only are Logos's own functions to Kairos
   for (const std::string& n : d_names)
@@ -2118,7 +2402,7 @@ void KairosMetaReduce::finalize()
   for (const std::string& n : d_names)
   {
     Prog& p = d_progs[n];
-    if (p.pure)
+    if (p.pure || p.dispatch)
     {
       continue;
     }
@@ -2138,7 +2422,7 @@ void KairosMetaReduce::finalize()
     for (const std::string& n : d_names)
     {
       Prog& p = d_progs[n];
-      if (!p.supported || p.lifted || p.pure)
+      if (!p.supported || p.lifted || p.pure || p.dispatch)
       {
         continue;
       }
@@ -2207,7 +2491,8 @@ void KairosMetaReduce::finalize()
   }
 
   std::stringstream matchers, code, specs, calls, steps, sem, zero, succ, skipped, lifted;
-  size_t npure = 0, nlifted = 0;
+  size_t npure = 0, nlifted = 0, ndispatch = 0;
+  std::stringstream dispatch;
   std::vector<std::string> fields;
   size_t nsupp = 0;
   for (const std::string& n : d_names)
@@ -2216,6 +2501,13 @@ void KairosMetaReduce::finalize()
     if (p.pure)
     {
       npure++;
+      continue;
+    }
+    if (p.dispatch)
+    {
+      std::stringstream dm, dc, ds, dcl, dst;
+      emitProgram(p, dm, dc, ds, dcl, dst, &dispatch);
+      ndispatch++;
       continue;
     }
     if (!p.supported)
@@ -2302,6 +2594,14 @@ void KairosMetaReduce::finalize()
   }
   std::ofstream os(path);
   os << outText.str();
+  std::ofstream ds(getOutputPath("kairos/Kairos/Gen/Dispatch.lean"));
+  ds << "-- This file is auto-generated by scripts/generate.sh (kairos-eoc) from the\n"
+     << "-- signature of the pinned Logos. Do not edit.\n"
+     << "-- The rule dispatch: " << ndispatch << " programs.\n"
+     << "import Kairos.Checker.Base\n\n"
+     << "set_option linter.unusedVariables false\n\n"
+     << "namespace Kairos.Checker\nopen Eo Kairos Store SmtEval Kairos.Gen\n\n"
+     << dispatch.str() << "end Kairos.Checker\n";
 }
 
 }  // namespace ethos

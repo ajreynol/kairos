@@ -10,4 +10,5 @@ O=build/kairos-out-mini
 rm -rf "$O"
 ETHOS_PLUGIN_OUTPUT_DIR="$PWD/$O" "$KAIROS_EOC" build/eoc-out-mini/lean-cpc-final.eo >/dev/null
 cp "$O/kairos/Kairos/Gen/Programs.lean" Kairos/Gen/Programs.lean
-lake env lean Kairos/Gen/Programs.lean
+cp "$O/kairos/Kairos/Gen/Dispatch.lean" Kairos/Gen/Dispatch.lean
+lake build Kairos

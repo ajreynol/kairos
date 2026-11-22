@@ -12,8 +12,8 @@ refutation, so does Logos's `__eo_checker_is_refutation` (Lean's standard
 axioms only). `kairos-eoc` generates the term programs and their proofs
 (`Kairos/Gen/Programs.lean`: 36 of 57 programs, 2 of them lifted, 4 over
 native values only). The checker (`Kairos/Checker/`) mirrors lean-meta's
-fixed checker template by hand; its rule dispatch is written by hand for now
-and is the next thing to generate. See [docs/prototype.md](docs/prototype.md)
+fixed checker template by hand; the rule dispatch, the part of the checker
+that depends on the rules, is generated (`Kairos/Gen/Dispatch.lean`). See [docs/prototype.md](docs/prototype.md)
 for the design.
 
 ## Layout
