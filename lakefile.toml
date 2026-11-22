@@ -18,7 +18,7 @@ moreLeanArgs = ["-DwarningAsError=true"]
 
 [[lean_lib]]
 name = "KairosProto"
-roots = ["Kairos.Runtime.Core", "Kairos.Runtime.Monad", "Kairos.Runtime.Ctx", "Kairos.Runtime.Match", "Kairos.Runtime.Prog", "Kairos.Runtime.Lift", "Kairos.Proto.Mini", "Kairos.Proto.Golden"]
+roots = ["Kairos.Runtime.Core", "Kairos.Runtime.Monad", "Kairos.Runtime.Ctx", "Kairos.Runtime.Match", "Kairos.Runtime.Prog", "Kairos.Runtime.Lift", "Kairos.Runtime.Val", "Kairos.Checker.Test", "Kairos.Proto.Mini", "Kairos.Proto.Golden"]
 
 [[lean_exe]]
 name = "kairos-proto-bench"

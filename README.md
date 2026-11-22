@@ -5,14 +5,16 @@ refine [Logos](https://github.com/cvc5/logos). See [VISION.md](VISION.md) for
 the goals, the correctness argument, and how it is compared with
 [Pathos](https://github.com/daniel-larraz/pathos).
 
-**Status: milestone 2 (CpcMini) in progress.** `kairos-eoc` generates
-Kairos programs with machine-checked proofs that they compute Logos's
-functions (`Kairos/Gen/Programs.lean`). It currently covers 36 of CpcMini's 57
-programs, including the five rules and `__eo_typeof`; what remains is the
-checker's state machine. The hand-written runtime the
-generated code builds on is in `Kairos/Runtime/`; `Kairos/Proto/` holds the
-prototype and the golden output the generator was written against (see
-[docs/prototype.md](docs/prototype.md)).
+**Status: milestone 2 (CpcMini) end to end.** For CpcMini, Logos's five-rule
+calculus, Kairos checks proofs and is proven to agree with Logos:
+`Kairos.Checker.kairos_refines_logos` says that if Kairos's checker accepts a
+refutation, so does Logos's `__eo_checker_is_refutation` (Lean's standard
+axioms only). `kairos-eoc` generates the term programs and their proofs
+(`Kairos/Gen/Programs.lean`: 36 of 57 programs, 2 of them lifted, 4 over
+native values only). The checker (`Kairos/Checker/`) mirrors lean-meta's
+fixed checker template by hand; its rule dispatch is written by hand for now
+and is the next thing to generate. See [docs/prototype.md](docs/prototype.md)
+for the design.
 
 ## Layout
 
@@ -24,6 +26,7 @@ prototype and the golden output the generator was written against (see
 | `eoc/FORK_BASE` | The upstream Ethos files the stage is forked from, and the commit they were forked at |
 | `Kairos/Runtime/` | The hand-written core: store, program logic, contexts of facts, matching, program primitives |
 | `Kairos/Gen/` | Generated Lean, committed, never edited by hand |
+| `Kairos/Checker/` | The checker's datatypes and functions over ids, the end-to-end theorem, a smoke test |
 | `Kairos/Proto/` | The prototype and the golden generated-style file |
 | `scripts/` | `get-deps.sh`, `generate.sh`, `fork-drift.sh`, `logos-rev.sh`, `gen-mini.sh` (development loop) |
 

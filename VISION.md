@@ -184,8 +184,10 @@ caching off, Logos, Pathos, Ethos.
    commit and `kairos-eoc` with a stub stage that emits a manifest of the
    signature. Check that the pipeline reproduces Logos's `Cpc/`. Regeneration
    and a `--check` mode run in CI.
-2. **CpcMini end to end.** *(in progress: runtime, prototype, golden output,
-   and generated programs with proofs for 27 of 57 CpcMini programs.)*
+2. **CpcMini end to end.** *(done, with the rule dispatch written by hand:
+   `kairos_refines_logos`. Remaining: generate the dispatch, and compose with
+   Logos's `correct___eo_is_refutation` in a separate project that depends on
+   Logos's `verification/`, since that one requires Mathlib.)*
    Generate the code for Logos's five-rule CpcMini,
    build the store and cache core, and prove `kairos_refines_logos` for
    CpcMini with generated lemmas. This is the direct counterpart of Pathos's
