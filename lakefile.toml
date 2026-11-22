@@ -16,8 +16,9 @@ rev = "4b25707331d5408c0b2597c942ddce892c1f7f3b"
 name = "Kairos"
 # maxHeartbeats on the command line: Lean generates the equation lemmas of
 # Logos's (imported) definitions with the command line's options, not the
-# file's, and those of __eo_typeof need more than the default.
-moreLeanArgs = ["-DwarningAsError=true", "-DmaxHeartbeats=20000000"]
+# file's, and those of __eo_typeof (heartbeats) and of the many-argument rules
+# (recursion depth) need more than the defaults.
+moreLeanArgs = ["-DwarningAsError=true", "-DmaxHeartbeats=20000000", "-DmaxRecDepth=100000"]
 
 [[lean_lib]]
 name = "KairosTest"

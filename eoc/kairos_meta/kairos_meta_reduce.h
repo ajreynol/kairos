@@ -137,6 +137,8 @@ class KairosMetaReduce : public MetaReducePlugin
   std::vector<std::pair<std::string, std::vector<std::string>>> d_termCons;
   /** The user operators by index arity, as lean-meta's d_emittedUserOps. */
   std::map<size_t, std::vector<std::string>> d_userOps;
+  /** The number of rules (CRule's constructors). */
+  size_t d_numRules = 0;
   /** Index arity of each user operator (by Eunoia name). */
   std::map<std::string, size_t> d_userOpArity;
   std::string printType(const Expr& t);

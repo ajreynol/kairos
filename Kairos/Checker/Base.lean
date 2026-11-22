@@ -116,7 +116,7 @@ theorem k_push_check_sim {mk : Id → KStateObj} {lmk : Term → CStateObj}
     show KState.dec σ .Stuck = _
     rw [g2]
     · rfl
-    · exact fun e => hv (decode_boolean_inv hI e)
+    · exact fun e => hv (decode_Boolean_inv hI e)
 
 def k_push_proven (fuel : Nat) (F : Id) (s : KState) : K KState := do
   let b ← k__eo_is_bool_type fuel F

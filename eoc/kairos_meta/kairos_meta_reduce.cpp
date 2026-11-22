@@ -5,6 +5,7 @@
 #include <functional>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include "linear_patterns/linear_patterns.h"
 #include "state.h"
@@ -193,6 +194,10 @@ void KairosMetaReduce::finalizeDecl(const Expr& e)
   std::string cnamek;
   MetaKind tk = getMetaKindFor(e, cnamek);
   d_declCount[metaKindToString(tk)]++;
+  if (tk == MetaKind::CHECKER_RULE)
+  {
+    d_numRules++;
+  }
   if (tk != MetaKind::EUNOIA || str(e) == "$eo_pf")
   {
     return;
@@ -1637,172 +1642,661 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       rc = pre == "al" ? "⟨w_" + hd + ", " + rcTail + "⟩" : "-";
       return "(" + ty + "." + ctor + " " + hd + " " + tl + ")";
     };
-    std::stringstream def, thm;
-    def << "def " << kf << " (fuel : Nat)";
-    for (size_t i = 0; i + 1 < p.macroStart; i++)
+    // One Kairos function per rule. It matches every shape of its list
+    // arguments up to the depth of the rule's pattern; on each shape, Logos's
+    // dispatch reduces by unfolding to the rule's right-hand side or to
+    // Stuck. So no equation lemma of the dispatch is needed: Lean takes too
+    // long to generate them for hundreds of rules.
+    struct Shape
     {
-      def << " (" << names[i] << " : " << p.args[i].kType << ")";
-    }
-    def << " :";
-    for (size_t i = p.macroStart - 1; i < nargs; i++)
-    {
-      def << " " << p.args[i].kType << " →";
-    }
-    def << " K Id\n";
-    // the theorem's binders
-    thm << "theorem " << kf << "_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ)";
+      std::string text;
+      bool match;
+      std::vector<DVar> vars;
+      std::string rc;
+    };
+    // the shapes of a list pattern, left to right
+    std::function<std::vector<Shape>(const Expr&)> listShapes =
+        [&](const Expr& e) -> std::vector<Shape> {
+      if (e.getKind() == Kind::PARAM)
+      {
+        return {{cleanSmtId(str(e)), true, {}, "-"}};
+      }
+      std::string raw = getName(e.getKind() == Kind::APPLY_OPAQUE ? e[0] : e);
+      std::string rest = raw.substr(5);
+      std::string pre = rest.substr(0, rest.find('.'));
+      std::string ty = pre == "al" ? "KArgList" : "CIndexList";
+      if (e.getKind() != Kind::APPLY_OPAQUE)
+      {
+        // nil: anything longer does not match
+        return {{ty + ".nil", true, {}, "-"}, {"(" + ty + ".cons _ _)", false, {}, "-"}};
+      }
+      std::string hd = cleanSmtId(str(e[1]));
+      std::vector<Shape> out = {{ty + ".nil", false, {}, "-"}};
+      for (const Shape& t : listShapes(e[2]))
+      {
+        Shape sh;
+        sh.match = t.match;
+        if (t.match)
+        {
+          sh.text = "(" + ty + ".cons " + hd + " " + t.text + ")";
+          sh.vars = {{hd, pre == "al"}};
+          sh.vars.insert(sh.vars.end(), t.vars.begin(), t.vars.end());
+          sh.rc = pre == "al" ? "⟨w_" + hd + ", " + t.rc + "⟩" : "-";
+        }
+        else
+        {
+          sh.text = "(" + ty + ".cons _ " + t.text + ")";
+        }
+        out.push_back(sh);
+      }
+      return out;
+    };
+    // the arguments after the rule, their binders, and the call of a rule's lemma
+    size_t first = p.macroStart;   // index in hd of the rule
+    std::stringstream bind, decRest, ktys, callArgs;
     std::vector<std::string> gamma = {"0"};
     std::string ctx = "Ctx.stuck hI";
-    std::stringstream dec;
-    for (size_t i = 0; i < nargs; i++)
+    for (size_t i = 0; i + 1 < p.macroStart; i++)
     {
       const std::string& a = names[i];
       std::string h = "h" + std::to_string(i + 1);
+      bind << " {" << a << " : KState} (" << h << " : " << a << ".valid σ)";
+      ctx = "Ctx.cons (f := Fact.state " + a + " (" + a + ".dec σ)) ⟨" + h + ", rfl⟩ (" + ctx + ")";
+      gamma.push_back(a);
+      callArgs << " " << h;
+    }
+    std::string sDec;
+    for (size_t i = 0; i + 1 < p.macroStart; i++)
+    {
+      sDec += " (" + names[i] + ".dec σ)";
+    }
+    for (size_t i = first; i < nargs; i++)
+    {
+      const std::string& a = names[i];
+      std::string h = "h" + std::to_string(i + 1);
+      ktys << " " << p.args[i].kType << " →";
       switch (p.args[i].sort)
       {
-        case Sort::STATE:
-          thm << " {" << a << " : KState} (" << h << " : " << a << ".valid σ)";
-          ctx = "Ctx.cons (f := Fact.state " + a + " (" + a + ".dec σ)) ⟨" + h + ", rfl⟩ (" + ctx + ")";
-          gamma.push_back(a);
-          dec << " (" << a << ".dec σ)";
-          break;
         case Sort::ARGS:
-          thm << " {" << a << " : KArgList} (" << h << " : " << a << ".valid σ)";
-          dec << " (" << a << ".dec σ)";
+          bind << " {" << a << " : KArgList} (" << h << " : " << a << ".valid σ)";
+          decRest << " (" << a << ".dec σ)";
+          callArgs << " " << h;
           break;
         case Sort::TERM:
-          thm << " {" << a << " : Id} (" << h << " : " << a << " < σ.size)";
+          bind << " {" << a << " : Id} (" << h << " : " << a << " < σ.size)";
           ctx = "Ctx.arg " + h + " (" + ctx + ")";
           gamma.push_back(a);
-          dec << " (σ.decode " << a << ")";
+          decRest << " (σ.decode " << a << ")";
+          callArgs << " " << h;
           break;
         default:
-          thm << " (" << a << " : " << p.args[i].kType << ")";
-          dec << " " << a;
+          bind << " (" << a << " : " << p.args[i].kType << ")";
+          decRest << " " << a;
+          callArgs << " " << a;
           break;
       }
     }
-    thm << " :\n    Sim sem σ (" << kf << " fuel";
+    std::stringstream rules, top;
+    std::string stateBinders;
+    for (size_t i = 0; i + 1 < p.macroStart; i++)
+    {
+      stateBinders += " (" + names[i] + " : KState)";
+    }
+    top << "def " << kf << " (fuel : Nat)" << stateBinders << " : " << p.args[first - 1].kType
+        << " →" << ktys.str() << " K Id\n";
+    std::stringstream topThm;
+    topThm << "theorem " << kf << "_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ)";
+    {
+      // the same binders, with the rule in between
+      std::stringstream b2;
+      for (size_t i = 0; i + 1 < p.macroStart; i++)
+      {
+        b2 << " {" << names[i] << " : KState} (h" << i + 1 << " : " << names[i] << ".valid σ)";
+      }
+      b2 << " (" << names[first - 1] << " : CRule)";
+      std::string rest = bind.str();
+      // drop the state binders already printed
+      for (size_t i = 0; i + 1 < p.macroStart; i++)
+      {
+        std::string sb = " {" + names[i] + " : KState} (h" + std::to_string(i + 1) + " : "
+                         + names[i] + ".valid σ)";
+        rest = replaceAll(rest, sb, "");
+      }
+      topThm << b2.str() << rest;
+    }
+    topThm << " :\n    Sim sem σ (" << kf << " fuel";
     for (const std::string& a : names)
     {
-      thm << " " << a;
+      topThm << " " << a;
     }
-    thm << ")\n      (" << f << dec.str() << ") := by\n";
-    thm << "  have hΓ := " << ctx << "\n  unfold " << kf << "\n  split\n";
+    topThm << ")\n      (" << f << sDec << " " << names[first - 1] << decRest.str()
+           << ") := by\n  cases " << names[first - 1] << "\n";
+    size_t nrules = 0;
     for (size_t ci = 0; ci < p.def.getNumChildren(); ci++)
     {
       const Expr& hd = p.def[ci][0];
       const Expr& body = p.def[ci][1];
-      std::vector<DVar> vs;
-      std::vector<std::string> pats;
-      std::string argsRc;
-      size_t argsPos = 0;
-      bool allParams = true;
-      for (size_t i = p.macroStart; i < hd.getNumChildren(); i++)
+      if (hd[first].getKind() == Kind::PARAM)
       {
-        std::string rc;
+        continue;   // the catch-all: Stuck
+      }
+      nrules++;
+      std::vector<DVar> ignore;
+      std::string rrc;
+      std::string rule = dpat(hd[first], ignore, rrc);   // CRule.X
+      std::string rname = rule.substr(6);
+      std::string kr = "kr" + f + "_" + rname;
+      top << "  | " << rule;
+      for (size_t i = first; i < nargs; i++)
+      {
+        top << ", " << names[i];
+      }
+      top << " => " << kr << " fuel";
+      for (size_t i = 0; i + 1 < p.macroStart; i++)
+      {
+        top << " " << names[i];
+      }
+      for (size_t i = first; i < nargs; i++)
+      {
+        top << " " << names[i];
+      }
+      top << "\n";
+      topThm << "  case " << rname << " => exact " << kr << "_sim fuel hI" << callArgs.str() << "\n";
+      // the rule's function: the product of the shapes of its arguments
+      std::vector<std::vector<Shape>> perArg;
+      for (size_t i = first + 1; i < hd.getNumChildren(); i++)
+      {
         if (hd[i].getKind() == Kind::PARAM)
         {
-          // named as the argument, which the code and the facts use
-          pats.push_back(names[i - 1]);
-          rc = "-";
+          perArg.push_back({{names[i - 1], true, {}, "-"}});
         }
         else
         {
-          pats.push_back(dpat(hd[i], vs, rc));
-          allParams = false;
+          perArg.push_back(listShapes(hd[i]));
         }
-        if (p.args[i - 1].sort == Sort::ARGS)
+      }
+      std::vector<std::pair<std::vector<std::string>, std::vector<const Shape*>>> alts;
+      std::function<void(size_t, std::vector<std::string>, std::vector<const Shape*>)> enumerate =
+          [&](size_t k, std::vector<std::string> texts, std::vector<const Shape*> chosen) {
+            if (k == perArg.size())
+            {
+              alts.emplace_back(texts, chosen);
+              return;
+            }
+            for (const Shape& sh : perArg[k])
+            {
+              std::vector<std::string> t2 = texts;
+              std::vector<const Shape*> c2 = chosen;
+              t2.push_back(sh.text);
+              c2.push_back(&sh);
+              if (!sh.match)
+              {
+                for (size_t j = k + 1; j < perArg.size(); j++)
+                {
+                  t2.push_back("_");
+                  c2.push_back(nullptr);
+                }
+                alts.emplace_back(t2, c2);
+                continue;
+              }
+              enumerate(k + 1, t2, c2);
+            }
+          };
+      enumerate(0, {}, {});
+      std::stringstream def, thm;
+      def << "def " << kr << " (fuel : Nat)" << stateBinders << " :" << ktys.str() << " K Id\n";
+      thm << "theorem " << kr << "_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ)" << bind.str()
+          << " :\n    Sim sem σ (" << kr << " fuel";
+      for (size_t i = 0; i + 1 < p.macroStart; i++)
+      {
+        thm << " " << names[i];
+      }
+      for (size_t i = first; i < nargs; i++)
+      {
+        thm << " " << names[i];
+      }
+      thm << ")\n      (" << f << sDec << " " << rule << decRest.str() << ") := by\n"
+          << "  have hΓ := " << ctx << "\n  unfold " << kr << "\n  split\n";
+      for (const auto& [texts, chosen] : alts)
+      {
+        bool match = true;
+        for (const Shape* sh : chosen)
         {
-          argsRc = rc;
-          argsPos = i;
+          match &= (sh != nullptr && sh->match);
         }
-      }
-      def << "  |";
-      for (size_t j = 0; j < pats.size(); j++)
-      {
-        def << (j ? ", " : " ") << pats[j];
-      }
-      def << " =>";
-      std::string eqName = f + ".eq_" + std::to_string(ci + 1);
-      Scope sc;
-      sc.sig = "σ";
-      sc.hI = "hI";
-      sc.hG = "hΓ";
-      sc.gamma = gamma;
-      for (size_t i = 0; i < nargs; i++)
-      {
-        if (p.args[i].sort == Sort::STATE || p.args[i].sort == Sort::TERM)
+        def << "  |";
+        for (size_t j = 0; j < texts.size(); j++)
         {
-          sc.vars[names[i]] = {names[i], p.args[i].sort == Sort::TERM};
+          def << (j ? ", " : " ") << texts[j];
         }
-      }
-      // top-level parameters of this case alias the arguments
-      for (size_t i = p.macroStart; i < hd.getNumChildren(); i++)
-      {
-        if (hd[i].getKind() == Kind::PARAM)
+        def << " =>";
+        thm << "  · ";
+        std::string pind = "    ";
+        if (!match)
         {
-          sc.vars[cleanSmtId(str(hd[i]))] = {names[i - 1], p.args[i - 1].sort == Sort::TERM};
+          def << " pure 0\n";
+          thm << "unfold " << f << "; (try simp only [KArgList.dec]); exact Sim.stuck hI\n";
+          continue;
         }
-      }
-      Out o;
-      thm << "  · ";
-      std::string pind = "    ";
-      if (!allParams)
-      {
+        Scope sc;
+        sc.sig = "σ";
+        sc.hI = "hI";
+        sc.hG = "hΓ";
+        sc.gamma = gamma;
+        for (size_t i = 0; i < nargs; i++)
+        {
+          if (p.args[i].sort == Sort::STATE || p.args[i].sort == Sort::TERM)
+          {
+            sc.vars[names[i]] = {names[i], p.args[i].sort == Sort::TERM};
+          }
+        }
+        for (size_t i = first + 1; i < hd.getNumChildren(); i++)
+        {
+          if (hd[i].getKind() == Kind::PARAM)
+          {
+            sc.vars[cleanSmtId(str(hd[i]))] = {names[i - 1], p.args[i - 1].sort == Sort::TERM};
+          }
+        }
+        std::vector<DVar> vs;
+        std::string argsRc = "-";
+        size_t argsPos = 0;
+        for (size_t j = 0; j < chosen.size(); j++)
+        {
+          vs.insert(vs.end(), chosen[j]->vars.begin(), chosen[j]->vars.end());
+          size_t i = first + 1 + j;
+          if (p.args[i - 1].sort == Sort::ARGS)
+          {
+            argsRc = chosen[j]->rc;
+            argsPos = i;
+          }
+        }
+        bool first_line = true;
+        auto tl = [&](const std::string& l) {
+          thm << (first_line ? "" : pind) << l << "\n";
+          first_line = false;
+        };
         if (!vs.empty())
         {
-          thm << "rename_i";
+          std::string r = "rename_i";
           for (const DVar& v : vs)
           {
-            thm << " " << v.name;
+            r += " " + v.name;
           }
-          thm << "\n" << pind;
+          tl(r);
         }
-        std::string hctx = "hΓ";
         bool anyId = false;
+        std::string hctx = "hΓ";
         for (const DVar& v : vs)
         {
           sc.vars[v.name] = {v.name, v.isId};
           if (v.isId)
           {
             anyId = true;
+            hctx = "Ctx.arg w_" + v.name + " (" + hctx + ")";
+            sc.gamma.push_back(v.name);
           }
         }
         if (anyId)
         {
-          thm << "obtain " << argsRc << " := h" << argsPos << "\n" << pind;
-          for (const DVar& v : vs)
-          {
-            if (v.isId)
-            {
-              hctx = "Ctx.arg w_" + v.name + " (" + hctx + ")";
-              sc.gamma.push_back(v.name);
-            }
-          }
-          thm << "have hΓb := " << hctx << "\n" << pind;
+          tl("obtain " + argsRc + " := h" + std::to_string(argsPos));
+          tl("have hΓb := " + hctx);
           sc.hG = "hΓb";
         }
-        thm << "simp only [KArgList.dec]\n" << pind;
+        tl("unfold " + f + "; (try simp only [KArgList.dec])");
+        Out o;
+        compileTerm(body, sc, o, true);
+        def << " do\n";
+        for (const std::string& l : o.code)
+        {
+          def << "    " << replaceAll(l, "\n", "\n    ") << "\n";
+        }
+        for (const std::string& l : o.proof)
+        {
+          tl(replaceAll(l, "\n", "\n" + pind));
+        }
       }
-      thm << "rw [" << eqName << "]; kside\n";
-      compileTerm(body, sc, o, true);
-      def << " do\n";
-      for (const std::string& l : o.code)
-      {
-        def << "    " << replaceAll(l, "\n", "\n    ") << "\n";
-      }
-      for (const std::string& l : o.proof)
-      {
-        thm << pind << replaceAll(l, "\n", "\n" + pind) << "\n";
-      }
+      rules << def.str() << "\n" << thm.str() << "\n";
     }
-    out << def.str() << "\n" << thm.str() << "\n";
+    if (nrules < d_numRules)
+    {
+      // the rules this dispatch has no case for: Stuck
+      top << "  | _";
+      for (size_t i = first; i < nargs; i++)
+      {
+        top << ", _";
+      }
+      top << " => pure 0\n";
+      topThm << "  all_goals (unfold " << kf << " " << f << "; exact Sim.stuck hI)\n";
+    }
+    out << rules.str() << top.str() << "\n" << topThm.str() << "\n";
     return "";
   }
 
   // --- the alternatives ---
   size_t nalts = p.alts.size();
+
+  // Patterns as trees, by alternative and argument, to compute the
+  // hypotheses Lean gives the equation lemma of each case: one per earlier
+  // case whose pattern unifies with this one, constraining this case's
+  // variables to the earlier case's subpatterns. They are emitted as `have`s,
+  // so that `kdis` closes them by `assumption` rather than by `simp_all`.
+  struct PN
+  {
+    enum K
+    {
+      VAR,
+      LEAF,
+      CTOR
+    } k;
+    std::string text;  // VAR: name; LEAF: Logos term; CTOR: Logos constructor
+    std::string type;  // VAR: Logos type
+    std::vector<std::shared_ptr<PN>> cs;
+  };
+  using PNP = std::shared_ptr<PN>;
+  std::function<PNP(const Expr&)> toPN = [&](const Expr& e) -> PNP {
+    auto n = std::make_shared<PN>();
+    Kind k = e.getKind();
+    if (k == Kind::PARAM)
+    {
+      n->k = PN::VAR;
+      n->text = cleanSmtId(str(e));
+      n->type = "Term";
+      return n;
+    }
+    if (e.getNumChildren() == 0)
+    {
+      n->k = PN::LEAF;
+      n->text = termOfNode(atomNode(e));
+      return n;
+    }
+    n->k = PN::CTOR;
+    if (k == Kind::FUNCTION_TYPE)
+    {
+      auto g = std::make_shared<PN>();
+      g->k = PN::CTOR;
+      g->text = "Term.Apply";
+      auto ft = std::make_shared<PN>();
+      ft->k = PN::LEAF;
+      ft->text = "Term.FunType";
+      g->cs = {ft, toPN(e[0])};
+      n->text = "Term.Apply";
+      n->cs = {g, toPN(e[1])};
+      return n;
+    }
+    if (k == Kind::APPLY)
+    {
+      n->text = "Term.Apply";
+      n->cs = {toPN(e[0]), toPN(e[1])};
+      return n;
+    }
+    if (!isEmbedCons(e[0]))
+    {
+      size_t ar = d_userOpArity.at(getName(e[0]));
+      std::string ocname;
+      getMetaKindFor(e[0], ocname);
+      n->text = "Term.UOp" + std::to_string(ar);
+      auto op = std::make_shared<PN>();
+      op->k = PN::LEAF;
+      op->text = "UserOp" + std::to_string(ar) + "." + cleanSmtId(ocname);
+      n->cs.push_back(op);
+      for (size_t i = 1; i < e.getNumChildren(); i++)
+      {
+        n->cs.push_back(toPN(e[i]));
+      }
+      return n;
+    }
+    std::string cname;
+    getMetaKindFor(e[0], cname);
+    const CtorInfo& ci = ctorTable().at(cname);
+    n->text = "Term." + cname;
+    for (size_t i = 1; i < e.getNumChildren(); i++)
+    {
+      PNP c = toPN(e[i]);
+      if (c->k == PN::VAR && ci.fields[i - 1] != "I")
+      {
+        c->type = ci.fields[i - 1].substr(2);
+      }
+      n->cs.push_back(c);
+    }
+    return n;
+  };
+  // the pattern of each alternative at each argument (null: a variable that
+  // is the argument itself)
+  std::vector<std::vector<PNP>> altPats(nalts);
+  for (size_t ai = 0; ai < nalts; ai++)
+  {
+    const Alt& alt = p.alts[ai];
+    altPats[ai].resize(nargs);
+    for (size_t i = 0; i < nargs; i++)
+    {
+      if (alt.kind == Alt::GUARD && alt.arg == i + 1)
+      {
+        auto n = std::make_shared<PN>();
+        n->k = PN::LEAF;
+        n->text = "Term.Stuck";
+        altPats[ai][i] = n;
+      }
+      else if (alt.kind == Alt::CASE && p.args[i].sort == Sort::TERM
+               && p.def[alt.ci][0][i + 1].getKind() != Kind::PARAM)
+      {
+        altPats[ai][i] = toPN(p.def[alt.ci][0][i + 1]);
+      }
+      else if (alt.kind == Alt::CASE && p.args[i].sort == Sort::PROOF
+               && p.def[alt.ci][0][i + 1][1].getKind() != Kind::PARAM)
+      {
+        // (pf F): the formula's pattern, on the formula's id
+        altPats[ai][i] = toPN(p.def[alt.ci][0][i + 1][1]);
+      }
+    }
+  }
+  // the bound variables of each alternative, in its matcher's order
+  std::vector<std::vector<std::pair<std::string, bool>>> altBound(nalts);
+  // The hypotheses of case k's equation lemma, as `have`s proven from the
+  // earlier cases' failure facts. kform maps a variable of case k to the
+  // Logos term it stands for; dnames are case k's decoded-shape facts.
+  auto overlapHaves = [&](size_t k, const std::map<std::string, std::string>& kform,
+                          const std::vector<std::string>& dnames) {
+    std::vector<std::string> out;
+    for (size_t j = 0; j < k; j++)
+    {
+      if (p.alts[j].kind == Alt::DEFAULT)
+      {
+        continue;
+      }
+      std::map<std::string, std::string> subst;   // j's variables fixed by k
+      std::vector<std::pair<std::string, PNP>> eqs;   // k's form = j's subpattern
+      bool clash = false;
+      std::function<std::string(const PNP&)> kprint = [&](const PNP& n) -> std::string {
+        if (n->k == PN::VAR)
+        {
+          return kform.count(n->text) ? kform.at(n->text) : n->text;
+        }
+        if (n->k == PN::LEAF)
+        {
+          return n->text;
+        }
+        std::string r = "(" + n->text;
+        for (const PNP& c : n->cs)
+        {
+          r += " " + kprint(c);
+        }
+        return r + ")";
+      };
+      std::function<void(const PNP&, const PNP&, const std::string&)> unify =
+          [&](const PNP& jn, const PNP& kn, const std::string& kTop) {
+            if (clash)
+            {
+              return;
+            }
+            // kn null: k's variable is the argument itself, standing for kTop
+            if (kn == nullptr || kn->k == PN::VAR)
+            {
+              std::string kf = kn == nullptr ? kTop : kform.at(kn->text);
+              if (jn == nullptr)
+              {
+                return;
+              }
+              if (jn->k == PN::VAR)
+              {
+                subst[jn->text] = kf;
+                return;
+              }
+              eqs.emplace_back(kf, jn);
+              return;
+            }
+            if (jn == nullptr)
+            {
+              return;
+            }
+            if (jn->k == PN::VAR)
+            {
+              subst[jn->text] = kprint(kn);
+              return;
+            }
+            if (jn->k != kn->k || jn->text != kn->text || jn->cs.size() != kn->cs.size())
+            {
+              clash = true;
+              return;
+            }
+            for (size_t i = 0; i < jn->cs.size(); i++)
+            {
+              unify(jn->cs[i], kn->cs[i], "");
+            }
+          };
+      std::set<size_t> wholeProof;
+      for (size_t i = 0; i < nargs; i++)
+      {
+        std::string top = isIdSort(p.args[i].sort) ? "(σ.decode " + argNames[i] + ")"
+                                                    : argNames[i];
+        bool whole = p.args[i].sort == Sort::PROOF
+                     && (p.alts[k].kind == Alt::DEFAULT
+                         || (p.alts[k].kind == Alt::CASE
+                             && p.def[p.alts[k].ci][0][i + 1].getKind() == Kind::PARAM));
+        size_t before = eqs.size();
+        if (whole && altPats[j][i] != nullptr)
+        {
+          top = "(Proof.pf " + top + ")";
+        }
+        unify(altPats[j][i], altPats[k][i], top);
+        if (whole && eqs.size() > before)
+        {
+          wholeProof.insert(before);
+        }
+      }
+      if (clash || eqs.empty())
+      {
+        continue;
+      }
+      // j's remaining variables are quantified, in their order in j
+      std::vector<std::pair<std::string, std::string>> qs;
+      std::function<void(const PNP&)> collect = [&](const PNP& n) {
+        if (n == nullptr)
+        {
+          return;
+        }
+        if (n->k == PN::VAR && !subst.count(n->text))
+        {
+          qs.emplace_back(n->text, n->type);
+        }
+        for (const PNP& c : n->cs)
+        {
+          collect(c);
+        }
+      };
+      for (size_t i = 0; i < nargs; i++)
+      {
+        collect(altPats[j][i]);
+      }
+      std::function<std::string(const PNP&)> jprint = [&](const PNP& n) -> std::string {
+        if (n->k == PN::VAR)
+        {
+          return subst.count(n->text) ? subst.at(n->text) : "q_" + n->text;
+        }
+        if (n->k == PN::LEAF)
+        {
+          return n->text;
+        }
+        std::string r = "(" + n->text;
+        for (const PNP& c : n->cs)
+        {
+          r += " " + jprint(c);
+        }
+        return r + ")";
+      };
+      std::string stmt;
+      if (!qs.empty())
+      {
+        stmt += "∀";
+        for (const auto& [nm, ty] : qs)
+        {
+          stmt += " (q_" + nm + " : " + ty + ")";
+        }
+        stmt += ", ";
+      }
+      std::vector<std::string> es;
+      std::vector<std::string> pfEs;
+      for (size_t e = 0; e < eqs.size(); e++)
+      {
+        std::string pat = jprint(eqs[e].second);
+        if (wholeProof.count(e))
+        {
+          pat = "(Proof.pf " + pat + ")";
+          pfEs.push_back("e" + std::to_string(e + 1));
+        }
+        stmt += eqs[e].first + " = " + pat + " → ";
+        es.push_back("e" + std::to_string(e + 1));
+      }
+      stmt += "False";
+      // the proof: j's failure fact, on the instance
+      std::string simps;
+      for (const std::string& d : dnames)
+      {
+        simps += (simps.empty() ? "" : ", ") + d;
+      }
+      for (const std::string& e : es)
+      {
+        simps += (simps.empty() ? "" : ", ") + e;
+      }
+      std::string prf = "fun";
+      for (const auto& q : qs)
+      {
+        prf += " q_" + q.first;
+      }
+      for (const std::string& e : es)
+      {
+        prf += " " + e;
+      }
+      prf += " => kneg" + std::to_string(j + 1);
+      for (const auto& [nm, isId] : altBound[j])
+      {
+        prf += " " + (subst.count(nm) ? subst.at(nm) : "q_" + nm);
+      }
+      size_t ncj = 0;
+      for (size_t i = 0; i < nargs; i++)
+      {
+        if (altPats[j][i] != nullptr)
+        {
+          ncj++;
+        }
+      }
+      std::string inj;
+      if (!pfEs.empty())
+      {
+        inj = "simp only [Proof.pf.injEq] at";
+        for (const std::string& e : pfEs)
+        {
+          inj += " " + e;
+        }
+        inj += "; ";
+      }
+      for (size_t c = 0; c < ncj; c++)
+      {
+        prf += " (by " + inj + "simp only [" + simps + "])";
+      }
+      out.push_back("have o" + std::to_string(j + 1) + " : " + stmt + " := " + prf);
+    }
+    return out;
+  };
   std::string hgCur = "hΓ";
   std::vector<std::string> gammaCur = gamma0;
   size_t depth = 0;
@@ -1897,6 +2391,10 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       }
       else
       {
+        for (const std::string& h : overlapHaves(ai, {}, {}))
+        {
+          proof << pi << h << "\n";
+        }
         proof << pi << "rw [" << eqName << "]; kside\n";
       }
       kbody << ci << "--" << (alt.kind == Alt::DEFAULT ? " default" : " case")
@@ -2179,6 +2677,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     {
       bnames.push_back(b.name);
       btypes.push_back(b.type);
+      altBound[ai].emplace_back(b.name, b.isId);
     }
     mdef << "some " << tupleVal(bnames) << closeParens;
     matchers << "def " << mname << " (σ : Store)";
@@ -2463,12 +2962,21 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       {
         l += d + ", ";
       }
+      std::map<std::string, std::string> kform;
+      for (const Bound& b : bound)
+      {
+        kform[b.name] = b.isId ? "(σ.decode " + b.name + ")" : b.name;
+      }
+      for (const std::string& h : overlapHaves(ai, kform, dnames))
+      {
+        pline(h);
+      }
       pline(l + eqName + "]; kside");
     }
     emitRhs(sc, base + 4, 4, true);
     // the none branch continues the chain
     kbody << ci << "<|\n";
-    proof << pi << "have n" << eqIdx << " := " << mname << "_none hI";
+    proof << pi << "have kneg" << eqIdx << " := " << mname << "_none hI";
     if (alt.kind == Alt::GUARD)
     {
       proof << " " << argValid[argNames[alt.arg - 1]];
@@ -2480,7 +2988,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
       // a match that is not total in Kairos: Logos has no case left, so this
       // is unreachable; Lean still needs a value
       kbody << ci << "pure 0\n";
-      proof << pi << "exact absurd rfl (n" << eqIdx << " _)\n";
+      proof << pi << "exact absurd rfl (kneg" << eqIdx << " _)\n";
     }
   }
   (void)depth;
@@ -2939,6 +3447,10 @@ void KairosMetaReduce::finalize()
     }
     return true;
   };
+  // Lean's equation lemmas for a program with many stuck guards (one per term
+  // argument a case matches with a variable) take it minutes to generate;
+  // such programs are lifted instead, which needs none.
+  const size_t maxGuards = 8;
   for (const std::string& n : d_names)
   {
     Prog& p = d_progs[n];
@@ -2947,6 +3459,17 @@ void KairosMetaReduce::finalize()
       continue;
     }
     bool typesOk = liftable(p);
+    size_t nguards = 0;
+    for (const Alt& a : p.alts)
+    {
+      nguards += (a.kind == Alt::GUARD);
+    }
+    if (nguards > maxGuards && typesOk)
+    {
+      p.lifted = true;
+      p.why = std::to_string(nguards) + " stuck guards (equation lemmas too costly)";
+      continue;
+    }
     checkSupported(p);
     if (!p.supported && typesOk)
     {
@@ -3226,10 +3749,10 @@ void KairosMetaReduce::finalize()
   outText << "-- This file is auto-generated by install/install-cpc.sh (kairos-eoc) from the\n"
           << "-- signature of the pinned Logos. Do not edit.\n"
           << "import Kairos.Runtime.Val\n\n"
-          << "set_option linter.unusedVariables false\n"
+          << "set_option linter.unusedVariables false\nset_option linter.constructorNameAsVariable false\n"
           << "set_option linter.unusedSimpArgs false\n"
 
-          << "set_option maxHeartbeats 0\n"
+          << "set_option maxHeartbeats 10000000\n"
           << "set_option maxRecDepth 100000\n\n"
           << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n"
           << "/-! Generated " << nsupp << " of " << d_names.size() << " programs (" << nlifted
@@ -3266,7 +3789,7 @@ void KairosMetaReduce::finalize()
      << "-- signature of the pinned Logos. Do not edit.\n"
      << "-- The rule dispatch: " << ndispatch << " programs.\n"
      << "import Kairos.Checker.Base\n\n"
-     << "set_option linter.unusedVariables false\n\n"
+     << "set_option linter.unusedVariables false\nset_option linter.constructorNameAsVariable false\n\n"
      << "namespace Kairos.Checker\nopen Eo Kairos Store SmtEval Kairos.Gen\n\n"
      << dispatch.str() << "end Kairos.Checker\n";
 }
