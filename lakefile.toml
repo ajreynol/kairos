@@ -1,6 +1,6 @@
 name = "Kairos"
 version = "0.1.0"
-defaultTargets = ["Kairos"]
+defaultTargets = ["Kairos", "KairosProto"]
 
 # Logos, the verified CPC checker Kairos is proven to refine. This pin is the
 # single source of truth for the CPC signature (install/defs/Cpc.cached.eo)
@@ -15,3 +15,11 @@ rev = "4b25707331d5408c0b2597c942ddce892c1f7f3b"
 [[lean_lib]]
 name = "Kairos"
 moreLeanArgs = ["-DwarningAsError=true"]
+
+[[lean_lib]]
+name = "KairosProto"
+roots = ["Kairos.Proto.Core", "Kairos.Proto.Monad", "Kairos.Proto.Mini"]
+
+[[lean_exe]]
+name = "kairos-proto-bench"
+root = "Kairos.Proto.Bench"
