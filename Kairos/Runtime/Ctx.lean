@@ -124,6 +124,12 @@ theorem intern_var {s T : Id} {S U : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
   (intern_sim hI (by simp [Node.children, hΓ.valid hs, hΓ.valid hT])).congr
     (by simp [Node.toTerm, hΓ.dec hs, hΓ.dec hT])
 
+theorem intern_uconst {i : Nat} {T : Id} {U : Term} (hI : Inv sem σ) (hΓ : Ctx σ Γ)
+    (hT : Fact.term T U ∈ Γ) :
+    Sim sem σ (intern (.UConst i T)) (.UConst i U) :=
+  (intern_sim hI (by simp [Node.children, hΓ.valid hT])).congr
+    (by simp [Node.toTerm, hΓ.dec hT])
+
 /-- A cached program: the cache is sound for `sem`, so a hit is correct. -/
 theorem cached_ctx {p : Nat} {args : List Id} {body : K Id} {t : Term}
     (hI : Inv sem σ) (hargs : ∀ a ∈ args, a < σ.size)

@@ -42,6 +42,31 @@ hands its parts to the rest of the matcher. They inline to nested matches. -/
   | .Binary w n => k w n
   | _ => none
 
+@[inline] def numeral {α : Type} (σ : Store) (x : Id) (k : Int → Option α) : Option α :=
+  match σ.view x with
+  | .Numeral n => k n
+  | _ => none
+
+@[inline] def rational {α : Type} (σ : Store) (x : Id) (k : Rat → Option α) : Option α :=
+  match σ.view x with
+  | .Rational q => k q
+  | _ => none
+
+@[inline] def string {α : Type} (σ : Store) (x : Id) (k : List Nat → Option α) : Option α :=
+  match σ.view x with
+  | .String s => k s
+  | _ => none
+
+@[inline] def usort {α : Type} (σ : Store) (x : Id) (k : Nat → Option α) : Option α :=
+  match σ.view x with
+  | .USort i => k i
+  | _ => none
+
+@[inline] def uconst {α : Type} (σ : Store) (x : Id) (k : Nat → Id → Option α) : Option α :=
+  match σ.view x with
+  | .UConst i T => k i T
+  | _ => none
+
 /-- The `Stuck` pattern, which is id 0. -/
 @[inline] def stuck {α : Type} (x : Id) (k : Option α) : Option α :=
   if x = 0 then k else none
@@ -106,6 +131,36 @@ theorem binary_some {α : Type} {x : Id} {k : Int → Int → Option α} {r : α
   · rename_i w n hv; exact ⟨w, n, hv, h⟩
   · simp at h
 
+theorem numeral_some {α : Type} {x : Id} {k : Int → Option α} {r : α}
+    (h : σ.numeral x k = some r) : ∃ n, σ.view x = .Numeral n ∧ k n = some r := by
+  unfold numeral at h; split at h
+  · rename_i n hv; exact ⟨n, hv, h⟩
+  · simp at h
+
+theorem rational_some {α : Type} {x : Id} {k : Rat → Option α} {r : α}
+    (h : σ.rational x k = some r) : ∃ q, σ.view x = .Rational q ∧ k q = some r := by
+  unfold rational at h; split at h
+  · rename_i q hv; exact ⟨q, hv, h⟩
+  · simp at h
+
+theorem string_some {α : Type} {x : Id} {k : List Nat → Option α} {r : α}
+    (h : σ.string x k = some r) : ∃ s, σ.view x = .String s ∧ k s = some r := by
+  unfold string at h; split at h
+  · rename_i s hv; exact ⟨s, hv, h⟩
+  · simp at h
+
+theorem usort_some {α : Type} {x : Id} {k : Nat → Option α} {r : α}
+    (h : σ.usort x k = some r) : ∃ i, σ.view x = .USort i ∧ k i = some r := by
+  unfold usort at h; split at h
+  · rename_i i hv; exact ⟨i, hv, h⟩
+  · simp at h
+
+theorem uconst_some {α : Type} {x : Id} {k : Nat → Id → Option α} {r : α}
+    (h : σ.uconst x k = some r) : ∃ i T, σ.view x = .UConst i T ∧ k i T = some r := by
+  unfold uconst at h; split at h
+  · rename_i i T hv; exact ⟨i, T, hv, h⟩
+  · simp at h
+
 theorem stuck_some {α : Type} {x : Id} {k : Option α} {r : α}
     (h : Store.stuck x k = some r) : x = 0 ∧ k = some r := by
   unfold Store.stuck at h; split at h
@@ -128,6 +183,21 @@ theorem boolean_of_view {α : Type} {x : Id} {b : Bool} {k : Bool → Option α}
 
 theorem binary_of_view {α : Type} {x : Id} {w n : Int} {k : Int → Int → Option α}
     (hv : σ.view x = .Binary w n) : σ.binary x k = k w n := by simp [binary, hv]
+
+theorem numeral_of_view {α : Type} {x : Id} {n : Int} {k : Int → Option α}
+    (hv : σ.view x = .Numeral n) : σ.numeral x k = k n := by simp [numeral, hv]
+
+theorem rational_of_view {α : Type} {x : Id} {q : Rat} {k : Rat → Option α}
+    (hv : σ.view x = .Rational q) : σ.rational x k = k q := by simp [rational, hv]
+
+theorem string_of_view {α : Type} {x : Id} {s : List Nat} {k : List Nat → Option α}
+    (hv : σ.view x = .String s) : σ.string x k = k s := by simp [string, hv]
+
+theorem usort_of_view {α : Type} {x : Id} {i : Nat} {k : Nat → Option α}
+    (hv : σ.view x = .USort i) : σ.usort x k = k i := by simp [usort, hv]
+
+theorem uconst_of_view {α : Type} {x T : Id} {i : Nat} {k : Nat → Id → Option α}
+    (hv : σ.view x = .UConst i T) : σ.uconst x k = k i T := by simp [uconst, hv]
 
 theorem stuck_of_zero {α : Type} {k : Option α} : Store.stuck 0 k = k := by simp [Store.stuck]
 
@@ -165,6 +235,37 @@ theorem decode_binary_inv (hI : Inv sem σ) {x : Id} {w n : Int}
   rw [decode_view' hI x] at h
   cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
   simp [h]
+
+theorem decode_numeral_inv (hI : Inv sem σ) {x : Id} {n : Int}
+    (h : σ.decode x = .Numeral n) : σ.view x = .Numeral n := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_rational_inv (hI : Inv sem σ) {x : Id} {q : Rat}
+    (h : σ.decode x = .Rational q) : σ.view x = .Rational q := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_string_inv (hI : Inv sem σ) {x : Id} {s : List Nat}
+    (h : σ.decode x = .String s) : σ.view x = .String s := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_usort_inv (hI : Inv sem σ) {x : Id} {i : Nat}
+    (h : σ.decode x = .USort i) : σ.view x = .USort i := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  simp [h]
+
+theorem decode_uconst_inv (hI : Inv sem σ) {x : Id} {i : Nat} {T : Term}
+    (h : σ.decode x = .UConst i T) : ∃ t, σ.view x = .UConst i t ∧ σ.decode t = T := by
+  rw [decode_view' hI x] at h
+  cases hv : σ.view x <;> simp [hv, Node.toTerm] at h
+  obtain ⟨rfl, h⟩ := h
+  exact ⟨_, rfl, h⟩
 
 theorem decode_stuck_inv (hI : Inv sem σ) {x : Id} (hx : x < σ.size)
     (h : σ.decode x = .Stuck) : x = 0 :=

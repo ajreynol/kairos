@@ -5,9 +5,14 @@ refine [Logos](https://github.com/cvc5/logos). See [VISION.md](VISION.md) for
 the goals, the correctness argument, and how it is compared with
 [Pathos](https://github.com/daniel-larraz/pathos).
 
-**Status: milestone 1 (toolchain).** The generation pipeline runs end to end.
-The stage is still a stub: it emits a manifest of the signature
-(`Kairos/Gen/Manifest.lean`), not a checker.
+**Status: milestone 2 (CpcMini) in progress.** `kairos-eoc` generates
+Kairos programs with machine-checked proofs that they compute Logos's
+functions (`Kairos/Gen/Programs.lean`). It currently covers 27 of CpcMini's 57
+programs. Not yet supported: datatype declarations, `Proof` patterns (the
+rules) and the checker's state machine. The hand-written runtime the
+generated code builds on is in `Kairos/Runtime/`; `Kairos/Proto/` holds the
+prototype and the golden output the generator was written against (see
+[docs/prototype.md](docs/prototype.md)).
 
 ## Layout
 
@@ -17,8 +22,10 @@ The stage is still a stub: it emits a manifest of the signature
 | `eoc/` | `kairos-eoc`, our code-generation stage, a standalone CMake project built against the pinned Ethos tree |
 | `eoc/kairos_meta/` | The stage (`kairos_meta_reduce.{h,cpp}`) and its Lean templates |
 | `eoc/FORK_BASE` | The upstream Ethos files the stage is forked from, and the commit they were forked at |
+| `Kairos/Runtime/` | The hand-written core: store, program logic, contexts of facts, matching, program primitives |
 | `Kairos/Gen/` | Generated Lean, committed, never edited by hand |
-| `scripts/` | `get-deps.sh`, `generate.sh`, `fork-drift.sh`, `logos-rev.sh` |
+| `Kairos/Proto/` | The prototype and the golden generated-style file |
+| `scripts/` | `get-deps.sh`, `generate.sh`, `fork-drift.sh`, `logos-rev.sh`, `gen-mini.sh` (development loop) |
 
 ## Building
 
