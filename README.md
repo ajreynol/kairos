@@ -38,7 +38,7 @@ Laid out like Logos (checker apart from verification):
 | `verification/KairosVerification/` | The proofs: the same layout, `Gen/` generated |
 | `soundness/` | The opt-in composition with Logos's soundness theorem |
 | `install/` | Regeneration, laid out like Logos's: `get-eo-compiler.sh`, `install-cpc.sh` |
-| `scripts/` | `fork-drift.sh`, `logos-rev.sh` |
+| `scripts/` | `kairos-loc-summary.py` (lines of code, specification and proof; `--files` for every file), `fork-drift.sh`, `logos-rev.sh` |
 
 ## Building
 
