@@ -1,7 +1,7 @@
 # Kairos
 
 A fast CPC proof checker in Lean that is generated from CPC and proven to
-refine [Logos](https://github.com/cvc5/logos). See [VISION.md](VISION.md) for
+refine [Logos](https://github.com/cvc5/logos). See [docs/vision.md](docs/vision.md) for
 the goals, the correctness argument, and how it is compared with
 [Pathos](https://github.com/daniel-larraz/pathos).
 
@@ -60,6 +60,7 @@ Laid out like Logos (checker apart from verification):
 | `soundness/` | The opt-in composition with Logos's soundness theorem |
 | `install/` | Regeneration, laid out like Logos's: `get-eo-compiler.sh`, `install-cpc.sh` |
 | `scripts/` | `kairos-loc-summary.py` (lines of code, specification and proof; `--files` for every file), `fork-drift.sh`, `logos-rev.sh` |
+| [`docs/design.md`](docs/design.md) | The design of the core and of the generated proofs, and the prototype's measurements |
 
 ## Building
 
@@ -75,3 +76,23 @@ lake build                   # the checker (under a minute)
 
 See [install/README.md](install/README.md) for what these do and how to move
 the Logos pin.
+
+## The name
+
+*Kairos* (καιρός) is Greek for the right moment. In classical rhetoric it sits
+beside *ethos*, *pathos* and *logos*, which name this checker's neighbours:
+Ethos, the reference checker it is generated with; Pathos, the fast Rust
+checker it is compared with; and Logos, the Lean checker it refines. Kairos is
+the one about time, which suits the checker built for speed.
+
+## How this repository is maintained
+
+This repository is part of the **Eunoia ecosystem** and follows its shared
+repository policy, kept by [kanon](https://github.com/ajreynol/kanon) in
+[`docs/policy.md`](https://github.com/ajreynol/kanon/blob/main/docs/policy.md).
+Its `anoieu / policy` CI job checks it against policy contract 1.
+
+AI agents write the work, directed by one human maintainer, who decides what
+is done and commits it. That supervision does not include reading generated
+code or proofs line by line: what they establish rests on Lean checking them,
+not on review. Nor does it cover `soundness/`, which CI does not build.

@@ -70,24 +70,24 @@ size; it does not make them free.
 
 ### The theorem
 
-The top theorem is refinement:
+The top theorem is refinement, on parsed assumptions and commands:
 
 ```lean
-theorem kairos_refines_logos (input : String) :
-    kairos_check_proof input = .ok .correct →
-    logos_check_proof input = .ok .correct
+theorem kairos_refines_logos (F : CArgList) (C : CCmdList) :
+    kairos_checker_is_refutation F C = true → __eo_checker_is_refutation F C = true
 ```
 
-Combined with Logos's `correct___logos_check_proof`, this gives soundness of
-Kairos about the text of a proof file. Refinement is all soundness needs. It
-lets Kairos answer "incomplete" where Logos would decide, for example when
-Kairos runs out of a resource. Full equivalence, the converse included, is a
-later completeness goal.
+Combined with Logos's `correct___eo_is_refutation`, this gives soundness of
+Kairos (`correct___kairos_is_refutation`, in `soundness/`). Refinement is all
+soundness needs. It lets Kairos answer "incomplete" where Logos would decide,
+for example when Kairos runs out of a resource. Full equivalence, the converse
+included, is a later completeness goal.
 
-If Kairos uses its own parser that reads straight into the store, the theorem
-also needs a parser-agreement statement against Logos's `parseProof`. If
-proving that turns out to be expensive, the fallback is to treat the parser as
-outside the theorem, as both Logos and Pathos do for their front ends.
+There is no parser yet. Once there is, a theorem about the text of a proof
+file needs a parser-agreement statement against Logos's parser if Kairos
+reads straight into the store. If proving that turns out to be expensive, the
+fallback is to treat the parser as outside the theorem, as both Logos and
+Pathos do for their front ends.
 
 ### How it is proven
 
@@ -102,13 +102,12 @@ There are two layers:
   - compiled pattern matching agrees with Logos's `match`, including
     non-linear patterns;
   - stuck results, failure and fuel are handled the same way as in Logos;
-  - one tactic for the step after each store operation.
-- **The generated layer, one lemma per generated function:**
-  ```lean
-  decode σ' (kairos_f σ ids) = logos_f (decode σ ids)
-  ```
-  The lemma is emitted by `kairos_meta_reduce.cpp` and closed by the core's
-  tactic. **If the tactic fails on a function, that is a bug in the code
+  - one lemma per store operation, for the step after it.
+- **The generated layer, one simulation lemma per generated function:** at
+  every fuel, if `kairos_f` returns, its result decodes to `logos_f` of the
+  decoded arguments (`Sim`). The lemma and its proof are both emitted by
+  `kairos_meta_reduce.cpp`; [design.md](design.md) shows how such a proof
+  goes. **If a generated proof fails on a function, that is a bug in the code
   generator, not a proof to write by hand.** This is what keeps Kairos as
   agile as CPC.
 
@@ -123,14 +122,14 @@ There are two layers:
 - **Cache only completed results.** `Stuck` is a legitimate cached result.
   Errors, exhausted budgets and unfinished calls are never cached.
 - **Mind laziness.** Memoization must not make Kairos compute something that
-  Logos would not reach (lazy `ite`, `eo::requires`). The equation is stated
+  Logos would not reach (lazy `ite`). The equation is stated
   against Logos's evaluation order.
-- **Choose what to cache from the call graph.** Reuse `rust_meta`'s analysis
-  (`caches.tsv`): cache programs in recursive cycles that take terms as
-  arguments, and keep the lookup cost off non-recursive helpers.
+- **Choose what to cache from the call graph.** Following `rust_meta`'s
+  analysis, `kairos-eoc` caches programs in recursive cycles that take terms
+  as arguments, and keeps the lookup cost off non-recursive helpers.
 - **Trust nothing beyond Logos.** No `unsafe`, no pointer equality, no
-  `@[implemented_by]` outside an explicit allowlist that a script checks, and
-  that allowlist should start empty.
+  `@[implemented_by]` outside an explicit allowlist. The allowlist is empty
+  and none is used today; no script checks this yet.
 
 ## Consumers
 
@@ -178,35 +177,34 @@ caching off, Logos, Pathos, Ethos.
 - Being a general Eunoia interpreter.
 - Upstreaming `kairos_meta_reduce.cpp` into Ethos, for now.
 
-## Milestones (proposed)
+## Milestones
 
 1. **Toolchain.** *(done)* Pin Logos. Build `ethos-eoc` at Logos's Ethos
    commit and `kairos-eoc` with a stub stage that emits a manifest of the
    signature. Check that the pipeline reproduces Logos's `Cpc/`. Regeneration
    and a `--check` mode run in CI.
-2. **CpcMini end to end.** *(done: `kairos_refines_logos`, with the term
-   programs and the rule dispatch generated. Remaining: compose with
-   Logos's `correct___eo_is_refutation` in a separate project that depends on
-   Logos's `verification/`, since that one requires Mathlib.)*
+2. **CpcMini end to end.** *(done, including the composition with Logos's
+   `correct___eo_is_refutation` in `soundness/`, which needs Mathlib.)*
    Generate the code for Logos's five-rule CpcMini,
    build the store and cache core, and prove `kairos_refines_logos` for
    CpcMini with generated lemmas. This is the direct counterpart of Pathos's
    pilot, where they proved four programs by hand.
-3. **All of CPC, executable.** Generate the whole checker, plus the parser
-   and the CLI. First measurements against Logos and Pathos.
-4. **All of CPC, proven.** Every simulation lemma generated and closed, and
-   the top theorem with Logos's axioms only.
+3. **All of CPC, executable.** *(in part: the whole checker is generated,
+   with 19 programs still lifted to Logos's own functions. Remaining: the
+   parser, the CLI, and the first measurements against Logos and Pathos.)*
+   Generate the whole checker, plus the parser and the CLI.
+4. **All of CPC, proven.** *(done for the checker: `kairos_refines_logos`
+   for all 616 rules, with Lean's standard axioms only.)* Every simulation
+   lemma generated and closed, and the top theorem with Logos's axioms only.
 5. **Telos oracle.** The library API and the interning boundary for Telos
    nodes, measured on Telos workloads.
 
 ## Open questions
 
 - **Lean runtime cost.** How close can threaded, uniquely referenced
-  `Array`/`HashMap` state get to the Rust arena? Measure this early, at
-  milestone 2, with a micro-benchmark of intern plus cached recursion.
-- **Partiality.** Logos uses fuel in places, and the generated programs may
-  need `partial_fixpoint` or fuel. The simulation lemma must be stated so that
-  both sides' termination arguments line up.
+  `Array`/`HashMap` state get to the Rust arena? The milestone 2a prototype
+  measured intern plus cached recursion ([design.md](design.md)); the
+  current checker is not measured yet.
 - **Parser.** Write our own, reading straight into the store with a proven
   agreement with Logos's parser, or keep it outside the theorem?
 - **Cache across calls.** For Telos, does one long-lived store across many

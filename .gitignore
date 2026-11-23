@@ -3,3 +3,5 @@
 /build/
 /verification/.lake/
 /soundness/.lake/
+scratch/
+*.local.md

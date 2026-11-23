@@ -6,7 +6,7 @@
  * emits a Kairos program over hash-consed ids together with its proof of
  * simulation: matchers with their lemmas, the program, its spec, and a step
  * lemma proving the spec at fuel n+1 from the spec at fuel n. See
- * Kairos/Proto/Golden.lean for the format, written by hand.
+ * docs/design.md for the format.
  *
  * The case layout of every program (macro arguments, stuck guards, the
  * default case) follows LeanMetaReduce::finalizeProgram exactly, since the

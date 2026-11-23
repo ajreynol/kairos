@@ -1,5 +1,5 @@
 /-
-The Kairos monad and its program logic (prototype, milestone 2a).
+The Kairos monad and its program logic.
 
 * `K` threads the store; it can fail only by running out of a resource.
 * `Ok m σ Q`: if `m` returns from `σ`, then `Q` holds of its result. Errors
