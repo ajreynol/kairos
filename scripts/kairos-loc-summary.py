@@ -5,21 +5,22 @@ Reports:
 
   (1) The checker: the root `Kairos` library, code only. Hand-written
       (Kairos/Runtime, Kairos/Checker) apart from generated (Kairos/Gen).
-  (2) The specification kairos_refines_logos is stated against: the
-      definitions of the verification project (Inv, Sim/SimR, the
-      representations and decodings, the cache meaning `sem`, ...). For
-      context, also the size of Logos's checker definitions the statement
-      refers to (Cpc.Logos and its dependencies, in the pinned Logos).
-  (3) The proofs: the theorems of the verification project, hand-written
-      apart from generated, by part.
-  (4) The generator: kairos-eoc's C++ and the install scripts.
-  (5) soundness/: the opt-in composition with Logos's soundness theorem.
+  (2) The proofs: the verification project, hand-written apart from
+      generated, by part; its theorems apart from its auxiliary definitions
+      (the store invariant, Sim/SimR, the decodings, the generated specs).
+  (3) The generator: kairos-eoc's C++ and the install scripts.
+  (4) soundness/: the opt-in composition with Logos's soundness theorem.
+
+There is no specification section: Kairos adds none. The central statement,
+kairos_refines_logos, depends only on Logos's definitions, the checker's code
+and Lean, which verification/KairosVerification/Statement.lean checks in the
+build; the verification project's definitions are proof devices.
 
 A "line of code" is a non-blank, non-comment line: Lean line comments `--`
 and nested block comments `/- ... -/` (docstrings included) are stripped,
 and C++ `//` and `/* */` comments likewise. In the verification project, a
 line belongs to a proof when it is in a `theorem`/`lemma` declaration, and to
-the specification otherwise (definitions, structures, macros, ...).
+an auxiliary definition otherwise (definitions, structures, macros, ...).
 
 Usage:
   scripts/kairos-loc-summary.py            # the summary
@@ -170,45 +171,40 @@ def main() -> None:
     c = show("generated (Kairos/Gen)", gen, show_files)
     print(f"    {'total':<44} {'':>11}   lines: {a + b + c:>8}")
 
-    print("\n(2) The specification  [definitions of the verification project]")
-    print("    (what kairos_refines_logos is stated against, apart from Logos)")
+    print("\n(2) The proofs  [the verification project]")
     groups = [
         ("hand-written runtime", "verification/KairosVerification/Runtime/*.lean"),
         ("hand-written checker", "verification/KairosVerification/Checker/*.lean"),
+        ("hand-written statement check", "verification/KairosVerification/Statement.lean"),
         ("generated", "verification/KairosVerification/Gen/*.lean"),
     ]
-    spec_total = proof_total = 0
-    proof_rows = []
+    aux_total = thm_total = 0
     for title, pat in groups:
         files = lean_files(pat)
-        s = p = 0
+        a_ = t_ = 0
         rows = []
         for f in files:
-            fs, fp = split_lean(loc(f))
-            s += fs
-            p += fp
-            rows.append((fs, fp, rel(f)))
-        spec_total += s
-        proof_total += p
-        proof_rows.append((title, files, p, rows))
-        print(f"    {title:<44} files: {len(files):>4}   lines: {s:>8}")
+            fa, ft = split_lean(loc(f))
+            a_ += fa
+            t_ += ft
+            rows.append((fa + ft, fa, ft, rel(f)))
+        aux_total += a_
+        thm_total += t_
+        print(f"    {title:<36} files: {len(files):>4}   lines: {a_ + t_:>8}"
+              f"   (theorems {t_}, auxiliary definitions {a_})")
         if show_files:
-            for fs, _, r in sorted(rows, reverse=True):
-                print(f"      {fs:>8}  {r}")
-    print(f"    {'total':<44} {'':>11}   lines: {spec_total:>8}")
+            for n, fa, ft, r in sorted(rows, reverse=True):
+                print(f"      {n:>8}  {r}")
+    print(f"    {'total':<36} {'':>11}   lines: {aux_total + thm_total:>8}"
+          f"   (theorems {thm_total}, auxiliary definitions {aux_total})")
+    print("    Specification added by Kairos: none. The central statement depends only on")
+    print("    Logos's definitions, the checker's code and Lean (checked by")
+    print("    verification/KairosVerification/Statement.lean).")
     lc = logos_checker_lines()
     if lc is not None:
-        print(f"    {'for context: Logos checker (Cpc.Logos + deps)':<44} {'':>11}   lines: {lc:>8}")
+        print(f"    (For context: Logos's checker, Cpc.Logos and its dependencies: {lc} lines.)")
 
-    print("\n(3) The proofs  [theorems of the verification project]")
-    for title, files, p, rows in proof_rows:
-        print(f"    {title:<44} files: {len(files):>4}   lines: {p:>8}")
-        if show_files:
-            for _, fp, r in sorted(rows, key=lambda x: -x[1]):
-                print(f"      {fp:>8}  {r}")
-    print(f"    {'total':<44} {'':>11}   lines: {proof_total:>8}")
-
-    print("\n(4) The generator")
+    print("\n(3) The generator")
     cpp = sorted(glob.glob(os.path.join(ROOT, "eoc", "**", "*.cpp"), recursive=True)
                  + glob.glob(os.path.join(ROOT, "eoc", "**", "*.h"), recursive=True))
     tmpl = lean_files("eoc/**/*.lean")
@@ -221,7 +217,7 @@ def main() -> None:
 
     snd = lean_files("soundness/*.lean")
     if snd:
-        print("\n(5) Soundness  [opt-in; composes with Logos's theorem]")
+        print("\n(4) Soundness  [opt-in; composes with Logos's theorem]")
         show("soundness/", snd, show_files)
     print()
 

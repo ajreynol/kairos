@@ -13,15 +13,17 @@ import Cpc.Proofs.Checker
 namespace Kairos.Soundness
 open Eo Kairos Kairos.Checker
 
-/-- If Kairos's checker returns `true` on assumptions `as` and commands `cs`,
-then the assumptions are unsatisfiable, provided they are in the fragment
-Logos's theorem covers (its two translation hypotheses). -/
-theorem kairos_sound (fuel : Nat) (σ : Store) (hI : Inv Kairos.Gen.sem σ) {as : KArgList}
-    {cs : KCmdList} (has : as.valid σ) (hcs : cs.valid σ)
-    (htr : TranslatableAssumptionList (as.dec σ)) (hok : CmdListTranslationOk (cs.dec σ)) :
-    Ok (k_checker_is_refutation fuel as cs) σ (fun b _ =>
-      b = true → eo_satisfiability (argListAssumes (as.dec σ)) false) :=
-  Ok.mono (kairos_refines_logos fuel σ hI has hcs) fun _ _ h hb =>
-    correct___eo_is_refutation _ _ htr hok (eo_is_refutation.intro _ _ (h hb))
+/-- **Kairos is sound.** If Kairos's checker accepts the assumptions `F` and
+the commands `C`, the assumptions are unsatisfiable, provided they are in the
+fragment Logos's theorem covers (its two translation hypotheses). This is
+Logos's `correct___eo_is_refutation`, with Kairos's checker in place of
+Logos's. -/
+theorem correct___kairos_is_refutation (F : CArgList) (C : CCmdList) :
+    TranslatableAssumptionList F ->
+    CmdListTranslationOk C ->
+    kairos_checker_is_refutation F C = true ->
+    eo_satisfiability (argListAssumes F) false :=
+  fun htr hok h =>
+    correct___eo_is_refutation F C htr hok (eo_is_refutation.intro F C (kairos_refines_logos F C h))
 
 end Kairos.Soundness

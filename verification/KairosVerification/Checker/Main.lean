@@ -172,10 +172,10 @@ theorem k_checker_is_refutation_sim (fuel : Nat) (hI : Inv sem σ) {as : KArgLis
   exact (k_state_is_refutation_sim fuel hI2 hs'.1).congr (by rw [hs'.2] <;> rfl)
 
 /-! ## The theorem -/
-/-- If Kairos says the commands refute the assumptions, so does Logos's
-checker. With Logos's `correct___eo_is_refutation`, the assumptions are then
-unsatisfiable. -/
-theorem kairos_refines_logos (fuel : Nat) (σ : Store) (hI : Inv sem σ) {as : KArgList}
+/-- On a store: if Kairos's checker accepts ids standing for assumptions and
+commands, Logos's checker accepts what they stand for. The central theorem,
+`kairos_refines_logos` (Checker/Api), is stated on Logos's values instead. -/
+theorem kairos_refines_logos_store (fuel : Nat) (σ : Store) (hI : Inv sem σ) {as : KArgList}
     {cs : KCmdList} (has : as.valid σ) (hcs : cs.valid σ) :
     Ok (k_checker_is_refutation fuel as cs) σ (fun b _ =>
       b = true → __eo_checker_is_refutation (as.dec σ) (cs.dec σ) = true) :=

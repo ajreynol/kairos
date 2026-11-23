@@ -1,2 +1,2 @@
 import Kairos.Gen.Manifest
-import Kairos.Checker.Main
+import Kairos.Checker.Api

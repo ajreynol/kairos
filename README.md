@@ -6,14 +6,35 @@ the goals, the correctness argument, and how it is compared with
 [Pathos](https://github.com/daniel-larraz/pathos).
 
 **Status: full CPC.** Kairos checks proofs in the CPC calculus of the pinned
-Logos (all 616 rules), and is proven to agree with Logos:
-`Kairos.Checker.kairos_refines_logos` says that if Kairos's checker accepts a
-refutation, so does Logos's `__eo_checker_is_refutation` (Lean's standard
-axioms only). `kairos-eoc` generates the term programs (1111 of 1140; 19 of
-them lifted, i.e. computed by Logos on decoded arguments, and listed in the
-generated file), the rule dispatch, and all their proofs. The checker's
-template part is mirrored by hand (`Kairos/Checker/`). There is no parser or
-executable yet.
+Logos (all 616 rules), and is proven to accept only what Logos accepts:
+
+```lean
+theorem kairos_refines_logos (F : CArgList) (C : CCmdList) :
+    kairos_checker_is_refutation F C = true → __eo_checker_is_refutation F C = true
+```
+
+with Lean's standard axioms only. With Logos's soundness theorem
+(`soundness/`), the assumptions are then unsatisfiable:
+
+```lean
+theorem correct___kairos_is_refutation (F : CArgList) (C : CCmdList) :
+    TranslatableAssumptionList F -> CmdListTranslationOk C ->
+    kairos_checker_is_refutation F C = true ->
+    eo_satisfiability (argListAssumes F) false
+```
+
+**Kairos adds nothing to what must be trusted.** These statements mention only
+Logos's definitions and Kairos's checker (`kairos_checker_is_refutation`, the
+code that runs); everything else of Kairos — its store invariant, decodings,
+program logic, the generator, and the generated proofs — is checked by Lean,
+not trusted. `verification/KairosVerification/Statement.lean` checks in the
+build that the central statement depends on no definition of the verification
+project.
+
+`kairos-eoc` generates the term programs (1111 of 1140; 19 of them lifted,
+i.e. computed by Logos on decoded arguments, and listed in the generated
+file), the rule dispatch, and all their proofs. The checker's template part is
+mirrored by hand (`Kairos/Checker/`). There is no parser or executable yet.
 
 ## Three projects
 
@@ -22,7 +43,7 @@ Laid out like Logos (checker apart from verification):
 | Project | What | Needs | CI |
 | --- | --- | --- | --- |
 | `.` (`Kairos`) | the checker: code only | Logos's `Cpc` definitions | yes |
-| `verification/` (`KairosVerification`) | Kairos's proofs, up to `kairos_refines_logos` | the checker, Logos's definitions (no Mathlib) | yes |
+| `verification/` (`KairosVerification`) | Kairos's proofs, up to `kairos_refines_logos`, and the check that its statement adds nothing to trust | the checker, Logos's definitions (no Mathlib) | yes |
 | `soundness/` (`KairosSoundness`) | composition with Logos's `correct___eo_is_refutation` | Logos's `verification/`, Mathlib | no; by hand |
 
 ## Layout

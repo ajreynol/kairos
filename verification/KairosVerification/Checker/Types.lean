@@ -99,6 +99,7 @@ theorem KCmdList.mono (hE : Extends σ σ') :
 
 def argsRep : RepD KArgList CArgList := ⟨KArgList.dec, KArgList.valid, fun a hE h => KArgList.mono hE a h⟩
 def stateRep : RepD KState CState := ⟨KState.dec, KState.valid, fun s hE h => KState.mono hE s h⟩
+def cmdRep : RepD KCmd CCmd := ⟨KCmd.dec, KCmd.valid, fun c hE h => KCmd.mono hE c h⟩
 def cmdsRep : RepD KCmdList CCmdList := ⟨KCmdList.dec, KCmdList.valid, fun c hE h => KCmdList.mono hE c h⟩
 
 end Kairos
