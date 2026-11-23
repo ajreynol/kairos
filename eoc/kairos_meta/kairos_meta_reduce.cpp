@@ -1032,6 +1032,39 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
     zero += " _";
   }
   zero += " => by simp only [" + kf + "]; exact Ok.throw";
+  if (p.native)
+  {
+    codeOut << "/-- Native: Kairos/Runtime/Lists.lean. -/\n";
+    codeOut << "def " << kf << " : Nat";
+    for (size_t i = 0; i < nargs; i++)
+    {
+      codeOut << " → " << p.args[i].kType;
+    }
+    codeOut << " → K Id\n  | 0";
+    for (size_t i = 0; i < nargs; i++)
+    {
+      codeOut << ", _";
+    }
+    codeOut << " => throw .fuel\n  | kfuel + 1";
+    for (const std::string& a : argNames)
+    {
+      codeOut << ", " << a;
+    }
+    codeOut << " => " << p.nativeCode << "\n\n";
+    steps << "theorem step" << f << " {kn : Nat} : " << sf << " (kn + 1) := by\n"
+          << "  intro σ";
+    for (const std::string& a : argNames)
+    {
+      steps << " " << a;
+    }
+    steps << " hI";
+    for (size_t i = 0; i < termArgs.size(); i++)
+    {
+      steps << " h" << i + 1;
+    }
+    steps << "\n  simp only [" << kf << "]\n  exact " << p.nativeProof << "\n\n";
+    return zero;
+  }
   if (p.lifted)
   {
     codeOut << "/-- Lifted: Logos computes it on decoded arguments. -/\n";
@@ -3531,6 +3564,69 @@ void KairosMetaReduce::finalize()
       p.lifted = true;
     }
   }
+  // Eunoia's list operations that Kairos has native versions of, with their
+  // proofs (Kairos/Runtime/Lists.lean, and its proofs in verification/): the
+  // program's code and the term proving its step, given `kfuel`/`kn`, the
+  // argument ids `arg1`... and their validity `h1`...; and the generated
+  // programs the code calls. A program is made native only if it has the
+  // expected term arguments; otherwise it is compiled as usual.
+  struct NativeImpl
+  {
+    size_t arity;
+    std::string code;
+    std::string proof;
+    std::vector<std::string> callees;
+  };
+  const std::map<std::string, NativeImpl> natives = {
+      {"__eo_list_erase_rec",
+       {2, "Native.erase kfuel arg1 arg2", "Native.erase_sim hI h1 h2", {}}},
+      {"__eo_list_erase_all_rec",
+       {2, "Native.eraseAll kfuel arg1 arg2", "Native.eraseAll_sim hI h1 h2", {}}},
+      {"__eo_list_setof_rec", {1, "Native.setof kfuel arg1", "Native.setof_sim hI h1", {}}},
+      {"__eo_list_diff_rec",
+       {2, "Native.diff kfuel arg1 arg2", "Native.diff_sim hI h1 h2", {}}},
+      {"__eo_get_nil_rec",
+       {2, "Native.getNil (k__eo_is_list_nil kfuel) kfuel arg1 arg2",
+        "Native.getNil_sim (allS__eo_is_list_nil kn) hI h1 h2",
+        {"__eo_is_list_nil"}}},
+  };
+  for (const std::string& n : d_names)
+  {
+    Prog& p = d_progs[n];
+    auto it = natives.find(p.lname);
+    if (it == natives.end() || p.pure || p.dispatch || p.ret.sort != Sort::TERM
+        || p.args.size() != it->second.arity)
+    {
+      continue;
+    }
+    bool allTerms = true;
+    for (const ArgInfo& a : p.args)
+    {
+      allTerms &= (a.sort == Sort::TERM);
+    }
+    std::vector<std::string> callees;
+    for (const std::string& c : it->second.callees)
+    {
+      for (const std::string& m : d_names)
+      {
+        if (d_progs[m].lname == c)
+        {
+          callees.push_back(m);
+        }
+      }
+    }
+    if (!allTerms || callees.size() != it->second.callees.size())
+    {
+      continue;
+    }
+    p.supported = true;
+    p.lifted = true;
+    p.native = true;
+    p.why = "native (Kairos/Runtime/Lists.lean)";
+    p.nativeCode = it->second.code;
+    p.nativeProof = it->second.proof;
+    p.nativeCallees = callees;
+  }
   // a program calling an unsupported one is lifted, or unsupported
   bool changed = true;
   while (changed)
@@ -3636,9 +3732,12 @@ void KairosMetaReduce::finalize()
       stack.push_back(v);
       onStack.insert(v);
       const Prog& pv = d_progs[v];
-      if (!pv.lifted)
+      if (!pv.lifted || pv.native)
       {
-        for (const std::string& w : pv.callees)
+        std::set<std::string> cs(pv.native ? std::set<std::string>(pv.nativeCallees.begin(),
+                                                                   pv.nativeCallees.end())
+                                           : pv.callees);
+        for (const std::string& w : cs)
         {
           const Prog& pw = d_progs[w];
           if (!pw.supported || pw.pure || pw.dispatch)
@@ -3694,8 +3793,8 @@ void KairosMetaReduce::finalize()
     }
   }
 
-  std::stringstream matchers, sem, skipped, lifted, body, codeBody;
-  size_t npure = 0, nlifted = 0, ndispatch = 0, nsupp = 0, nmutual = 0;
+  std::stringstream matchers, sem, skipped, lifted, natived, body, codeBody;
+  size_t npure = 0, nlifted = 0, nnative = 0, ndispatch = 0, nsupp = 0, nmutual = 0;
   for (const std::string& n : d_names)
   {
     Prog& p = d_progs[n];
@@ -3706,6 +3805,11 @@ void KairosMetaReduce::finalize()
     else if (!p.supported)
     {
       skipped << "  " << p.lname << ": " << p.why << "\n";
+    }
+    else if (p.native)
+    {
+      natived << "  " << p.lname << "\n";
+      nnative++;
     }
     else if (p.lifted)
     {
@@ -3818,16 +3922,20 @@ void KairosMetaReduce::finalize()
       "set_option maxRecDepth 100000\n\n";
   std::stringstream summary;
   summary << "/-! Generated " << nsupp << " of " << d_names.size() << " programs (" << nlifted
-          << " lifted); " << npure << " over native values are Logos's own. Left out:\n"
+          << " lifted, " << nnative << " native); " << npure
+          << " over native values are Logos's own. Left out:\n"
           << skipped.str() << "\nLifted (Logos computes them on decoded arguments):\n"
-          << lifted.str() << "-/\n\n";
+          << lifted.str()
+          << "\nNative (hand-written, Kairos/Runtime/Lists.lean, with their proofs):\n"
+          << natived.str() << "-/\n\n";
   std::stringstream outText, proofText;
-  outText << hdr << "import Kairos.Gen.Intern\n\n" << opts
+  outText << hdr << "import Kairos.Gen.Intern\nimport Kairos.Runtime.Lists\n\n" << opts
           << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n" << summary.str()
           << "/-! ## Matchers -/\n\n" << matchers.str()
           << "/-! ## Programs, by component of the call graph (" << nmutual
           << " recursive) -/\n\n" << codeBody.str() << "end Kairos.Gen\n";
   proofText << hdr << "import Kairos.Gen.Programs\nimport KairosVerification.Gen.Intern\n"
+            << "import KairosVerification.Runtime.Lists\n"
             << "import KairosVerification.Runtime.Val\n\n" << opts
             << "namespace Kairos.Gen\nopen Eo Kairos Store SmtEval\n\n"
             << "/-- Cached programs, by id, with their Logos meaning. -/\n"

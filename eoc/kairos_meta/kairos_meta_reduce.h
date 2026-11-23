@@ -97,6 +97,13 @@ class KairosMetaReduce : public MetaReducePlugin
     bool pure = false;
     /** Not compiled yet: Kairos runs Logos's function on decoded arguments. */
     bool lifted = false;
+    /** Lifted, but to a hand-written native version (Kairos/Runtime/Lists.lean)
+     * rather than to Logos's function: its code, the term proving its step,
+     * and the generated programs that code calls. */
+    bool native = false;
+    std::string nativeCode;
+    std::string nativeProof;
+    std::vector<std::string> nativeCallees;
     /** The rule dispatch: emitted to Kairos/Gen/Dispatch.lean. */
     bool dispatch = false;
     /** Its strongly connected component of the call graph, and whether that

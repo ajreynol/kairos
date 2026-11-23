@@ -21,6 +21,8 @@ by the generated code and is no longer in the tree.
 | Laziness | `k_ite` evaluates only the branch taken, for Logos's `__eo_ite` and `native_ite`. Everything else, `__eo_requires` included, is evaluated as Logos does | Logos is strict but pure, so results agree; Kairos does less work |
 | Cache | `cached p args body`, keyed by (program id, argument ids), on each recursive program whose arguments are all terms. `kairos-eoc` chooses them from the call graph. Soundness is against a `Sem` table of Logos functions | `cached_sim` is proven once; a miss is only slower |
 | Lifted programs | A program the generator does not compile yet runs Logos's own function on the decoded arguments. The generated file lists them | The checker covers all of CPC before the generator compiles every program |
+| Native programs | Five of Eunoia's list operations (`__eo_list_erase_rec`, `_erase_all_rec`, `_setof_rec`, `_diff_rec`, `__eo_get_nil_rec`) are hand-written on ids (`Kairos/Runtime/Lists.lean`), each with a proof against Logos's definition (`verification/KairosVerification/Runtime/Lists.lean`); `kairos-eoc` calls them in place of compiling those definitions (its `natives` table), and compiles a program as usual if its arguments are not the expected ones | Compiled, they rebuild every cell and check the cache at each one; native, they reuse the cells they keep and compare by id, about twice as fast on resolution proofs |
+| Not cached | Eunoia's list walkers (`__eo_list_*`, `__eo_get_elements_rec`) are not cached | Their hit rate is low and every miss costs a lookup and an insert |
 
 ## How a generated proof goes
 

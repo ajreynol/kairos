@@ -2,6 +2,7 @@
 -- signature of the pinned Logos. Do not edit.
 import Kairos.Gen.Programs
 import KairosVerification.Gen.Intern
+import KairosVerification.Runtime.Lists
 import KairosVerification.Runtime.Val
 
 set_option linter.unusedVariables false
@@ -15,176 +16,175 @@ open Eo Kairos Store SmtEval
 
 /-- Cached programs, by id, with their Logos meaning. -/
 def sem : Sem
-  | 0, [a1, a2] => some (__eo_get_nil_rec a1 a2)
-  | 1, [a1, a2] => some (__get_arg_list_rec a1 a2)
-  | 2, [a1, a2] => some (__is_app a1 a2)
-  | 3, [a1] => some (__is_var_list a1)
-  | 4, [a1, a2] => some (__eo_l_1___extract_antec_rec a1 a2)
-  | 5, [a1, a2] => some (__extract_antec_rec a1 a2)
-  | 6, [a1, a2, a3] => some (__eo_l_1___assoc_nil_nth_type a1 a2 a3)
-  | 7, [a1, a2, a3] => some (__assoc_nil_nth_type a1 a2 a3)
-  | 8, [a1, a2, a3] => some (__eo_l_1___assoc_nil_nth a1 a2 a3)
-  | 9, [a1, a2, a3] => some (__assoc_nil_nth a1 a2 a3)
-  | 10, [a1, a2] => some (__iota_rec a1 a2)
-  | 11, [a1, a2, a3] => some (__chain_m_resolve_rec a1 a2 a3)
-  | 12, [a1] => some (__lower_not_and a1)
-  | 13, [a1] => some (__dt_get_constructors a1)
-  | 14, [a1, a2] => some (__tuple_get_selectors_rec a1 a2)
-  | 15, [a1, a2] => some (__dt_get_selectors_of_app a1 a2)
-  | 16, [a1] => some (__is_cons_app a1)
-  | 17, [a1] => some (__tuple_arg_list a1)
-  | 18, [a1, a2] => some (__dt_eq_cons a1 a2)
-  | 19, [a1, a2, a3] => some (__set_is_not_subset a1 a2 a3)
-  | 20, [a1, a2, a3] => some (__seq_distinct_terms a1 a2 a3)
-  | 21, [a1, a2] => some (__dt_distinct_terms a1 a2)
-  | 22, [a1, a2, a3] => some (__are_distinct_terms_type a1 a2 a3)
-  | 23, [a1, a2, a3] => some (__are_distinct_terms_list_rec a1 a2 a3)
-  | 24, [a1, a2] => some (__eo_l_1___are_distinct_terms_list a1 a2)
-  | 25, [a1, a2] => some (__are_distinct_terms_list a1 a2)
-  | 26, [a1, a2, a3] => some (__mk_trans a1 a2 a3)
-  | 27, [a1, a2] => some (__mk_cong_rhs a1 a2)
-  | 28, [a1, a2] => some (__mk_nary_cong_rhs a1 a2)
-  | 29, [a1, a2, a3] => some (__mk_ho_cong a1 a2 a3)
-  | 30, [a1, a2, a3] => some (__mk_distinct_elim_rec a1 a2 a3)
-  | 31, [a1] => some (__mk_distinct_elim a1)
-  | 32, [a1] => some (__poly_neg a1)
-  | 33, [a1, a2] => some (__poly_mod_coeffs a1 a2)
-  | 34, [a1, a2] => some (__poly_add a1 a2)
-  | 35, [a1, a2] => some (__mvar_mul_mvar a1 a2)
-  | 36, [a1, a2] => some (__poly_mul_mon a1 a2)
-  | 37, [a1, a2] => some (__poly_mul a1 a2)
-  | 38, [a1] => some (__get_arith_poly_norm a1)
-  | 39, [a1] => some (__get_bv_poly_norm_rec a1)
-  | 40, [a1, a2] => some (__mk_arith_sum_ub_rec a1 a2)
-  | 41, [a1, a2] => some (__strip_even_exponent a1 a2)
-  | 42, [a1, a2, a3] => some (__eo_l_2___mk_arith_mult_sign_sgn a1 a2 a3)
-  | 43, [a1, a2, a3] => some (__eo_l_1___mk_arith_mult_sign_sgn a1 a2 a3)
-  | 44, [a1, a2, a3] => some (__mk_arith_mult_sign_sgn a1 a2 a3)
-  | 45, [a1, a2] => some (__eo_l_1___mk_arith_mult_abs_comparison_rec a1 a2)
-  | 46, [a1, a2] => some (__mk_arith_mult_abs_comparison_rec a1 a2)
-  | 47, [a1] => some (__bv_eval_concat a1)
-  | 48, [a1] => some (__bv_get_first_const_child a1)
-  | 49, [a1, a2] => some (__bv_bitblast_concat a1 a2)
-  | 50, [a1, a2] => some (__bv_bitblast_prefix a1 a2)
-  | 51, [a1, a2, a3] => some (__bv_bitblast_subsequence a1 a2 a3)
-  | 52, [a1, a2] => some (__bv_bitblast_apply_unary a1 a2)
-  | 53, [a1, a2, a3] => some (__bv_bitblast_apply_binary a1 a2 a3)
-  | 54, [a1, a2, a3] => some (__bv_bitblast_apply_ite a1 a2 a3)
-  | 55, [a1, a2] => some (__bv_mk_bitblast_step_eq_rec a1 a2)
-  | 56, [a1, a2, a3] => some (__bv_bitblast_ult_rec a1 a2 a3)
-  | 57, [a1] => some (__bv_mk_bitblast_step_concat a1)
-  | 58, [a1, a2, a3, a4] => some (__bv_mk_bitblast_step_bitwise a1 a2 a3 a4)
-  | 59, [a1, a2, a3, a4] => some (__bv_ripple_carry_adder_2 a1 a2 a3 a4)
-  | 60, [a1, a2] => some (__bv_mk_bitblast_step_add a1 a2)
-  | 61, [a1, a2, a3, a4, a5] => some (__bv_shift_add_multiplier_rec_step a1 a2 a3 a4 a5)
-  | 62, [a1, a2, a3, a4] => some (__bv_shift_add_multiplier_rec a1 a2 a3 a4)
-  | 63, [a1, a2] => some (__bv_mk_bitblast_step_mul a1 a2)
-  | 64, [a1, a2, a3, a4] => some (__eo_l_1___bv_div_mod_impl a1 a2 a3 a4)
-  | 65, [a1, a2, a3, a4] => some (__bv_div_mod_impl a1 a2 a3 a4)
-  | 66, [a1, a2, a3] => some (__bv_mk_bitblast_step_ite a1 a2 a3)
-  | 67, [a1, a2] => some (__bv_const_to_bitlist_rec a1 a2)
-  | 68, [a1, a2, a3, a4] => some (__bv_mk_bitblast_step_shl_rec_step a1 a2 a3 a4)
-  | 69, [a1, a2, a3, a4] => some (__eo_l_1___bv_mk_bitblast_step_shl_rec a1 a2 a3 a4)
-  | 70, [a1, a2, a3, a4] => some (__bv_mk_bitblast_step_shl_rec a1 a2 a3 a4)
-  | 71, [a1, a2, a3, a4, a5] => some (__bv_mk_bitblast_step_shr_rec_step a1 a2 a3 a4 a5)
-  | 72, [a1, a2, a3, a4, a5] => some (__eo_l_1___bv_mk_bitblast_step_shr_rec a1 a2 a3 a4 a5)
-  | 73, [a1, a2, a3, a4, a5] => some (__bv_mk_bitblast_step_shr_rec a1 a2 a3 a4 a5)
-  | 74, [a1, a2] => some (__bv_mk_bitblast_step_var_rec a1 a2)
-  | 75, [a1, a2, a3, a4, a5, a6] => some (__bv_smulo_elim_rec a1 a2 a3 a4 a5 a6)
-  | 76, [a1, a2, a3, a4, a5, a6] => some (__bv_umulo_elim_rec a1 a2 a3 a4 a5 a6)
-  | 77, [a1, a2, a3, a4, a5, a6, a7] => some (__bv_mk_bitwise_slicing_rec a1 a2 a3 a4 a5 a6 a7)
-  | 78, [a1, a2] => some (__beta_reduce_type a1 a2)
-  | 79, [a1, a2] => some (__beta_reduce a1 a2)
-  | 80, [a1] => some (__is_seq_const_rec a1)
-  | 81, [a1] => some (__str_fixed_len_re a1)
-  | 82, [a1] => some (__re_nullable a1)
-  | 83, [a1, a2] => some (__derivative a1 a2)
-  | 84, [a1, a2] => some (__str_eval_str_in_re_rec a1 a2)
-  | 85, [a1, a2, a3] => some (__str_first_match_rec_smallest a1 a2 a3)
-  | 86, [a1, a2, a3, a4] => some (__str_first_match_rec a1 a2 a3 a4)
-  | 87, [a1, a2, a3, a4] => some (__re_unfold_pos_concat_rec a1 a2 a3 a4)
-  | 88, [a1, a2] => some (__str_flatten_word_rec a1 a2)
-  | 89, [a1] => some (__str_flatten a1)
-  | 90, [a1] => some (__str_collect a1)
-  | 91, [a1, a2] => some (__str_strip_prefix a1 a2)
-  | 92, [a1, a2, a3] => some (__str_mk_re_loop_elim_rec a1 a2 a3)
-  | 93, [a1, a2] => some (__str_mk_str_in_re_concat_star_char a1 a2)
-  | 94, [a1, a2, a3, a4] => some (__str_mk_str_in_re_sigma_rec a1 a2 a3 a4)
-  | 95, [a1, a2, a3] => some (__str_mk_str_in_re_sigma_star_rec a1 a2 a3)
-  | 96, [a1, a2] => some (__re_split_str_to_re a1 a2)
-  | 97, [a1, a2] => some (__re_rev_map_rev a1 a2)
-  | 98, [a1] => some (__re_rev_comp a1)
-  | 99, [a1, a2] => some (__re_flatten a1 a2)
-  | 100, [a1, a2] => some (__re_unflatten a1 a2)
-  | 101, [a1, a2] => some (__re_unflatten_str a1 a2)
-  | 102, [a1, a2] => some (__str_re_includes_lhs_union a1 a2)
-  | 103, [a1, a2] => some (__str_re_includes_rhs_inter a1 a2)
-  | 104, [a1, a2] => some (__str_re_includes_lhs_star a1 a2)
-  | 105, [a1] => some (__re_is_unbound_wildcard a1)
-  | 106, [a1, a2] => some (__str_re_includes_base_rec a1 a2)
-  | 107, [a1, a2, a3, a4] => some (__str_re_includes_concat a1 a2 a3 a4)
-  | 108, [a1, a2] => some (__str_re_includes_rec a1 a2)
-  | 109, [a1] => some (__str_arith_entail_simple_rec a1)
-  | 110, [a1, a2, a3] => some (__eo_l_1___str_arith_entail_is_approx a1 a2 a3)
-  | 111, [a1, a2, a3] => some (__str_arith_entail_is_approx a1 a2 a3)
-  | 112, [a1, a2, a3] => some (__str_re_consume_inter a1 a2 a3)
-  | 113, [a1, a2, a3] => some (__str_re_consume_union a1 a2 a3)
-  | 114, [a1, a2, a3] => some (__str_re_consume_rec a1 a2 a3)
-  | 115, [a1, a2] => some (__str_is_compatible a1 a2)
-  | 116, [a1, a2] => some (__str_overlap_rec a1 a2)
-  | 117, [a1, a2, a3] => some (__str_from_int_eval_rec a1 a2 a3)
-  | 118, [a1, a2, a3] => some (__str_to_int_eval_rec a1 a2 a3)
-  | 119, [a1, a2] => some (__str_case_conv_rec a1 a2)
-  | 120, [a1, a2] => some (__str_leq_eval_rec a1 a2)
-  | 121, [a1, a2] => some (__str_is_prefix_flat a1 a2)
-  | 122, [a1, a2, a3, a4, a5] => some (__str_eval_replace_all_rec a1 a2 a3 a4 a5)
-  | 123, [a1, a2] => some (__mk_re_concat a1 a2)
-  | 124, [a1] => some (__str_multiset_overapprox_word a1)
-  | 125, [a1] => some (__str_multiset_overapprox a1)
-  | 126, [a1, a2] => some (__str_is_multiset_subset_strict_done a1 a2)
-  | 127, [a1, a2, a3] => some (__str_is_multiset_subset_strict a1 a2 a3)
-  | 128, [a1, a2, a3, a4, a5] => some (__str_eval_replace_re_all_rec a1 a2 a3 a4 a5)
-  | 129, [a1, a2] => some (__eo_l_1___seq_is_prefix a1 a2)
-  | 130, [a1, a2] => some (__seq_is_prefix a1 a2)
-  | 131, [a1, a2, a3] => some (__eo_l_1___seq_find a1 a2 a3)
-  | 132, [a1, a2, a3] => some (__seq_find a1 a2 a3)
-  | 133, [a1, a2, a3] => some (__seq_subsequence_rec a1 a2 a3)
-  | 134, [a1, a2, a3, a4, a5] => some (__seq_eval_replace_all_rec a1 a2 a3 a4 a5)
-  | 135, [a1] => some (__seq_eval a1)
-  | 136, [a1] => some (__set_union_to_list a1)
-  | 137, [a1, a2] => some (__eval_sets_inter a1 a2)
-  | 138, [a1, a2] => some (__eval_sets_minus a1 a2)
-  | 139, [a1, a2, a3] => some (__abconv_ubv_to_int_elim a1 a2 a3)
-  | 140, [a1, a2, a3] => some (__abconv_int_to_bv_elim a1 a2 a3)
-  | 141, [a1, a2, a3] => some (__mk_skolems a1 a2 a3)
-  | 142, [a1, a2, a3] => some (__mk_quant_merge_prenex a1 a2 a3)
-  | 143, [a1, a2] => some (__mk_quant_miniscope_and a1 a2)
-  | 144, [a1, a2, a3] => some (__eo_l_2___is_quant_miniscope_or a1 a2 a3)
-  | 145, [a1, a2, a3] => some (__eo_l_1___is_quant_miniscope_or a1 a2 a3)
-  | 146, [a1, a2, a3] => some (__is_quant_miniscope_or a1 a2 a3)
-  | 147, [a1, a2, a3, a4, a5] => some (__eo_l_1___is_quant_dt_split_conj a1 a2 a3 a4 a5)
-  | 148, [a1, a2, a3, a4, a5] => some (__is_quant_dt_split_conj a1 a2 a3 a4 a5)
-  | 149, [a1, a2, a3, a4, a5] => some (__is_quant_dt_split a1 a2 a3 a4 a5)
-  | 150, [a1, a2] => some (__mk_dt_split a1 a2)
-  | 151, [a1, a2, a3] => some (__mk_dt_inst_rec a1 a2 a3)
-  | 152, [a1, a2, a3] => some (__mk_dt_inst_tuple_rec a1 a2 a3)
-  | 153, [a1, a2] => some (__mk_dt_cons_eq a1 a2)
-  | 154, [a1, a2, a3, a4] => some (__eo_l_1___dt_find_cycle a1 a2 a3 a4)
-  | 155, [a1, a2, a3, a4] => some (__dt_find_cycle a1 a2 a3 a4)
-  | 156, [a1, a2, a3] => some (__dt_collapse_updater_rhs a1 a2 a3)
-  | 157, [a1, a2, a3] => some (__tuple_collapse_updater_rhs a1 a2 a3)
-  | 158, [a1, a2, a3] => some (__eo_l_1___dt_updater_elim_rhs a1 a2 a3)
-  | 159, [a1, a2, a3] => some (__dt_updater_elim_rhs a1 a2 a3)
-  | 160, [a1, a2] => some (__eo_l_1___tuple_updater_elim_rhs a1 a2)
-  | 161, [a1, a2] => some (__tuple_updater_elim_rhs a1 a2)
-  | 162, [a1, a2, a3] => some (__get_ai_norm_rec a1 a2 a3)
-  | 163, [a1, a2, a3] => some (__get_a_norm_rec a1 a2 a3)
-  | 164, [a1] => some (__run_evaluate a1)
-  | 165, [a1] => some (__evaluate_list a1)
-  | 166, [a1, a2, a3] => some (__eo_l_1___is_absorb_rec a1 a2 a3)
-  | 167, [a1, a2, a3] => some (__is_absorb_rec a1 a2 a3)
-  | 168, [a1] => some (__eo_typeof a1)
-  | 169, [a1, a2] => some (__eo_is_closed_rec a1 a2)
+  | 0, [a1, a2] => some (__get_arg_list_rec a1 a2)
+  | 1, [a1, a2] => some (__is_app a1 a2)
+  | 2, [a1] => some (__is_var_list a1)
+  | 3, [a1, a2] => some (__eo_l_1___extract_antec_rec a1 a2)
+  | 4, [a1, a2] => some (__extract_antec_rec a1 a2)
+  | 5, [a1, a2, a3] => some (__eo_l_1___assoc_nil_nth_type a1 a2 a3)
+  | 6, [a1, a2, a3] => some (__assoc_nil_nth_type a1 a2 a3)
+  | 7, [a1, a2, a3] => some (__eo_l_1___assoc_nil_nth a1 a2 a3)
+  | 8, [a1, a2, a3] => some (__assoc_nil_nth a1 a2 a3)
+  | 9, [a1, a2] => some (__iota_rec a1 a2)
+  | 10, [a1, a2, a3] => some (__chain_m_resolve_rec a1 a2 a3)
+  | 11, [a1] => some (__lower_not_and a1)
+  | 12, [a1] => some (__dt_get_constructors a1)
+  | 13, [a1, a2] => some (__tuple_get_selectors_rec a1 a2)
+  | 14, [a1, a2] => some (__dt_get_selectors_of_app a1 a2)
+  | 15, [a1] => some (__is_cons_app a1)
+  | 16, [a1] => some (__tuple_arg_list a1)
+  | 17, [a1, a2] => some (__dt_eq_cons a1 a2)
+  | 18, [a1, a2, a3] => some (__set_is_not_subset a1 a2 a3)
+  | 19, [a1, a2, a3] => some (__seq_distinct_terms a1 a2 a3)
+  | 20, [a1, a2] => some (__dt_distinct_terms a1 a2)
+  | 21, [a1, a2, a3] => some (__are_distinct_terms_type a1 a2 a3)
+  | 22, [a1, a2, a3] => some (__are_distinct_terms_list_rec a1 a2 a3)
+  | 23, [a1, a2] => some (__eo_l_1___are_distinct_terms_list a1 a2)
+  | 24, [a1, a2] => some (__are_distinct_terms_list a1 a2)
+  | 25, [a1, a2, a3] => some (__mk_trans a1 a2 a3)
+  | 26, [a1, a2] => some (__mk_cong_rhs a1 a2)
+  | 27, [a1, a2] => some (__mk_nary_cong_rhs a1 a2)
+  | 28, [a1, a2, a3] => some (__mk_ho_cong a1 a2 a3)
+  | 29, [a1, a2, a3] => some (__mk_distinct_elim_rec a1 a2 a3)
+  | 30, [a1] => some (__mk_distinct_elim a1)
+  | 31, [a1] => some (__poly_neg a1)
+  | 32, [a1, a2] => some (__poly_mod_coeffs a1 a2)
+  | 33, [a1, a2] => some (__poly_add a1 a2)
+  | 34, [a1, a2] => some (__mvar_mul_mvar a1 a2)
+  | 35, [a1, a2] => some (__poly_mul_mon a1 a2)
+  | 36, [a1, a2] => some (__poly_mul a1 a2)
+  | 37, [a1] => some (__get_arith_poly_norm a1)
+  | 38, [a1] => some (__get_bv_poly_norm_rec a1)
+  | 39, [a1, a2] => some (__mk_arith_sum_ub_rec a1 a2)
+  | 40, [a1, a2] => some (__strip_even_exponent a1 a2)
+  | 41, [a1, a2, a3] => some (__eo_l_2___mk_arith_mult_sign_sgn a1 a2 a3)
+  | 42, [a1, a2, a3] => some (__eo_l_1___mk_arith_mult_sign_sgn a1 a2 a3)
+  | 43, [a1, a2, a3] => some (__mk_arith_mult_sign_sgn a1 a2 a3)
+  | 44, [a1, a2] => some (__eo_l_1___mk_arith_mult_abs_comparison_rec a1 a2)
+  | 45, [a1, a2] => some (__mk_arith_mult_abs_comparison_rec a1 a2)
+  | 46, [a1] => some (__bv_eval_concat a1)
+  | 47, [a1] => some (__bv_get_first_const_child a1)
+  | 48, [a1, a2] => some (__bv_bitblast_concat a1 a2)
+  | 49, [a1, a2] => some (__bv_bitblast_prefix a1 a2)
+  | 50, [a1, a2, a3] => some (__bv_bitblast_subsequence a1 a2 a3)
+  | 51, [a1, a2] => some (__bv_bitblast_apply_unary a1 a2)
+  | 52, [a1, a2, a3] => some (__bv_bitblast_apply_binary a1 a2 a3)
+  | 53, [a1, a2, a3] => some (__bv_bitblast_apply_ite a1 a2 a3)
+  | 54, [a1, a2] => some (__bv_mk_bitblast_step_eq_rec a1 a2)
+  | 55, [a1, a2, a3] => some (__bv_bitblast_ult_rec a1 a2 a3)
+  | 56, [a1] => some (__bv_mk_bitblast_step_concat a1)
+  | 57, [a1, a2, a3, a4] => some (__bv_mk_bitblast_step_bitwise a1 a2 a3 a4)
+  | 58, [a1, a2, a3, a4] => some (__bv_ripple_carry_adder_2 a1 a2 a3 a4)
+  | 59, [a1, a2] => some (__bv_mk_bitblast_step_add a1 a2)
+  | 60, [a1, a2, a3, a4, a5] => some (__bv_shift_add_multiplier_rec_step a1 a2 a3 a4 a5)
+  | 61, [a1, a2, a3, a4] => some (__bv_shift_add_multiplier_rec a1 a2 a3 a4)
+  | 62, [a1, a2] => some (__bv_mk_bitblast_step_mul a1 a2)
+  | 63, [a1, a2, a3, a4] => some (__eo_l_1___bv_div_mod_impl a1 a2 a3 a4)
+  | 64, [a1, a2, a3, a4] => some (__bv_div_mod_impl a1 a2 a3 a4)
+  | 65, [a1, a2, a3] => some (__bv_mk_bitblast_step_ite a1 a2 a3)
+  | 66, [a1, a2] => some (__bv_const_to_bitlist_rec a1 a2)
+  | 67, [a1, a2, a3, a4] => some (__bv_mk_bitblast_step_shl_rec_step a1 a2 a3 a4)
+  | 68, [a1, a2, a3, a4] => some (__eo_l_1___bv_mk_bitblast_step_shl_rec a1 a2 a3 a4)
+  | 69, [a1, a2, a3, a4] => some (__bv_mk_bitblast_step_shl_rec a1 a2 a3 a4)
+  | 70, [a1, a2, a3, a4, a5] => some (__bv_mk_bitblast_step_shr_rec_step a1 a2 a3 a4 a5)
+  | 71, [a1, a2, a3, a4, a5] => some (__eo_l_1___bv_mk_bitblast_step_shr_rec a1 a2 a3 a4 a5)
+  | 72, [a1, a2, a3, a4, a5] => some (__bv_mk_bitblast_step_shr_rec a1 a2 a3 a4 a5)
+  | 73, [a1, a2] => some (__bv_mk_bitblast_step_var_rec a1 a2)
+  | 74, [a1, a2, a3, a4, a5, a6] => some (__bv_smulo_elim_rec a1 a2 a3 a4 a5 a6)
+  | 75, [a1, a2, a3, a4, a5, a6] => some (__bv_umulo_elim_rec a1 a2 a3 a4 a5 a6)
+  | 76, [a1, a2, a3, a4, a5, a6, a7] => some (__bv_mk_bitwise_slicing_rec a1 a2 a3 a4 a5 a6 a7)
+  | 77, [a1, a2] => some (__beta_reduce_type a1 a2)
+  | 78, [a1, a2] => some (__beta_reduce a1 a2)
+  | 79, [a1] => some (__is_seq_const_rec a1)
+  | 80, [a1] => some (__str_fixed_len_re a1)
+  | 81, [a1] => some (__re_nullable a1)
+  | 82, [a1, a2] => some (__derivative a1 a2)
+  | 83, [a1, a2] => some (__str_eval_str_in_re_rec a1 a2)
+  | 84, [a1, a2, a3] => some (__str_first_match_rec_smallest a1 a2 a3)
+  | 85, [a1, a2, a3, a4] => some (__str_first_match_rec a1 a2 a3 a4)
+  | 86, [a1, a2, a3, a4] => some (__re_unfold_pos_concat_rec a1 a2 a3 a4)
+  | 87, [a1, a2] => some (__str_flatten_word_rec a1 a2)
+  | 88, [a1] => some (__str_flatten a1)
+  | 89, [a1] => some (__str_collect a1)
+  | 90, [a1, a2] => some (__str_strip_prefix a1 a2)
+  | 91, [a1, a2, a3] => some (__str_mk_re_loop_elim_rec a1 a2 a3)
+  | 92, [a1, a2] => some (__str_mk_str_in_re_concat_star_char a1 a2)
+  | 93, [a1, a2, a3, a4] => some (__str_mk_str_in_re_sigma_rec a1 a2 a3 a4)
+  | 94, [a1, a2, a3] => some (__str_mk_str_in_re_sigma_star_rec a1 a2 a3)
+  | 95, [a1, a2] => some (__re_split_str_to_re a1 a2)
+  | 96, [a1, a2] => some (__re_rev_map_rev a1 a2)
+  | 97, [a1] => some (__re_rev_comp a1)
+  | 98, [a1, a2] => some (__re_flatten a1 a2)
+  | 99, [a1, a2] => some (__re_unflatten a1 a2)
+  | 100, [a1, a2] => some (__re_unflatten_str a1 a2)
+  | 101, [a1, a2] => some (__str_re_includes_lhs_union a1 a2)
+  | 102, [a1, a2] => some (__str_re_includes_rhs_inter a1 a2)
+  | 103, [a1, a2] => some (__str_re_includes_lhs_star a1 a2)
+  | 104, [a1] => some (__re_is_unbound_wildcard a1)
+  | 105, [a1, a2] => some (__str_re_includes_base_rec a1 a2)
+  | 106, [a1, a2, a3, a4] => some (__str_re_includes_concat a1 a2 a3 a4)
+  | 107, [a1, a2] => some (__str_re_includes_rec a1 a2)
+  | 108, [a1] => some (__str_arith_entail_simple_rec a1)
+  | 109, [a1, a2, a3] => some (__eo_l_1___str_arith_entail_is_approx a1 a2 a3)
+  | 110, [a1, a2, a3] => some (__str_arith_entail_is_approx a1 a2 a3)
+  | 111, [a1, a2, a3] => some (__str_re_consume_inter a1 a2 a3)
+  | 112, [a1, a2, a3] => some (__str_re_consume_union a1 a2 a3)
+  | 113, [a1, a2, a3] => some (__str_re_consume_rec a1 a2 a3)
+  | 114, [a1, a2] => some (__str_is_compatible a1 a2)
+  | 115, [a1, a2] => some (__str_overlap_rec a1 a2)
+  | 116, [a1, a2, a3] => some (__str_from_int_eval_rec a1 a2 a3)
+  | 117, [a1, a2, a3] => some (__str_to_int_eval_rec a1 a2 a3)
+  | 118, [a1, a2] => some (__str_case_conv_rec a1 a2)
+  | 119, [a1, a2] => some (__str_leq_eval_rec a1 a2)
+  | 120, [a1, a2] => some (__str_is_prefix_flat a1 a2)
+  | 121, [a1, a2, a3, a4, a5] => some (__str_eval_replace_all_rec a1 a2 a3 a4 a5)
+  | 122, [a1, a2] => some (__mk_re_concat a1 a2)
+  | 123, [a1] => some (__str_multiset_overapprox_word a1)
+  | 124, [a1] => some (__str_multiset_overapprox a1)
+  | 125, [a1, a2] => some (__str_is_multiset_subset_strict_done a1 a2)
+  | 126, [a1, a2, a3] => some (__str_is_multiset_subset_strict a1 a2 a3)
+  | 127, [a1, a2, a3, a4, a5] => some (__str_eval_replace_re_all_rec a1 a2 a3 a4 a5)
+  | 128, [a1, a2] => some (__eo_l_1___seq_is_prefix a1 a2)
+  | 129, [a1, a2] => some (__seq_is_prefix a1 a2)
+  | 130, [a1, a2, a3] => some (__eo_l_1___seq_find a1 a2 a3)
+  | 131, [a1, a2, a3] => some (__seq_find a1 a2 a3)
+  | 132, [a1, a2, a3] => some (__seq_subsequence_rec a1 a2 a3)
+  | 133, [a1, a2, a3, a4, a5] => some (__seq_eval_replace_all_rec a1 a2 a3 a4 a5)
+  | 134, [a1] => some (__seq_eval a1)
+  | 135, [a1] => some (__set_union_to_list a1)
+  | 136, [a1, a2] => some (__eval_sets_inter a1 a2)
+  | 137, [a1, a2] => some (__eval_sets_minus a1 a2)
+  | 138, [a1, a2, a3] => some (__abconv_ubv_to_int_elim a1 a2 a3)
+  | 139, [a1, a2, a3] => some (__abconv_int_to_bv_elim a1 a2 a3)
+  | 140, [a1, a2, a3] => some (__mk_skolems a1 a2 a3)
+  | 141, [a1, a2, a3] => some (__mk_quant_merge_prenex a1 a2 a3)
+  | 142, [a1, a2] => some (__mk_quant_miniscope_and a1 a2)
+  | 143, [a1, a2, a3] => some (__eo_l_2___is_quant_miniscope_or a1 a2 a3)
+  | 144, [a1, a2, a3] => some (__eo_l_1___is_quant_miniscope_or a1 a2 a3)
+  | 145, [a1, a2, a3] => some (__is_quant_miniscope_or a1 a2 a3)
+  | 146, [a1, a2, a3, a4, a5] => some (__eo_l_1___is_quant_dt_split_conj a1 a2 a3 a4 a5)
+  | 147, [a1, a2, a3, a4, a5] => some (__is_quant_dt_split_conj a1 a2 a3 a4 a5)
+  | 148, [a1, a2, a3, a4, a5] => some (__is_quant_dt_split a1 a2 a3 a4 a5)
+  | 149, [a1, a2] => some (__mk_dt_split a1 a2)
+  | 150, [a1, a2, a3] => some (__mk_dt_inst_rec a1 a2 a3)
+  | 151, [a1, a2, a3] => some (__mk_dt_inst_tuple_rec a1 a2 a3)
+  | 152, [a1, a2] => some (__mk_dt_cons_eq a1 a2)
+  | 153, [a1, a2, a3, a4] => some (__eo_l_1___dt_find_cycle a1 a2 a3 a4)
+  | 154, [a1, a2, a3, a4] => some (__dt_find_cycle a1 a2 a3 a4)
+  | 155, [a1, a2, a3] => some (__dt_collapse_updater_rhs a1 a2 a3)
+  | 156, [a1, a2, a3] => some (__tuple_collapse_updater_rhs a1 a2 a3)
+  | 157, [a1, a2, a3] => some (__eo_l_1___dt_updater_elim_rhs a1 a2 a3)
+  | 158, [a1, a2, a3] => some (__dt_updater_elim_rhs a1 a2 a3)
+  | 159, [a1, a2] => some (__eo_l_1___tuple_updater_elim_rhs a1 a2)
+  | 160, [a1, a2] => some (__tuple_updater_elim_rhs a1 a2)
+  | 161, [a1, a2, a3] => some (__get_ai_norm_rec a1 a2 a3)
+  | 162, [a1, a2, a3] => some (__get_a_norm_rec a1 a2 a3)
+  | 163, [a1] => some (__run_evaluate a1)
+  | 164, [a1] => some (__evaluate_list a1)
+  | 165, [a1, a2, a3] => some (__eo_l_1___is_absorb_rec a1 a2 a3)
+  | 166, [a1, a2, a3] => some (__is_absorb_rec a1 a2 a3)
+  | 167, [a1] => some (__eo_typeof a1)
+  | 168, [a1, a2] => some (__eo_is_closed_rec a1 a2)
   | _, _ => none
 
 macro "kside" : tactic => `(tactic| all_goals try (kdis; done))
@@ -2449,56 +2449,6 @@ theorem m__eo_is_list_nil_22_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {ar
   have v0 := decode_leaf_inv (n := .__eo_List_cons) (d := σ.decode) hI rfl eq1
   have v1 := decode_leaf_inv (n := .__eo_List_nil) (d := σ.decode) hI rfl eq2
   simp [m__eo_is_list_nil_22, kguard, leaf_of_view v0, leaf_of_view v1] at h
-
-theorem m__eo_get_nil_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_get_nil_rec_1 σ arg1 arg2 = some ()) :
-    σ.decode arg1 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_get_nil_rec_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h1 : arg1 < σ.size)
-    (h : m__eo_get_nil_rec_1 σ arg1 arg2 = none) :
-    σ.decode arg1 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h1 e; subst this
-  simp [m__eo_get_nil_rec_1, stuck_of_zero] at h
-
-theorem m__eo_get_nil_rec_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_get_nil_rec_2 σ arg1 arg2 = some ()) :
-    σ.decode arg2 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_get_nil_rec_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h2 : arg2 < σ.size)
-    (h : m__eo_get_nil_rec_2 σ arg1 arg2 = none) :
-    σ.decode arg2 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h2 e; subst this
-  simp [m__eo_get_nil_rec_2, stuck_of_zero] at h
-
-theorem m__eo_get_nil_rec_3_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} {r_g : Id} {r_x : Id} {r_y : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_get_nil_rec_3 σ arg1 arg2 = some (r_g, r_x, r_y)) :
-    r_g < σ.size ∧ r_x < σ.size ∧ r_y < σ.size ∧ σ.decode arg2 = (Term.Apply (Term.Apply (σ.decode r_g) (σ.decode r_x)) (σ.decode r_y)) := by
-  unfold m__eo_get_nil_rec_3 at h
-  obtain ⟨kp0, y, v0, h⟩ := m_Apply_some h
-  have w3 := valid_of_view (j := kp0) hI h2 v0 (by simp [Node.children])
-  obtain ⟨g, x, v1, h⟩ := m_Apply_some h
-  have w6 := valid_of_view (j := g) hI w3 v1 (by simp [Node.children])
-  have w7 := valid_of_view (j := x) hI w3 v1 (by simp [Node.children])
-  have w8 := valid_of_view (j := y) hI h2 v0 (by simp [Node.children])
-  simp only [Option.some.injEq, Prod.mk.injEq] at h
-  obtain ⟨rfl, rfl, rfl⟩ := h
-  refine ⟨w6, w7, w8, ?_⟩ <;> simp only [decode_of_view hI v0, decode_of_view hI v1, Node.toTerm]
-
-theorem m__eo_get_nil_rec_3_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h : m__eo_get_nil_rec_3 σ arg1 arg2 = none) :
-    ∀ (g : Term) (x : Term) (y : Term), σ.decode arg2 = (Term.Apply (Term.Apply g x) y) → False := by
-  intro g x y eq2
-  obtain ⟨kp0, y, v0, e1, e2⟩ := decode_Apply_inv hI eq2
-  obtain ⟨g, x, v1, e4, e5⟩ := decode_Apply_inv hI e1
-  simp [m__eo_get_nil_rec_3, kguard, m_Apply_of_view v0, m_Apply_of_view v1] at h
 
 theorem m__eo_is_list_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
     (h1 : arg1 < σ.size)
@@ -10055,141 +10005,6 @@ theorem m__eo_list_rev_rec_3_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {ar
   obtain ⟨f, x, v1, e4, e5⟩ := decode_Apply_inv hI e1
   simp [m__eo_list_rev_rec_3, kguard, m_Apply_of_view v0, m_Apply_of_view v1] at h
 
-theorem m__eo_list_erase_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_rec_1 σ arg1 arg2 = some ()) :
-    σ.decode arg1 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_erase_rec_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h1 : arg1 < σ.size)
-    (h : m__eo_list_erase_rec_1 σ arg1 arg2 = none) :
-    σ.decode arg1 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h1 e; subst this
-  simp [m__eo_list_erase_rec_1, stuck_of_zero] at h
-
-theorem m__eo_list_erase_rec_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_rec_2 σ arg1 arg2 = some ()) :
-    σ.decode arg2 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_erase_rec_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_rec_2 σ arg1 arg2 = none) :
-    σ.decode arg2 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h2 e; subst this
-  simp [m__eo_list_erase_rec_2, stuck_of_zero] at h
-
-theorem m__eo_list_erase_rec_3_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} {r_f : Id} {r_x : Id} {r_y : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_rec_3 σ arg1 arg2 = some (r_f, r_x, r_y)) :
-    r_f < σ.size ∧ r_x < σ.size ∧ r_y < σ.size ∧ σ.decode arg1 = (Term.Apply (Term.Apply (σ.decode r_f) (σ.decode r_x)) (σ.decode r_y)) := by
-  unfold m__eo_list_erase_rec_3 at h
-  obtain ⟨kp0, y, v0, h⟩ := m_Apply_some h
-  have w3 := valid_of_view (j := kp0) hI h1 v0 (by simp [Node.children])
-  obtain ⟨f, x, v1, h⟩ := m_Apply_some h
-  have w6 := valid_of_view (j := f) hI w3 v1 (by simp [Node.children])
-  have w7 := valid_of_view (j := x) hI w3 v1 (by simp [Node.children])
-  have w8 := valid_of_view (j := y) hI h1 v0 (by simp [Node.children])
-  simp only [Option.some.injEq, Prod.mk.injEq] at h
-  obtain ⟨rfl, rfl, rfl⟩ := h
-  refine ⟨w6, w7, w8, ?_⟩ <;> simp only [decode_of_view hI v0, decode_of_view hI v1, Node.toTerm]
-
-theorem m__eo_list_erase_rec_3_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h : m__eo_list_erase_rec_3 σ arg1 arg2 = none) :
-    ∀ (f : Term) (x : Term) (y : Term), σ.decode arg1 = (Term.Apply (Term.Apply f x) y) → False := by
-  intro f x y eq1
-  obtain ⟨kp0, y, v0, e1, e2⟩ := decode_Apply_inv hI eq1
-  obtain ⟨f, x, v1, e4, e5⟩ := decode_Apply_inv hI e1
-  simp [m__eo_list_erase_rec_3, kguard, m_Apply_of_view v0, m_Apply_of_view v1] at h
-
-theorem m__eo_list_erase_all_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_all_rec_1 σ arg1 arg2 = some ()) :
-    σ.decode arg1 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_erase_all_rec_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h1 : arg1 < σ.size)
-    (h : m__eo_list_erase_all_rec_1 σ arg1 arg2 = none) :
-    σ.decode arg1 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h1 e; subst this
-  simp [m__eo_list_erase_all_rec_1, stuck_of_zero] at h
-
-theorem m__eo_list_erase_all_rec_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_all_rec_2 σ arg1 arg2 = some ()) :
-    σ.decode arg2 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_erase_all_rec_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_all_rec_2 σ arg1 arg2 = none) :
-    σ.decode arg2 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h2 e; subst this
-  simp [m__eo_list_erase_all_rec_2, stuck_of_zero] at h
-
-theorem m__eo_list_erase_all_rec_3_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} {r_f : Id} {r_x : Id} {r_y : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_erase_all_rec_3 σ arg1 arg2 = some (r_f, r_x, r_y)) :
-    r_f < σ.size ∧ r_x < σ.size ∧ r_y < σ.size ∧ σ.decode arg1 = (Term.Apply (Term.Apply (σ.decode r_f) (σ.decode r_x)) (σ.decode r_y)) := by
-  unfold m__eo_list_erase_all_rec_3 at h
-  obtain ⟨kp0, y, v0, h⟩ := m_Apply_some h
-  have w3 := valid_of_view (j := kp0) hI h1 v0 (by simp [Node.children])
-  obtain ⟨f, x, v1, h⟩ := m_Apply_some h
-  have w6 := valid_of_view (j := f) hI w3 v1 (by simp [Node.children])
-  have w7 := valid_of_view (j := x) hI w3 v1 (by simp [Node.children])
-  have w8 := valid_of_view (j := y) hI h1 v0 (by simp [Node.children])
-  simp only [Option.some.injEq, Prod.mk.injEq] at h
-  obtain ⟨rfl, rfl, rfl⟩ := h
-  refine ⟨w6, w7, w8, ?_⟩ <;> simp only [decode_of_view hI v0, decode_of_view hI v1, Node.toTerm]
-
-theorem m__eo_list_erase_all_rec_3_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h : m__eo_list_erase_all_rec_3 σ arg1 arg2 = none) :
-    ∀ (f : Term) (x : Term) (y : Term), σ.decode arg1 = (Term.Apply (Term.Apply f x) y) → False := by
-  intro f x y eq1
-  obtain ⟨kp0, y, v0, e1, e2⟩ := decode_Apply_inv hI eq1
-  obtain ⟨f, x, v1, e4, e5⟩ := decode_Apply_inv hI e1
-  simp [m__eo_list_erase_all_rec_3, kguard, m_Apply_of_view v0, m_Apply_of_view v1] at h
-
-theorem m__eo_list_setof_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id}
-    (h1 : arg1 < σ.size)
-    (h : m__eo_list_setof_rec_1 σ arg1 = some ()) :
-    σ.decode arg1 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_setof_rec_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} (h1 : arg1 < σ.size)
-    (h : m__eo_list_setof_rec_1 σ arg1 = none) :
-    σ.decode arg1 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h1 e; subst this
-  simp [m__eo_list_setof_rec_1, stuck_of_zero] at h
-
-theorem m__eo_list_setof_rec_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {r_f : Id} {r_x : Id} {r_y : Id}
-    (h1 : arg1 < σ.size)
-    (h : m__eo_list_setof_rec_2 σ arg1 = some (r_f, r_x, r_y)) :
-    r_f < σ.size ∧ r_x < σ.size ∧ r_y < σ.size ∧ σ.decode arg1 = (Term.Apply (Term.Apply (σ.decode r_f) (σ.decode r_x)) (σ.decode r_y)) := by
-  unfold m__eo_list_setof_rec_2 at h
-  obtain ⟨kp0, y, v0, h⟩ := m_Apply_some h
-  have w3 := valid_of_view (j := kp0) hI h1 v0 (by simp [Node.children])
-  obtain ⟨f, x, v1, h⟩ := m_Apply_some h
-  have w6 := valid_of_view (j := f) hI w3 v1 (by simp [Node.children])
-  have w7 := valid_of_view (j := x) hI w3 v1 (by simp [Node.children])
-  have w8 := valid_of_view (j := y) hI h1 v0 (by simp [Node.children])
-  simp only [Option.some.injEq, Prod.mk.injEq] at h
-  obtain ⟨rfl, rfl, rfl⟩ := h
-  refine ⟨w6, w7, w8, ?_⟩ <;> simp only [decode_of_view hI v0, decode_of_view hI v1, Node.toTerm]
-
-theorem m__eo_list_setof_rec_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id}
-    (h : m__eo_list_setof_rec_2 σ arg1 = none) :
-    ∀ (f : Term) (x : Term) (y : Term), σ.decode arg1 = (Term.Apply (Term.Apply f x) y) → False := by
-  intro f x y eq1
-  obtain ⟨kp0, y, v0, e1, e2⟩ := decode_Apply_inv hI eq1
-  obtain ⟨f, x, v1, e4, e5⟩ := decode_Apply_inv hI e1
-  simp [m__eo_list_setof_rec_2, kguard, m_Apply_of_view v0, m_Apply_of_view v1] at h
-
 theorem m__eo_list_minclude_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} {arg3 : Id}
     (h1 : arg1 < σ.size)
     (h2 : arg2 < σ.size)
@@ -10282,56 +10097,6 @@ theorem m__eo_list_minclude_rec_5_none {σ : Store} (hI : Inv sem σ) {arg1 : Id
   have v0 := decode_leaf_inv (n := .__eo_List_nil) (d := σ.decode) hI rfl eq2
   have v1 := decode_leaf_inv (n := (.Boolean true)) (d := σ.decode) hI rfl eq3
   simp [m__eo_list_minclude_rec_5, kguard, leaf_of_view v0, leaf_of_view v1] at h
-
-theorem m__eo_list_diff_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_diff_rec_1 σ arg1 arg2 = some ()) :
-    σ.decode arg1 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_diff_rec_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h1 : arg1 < σ.size)
-    (h : m__eo_list_diff_rec_1 σ arg1 arg2 = none) :
-    σ.decode arg1 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h1 e; subst this
-  simp [m__eo_list_diff_rec_1, stuck_of_zero] at h
-
-theorem m__eo_list_diff_rec_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_diff_rec_2 σ arg1 arg2 = some ()) :
-    σ.decode arg2 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_list_diff_rec_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h2 : arg2 < σ.size)
-    (h : m__eo_list_diff_rec_2 σ arg1 arg2 = none) :
-    σ.decode arg2 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h2 e; subst this
-  simp [m__eo_list_diff_rec_2, stuck_of_zero] at h
-
-theorem m__eo_list_diff_rec_3_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} {r_f : Id} {r_x : Id} {r_y : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_list_diff_rec_3 σ arg1 arg2 = some (r_f, r_x, r_y)) :
-    r_f < σ.size ∧ r_x < σ.size ∧ r_y < σ.size ∧ σ.decode arg1 = (Term.Apply (Term.Apply (σ.decode r_f) (σ.decode r_x)) (σ.decode r_y)) := by
-  unfold m__eo_list_diff_rec_3 at h
-  obtain ⟨kp0, y, v0, h⟩ := m_Apply_some h
-  have w3 := valid_of_view (j := kp0) hI h1 v0 (by simp [Node.children])
-  obtain ⟨f, x, v1, h⟩ := m_Apply_some h
-  have w6 := valid_of_view (j := f) hI w3 v1 (by simp [Node.children])
-  have w7 := valid_of_view (j := x) hI w3 v1 (by simp [Node.children])
-  have w8 := valid_of_view (j := y) hI h1 v0 (by simp [Node.children])
-  simp only [Option.some.injEq, Prod.mk.injEq] at h
-  obtain ⟨rfl, rfl, rfl⟩ := h
-  refine ⟨w6, w7, w8, ?_⟩ <;> simp only [decode_of_view hI v0, decode_of_view hI v1, Node.toTerm]
-
-theorem m__eo_list_diff_rec_3_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h : m__eo_list_diff_rec_3 σ arg1 arg2 = none) :
-    ∀ (f : Term) (x : Term) (y : Term), σ.decode arg1 = (Term.Apply (Term.Apply f x) y) → False := by
-  intro f x y eq1
-  obtain ⟨kp0, y, v0, e1, e2⟩ := decode_Apply_inv hI eq1
-  obtain ⟨f, x, v1, e4, e5⟩ := decode_Apply_inv hI e1
-  simp [m__eo_list_diff_rec_3, kguard, m_Apply_of_view v0, m_Apply_of_view v1] at h
 
 theorem m__eo_list_inter_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
     (h1 : arg1 < σ.size)
@@ -79241,7 +79006,7 @@ theorem allS__eo_is_list_nil : ∀ n, S__eo_is_list_nil n
   | 0 => fun _ _ _ => by simp only [k__eo_is_list_nil]; exact Ok.throw
   | _ + 1 => step__eo_is_list_nil
 
-/-! ### Recursive component 1 program: __eo_get_nil_rec -/
+/-! ### 1 program: __eo_get_nil_rec -/
 
 abbrev S__eo_get_nil_rec (n : Nat) : Prop :=
   ∀ {σ : Store} {arg1 : Id} {arg2 : Id}, Inv sem σ → arg1 < σ.size → arg2 < σ.size →
@@ -79253,57 +79018,14 @@ theorem C__eo_get_nil_rec {n : Nat} (hf : S__eo_get_nil_rec n) {σ : Store} {Γ 
     Sim sem σ (k__eo_get_nil_rec n arg1 arg2) (__eo_get_nil_rec A1 A2) :=
   (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
 
-structure Spec77 (n : Nat) : Prop where
-  s__eo_get_nil_rec : S__eo_get_nil_rec n
-
-theorem step__eo_get_nil_rec {kn : Nat} (ih : Spec77 kn) : S__eo_get_nil_rec (kn + 1) := by
+theorem step__eo_get_nil_rec {kn : Nat} : S__eo_get_nil_rec (kn + 1) := by
   intro σ arg1 arg2 hI h1 h2
-  have hΓ := Ctx.arg h2 (Ctx.arg h1 (Ctx.stuck hI))
   simp only [k__eo_get_nil_rec]
-  apply cached_ctx hI (List.forall_mem_cons.mpr ⟨h1, (List.forall_mem_cons.mpr ⟨h2, (fun _ h => absurd h List.not_mem_nil)⟩)⟩) rfl
-  apply Sim.withStore
-  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
-  · have d1 := m__eo_get_nil_rec_1_some hI h1 h2 hm1
-    try dsimp only
-    rw [d1, __eo_get_nil_rec.eq_1]; kside
-    exact Sim.stuck hI
-  have kneg1 := m__eo_get_nil_rec_1_none hI h1 hm1
-  refine kcase_sim (fun _ hm2 => ?_) (fun hm2 => ?_)
-  · have d1 := m__eo_get_nil_rec_2_some hI h1 h2 hm2
-    try dsimp only
-    have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [d1, e1])
-    rw [d1, __eo_get_nil_rec.eq_2]; kside
-    exact Sim.stuck hI
-  have kneg2 := m__eo_get_nil_rec_2_none hI h2 hm2
-  refine kcase_sim (fun v hm3 => ?_) (fun hm3 => ?_)
-  · obtain ⟨g, x, y⟩ := v
-    obtain ⟨hb_g, hb_x, hb_y, d1⟩ := m__eo_get_nil_rec_3_some hI h1 h2 hm3
-    have hΓb := Ctx.arg hb_y (Ctx.arg hb_x (Ctx.arg hb_g (hΓ)))
-    try dsimp only
-    have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [d1, e1])
-    rw [d1, __eo_get_nil_rec.eq_3]; kside
-    refine Sim.step hΓb (C__eo_get_nil_rec ih.s__eo_get_nil_rec hI hΓb (.tail _ (.tail _ (.tail _ (.tail _ (.head _))))) (.head _)) fun kt9 σ10 hI11 hΓ12 => ?_
-    exact C__eo_requires (allS__eo_requires kn) hI11 hΓ12 (.tail _ (.tail _ (.tail _ (.tail _ (.tail _ (.head _)))))) (.tail _ (.tail _ (.tail _ (.head _)))) (.head _)
-  have kneg3 := m__eo_get_nil_rec_3_none hI hm3
-  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
-  have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [e1])
-  have o3 : ∀ (q_g : Term) (q_x : Term) (q_y : Term), (σ.decode arg2) = (Term.Apply (Term.Apply q_g q_x) q_y) → False := fun q_g q_x q_y e1 => kneg3 q_g q_x q_y (by simp only [e1])
-  rw [__eo_get_nil_rec.eq_4]; kside
-  refine Sim.step hΓ (C__eo_is_list_nil (allS__eo_is_list_nil kn) hI hΓ (.tail _ (.head _)) (.head _)) fun kt13 σ14 hI15 hΓ16 => ?_
-  refine Sim.step hΓ16 (intern_leaf hI15 rfl) fun kt17 σ18 hI19 hΓ20 => ?_
-  exact C__eo_requires (allS__eo_requires kn) hI19 hΓ20 (.tail _ (.head _)) (.head _) (.tail _ (.tail _ (.head _)))
+  exact Native.getNil_sim (allS__eo_is_list_nil kn) hI h1 h2
 
-theorem spec77 : ∀ n, Spec77 n
-  | 0 => {
-    s__eo_get_nil_rec := fun _ _ _ => by simp only [k__eo_get_nil_rec]; exact Ok.throw
-    }
-  | n + 1 =>
-    have ih := spec77 n
-    {
-    s__eo_get_nil_rec := step__eo_get_nil_rec ih
-    }
-
-theorem allS__eo_get_nil_rec (n : Nat) : S__eo_get_nil_rec n := (spec77 n).s__eo_get_nil_rec
+theorem allS__eo_get_nil_rec : ∀ n, S__eo_get_nil_rec n
+  | 0 => fun _ _ _ => by simp only [k__eo_get_nil_rec]; exact Ok.throw
+  | _ + 1 => step__eo_get_nil_rec
 
 /-! ### 1 program: __eo_is_list -/
 
@@ -85673,7 +85395,7 @@ theorem allS__eo_list_rev : ∀ n, S__eo_list_rev n
   | 0 => fun _ _ _ => by simp only [k__eo_list_rev]; exact Ok.throw
   | _ + 1 => step__eo_list_rev
 
-/-! ### Recursive component 1 program: __eo_list_erase_rec -/
+/-! ### 1 program: __eo_list_erase_rec -/
 
 abbrev S__eo_list_erase_rec (n : Nat) : Prop :=
   ∀ {σ : Store} {arg1 : Id} {arg2 : Id}, Inv sem σ → arg1 < σ.size → arg2 < σ.size →
@@ -85685,54 +85407,14 @@ theorem C__eo_list_erase_rec {n : Nat} (hf : S__eo_list_erase_rec n) {σ : Store
     Sim sem σ (k__eo_list_erase_rec n arg1 arg2) (__eo_list_erase_rec A1 A2) :=
   (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
 
-structure Spec189 (n : Nat) : Prop where
-  s__eo_list_erase_rec : S__eo_list_erase_rec n
-
-theorem step__eo_list_erase_rec {kn : Nat} (ih : Spec189 kn) : S__eo_list_erase_rec (kn + 1) := by
+theorem step__eo_list_erase_rec {kn : Nat} : S__eo_list_erase_rec (kn + 1) := by
   intro σ arg1 arg2 hI h1 h2
-  have hΓ := Ctx.arg h2 (Ctx.arg h1 (Ctx.stuck hI))
   simp only [k__eo_list_erase_rec]
-  apply Sim.withStore
-  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
-  · have d1 := m__eo_list_erase_rec_1_some hI h1 h2 hm1
-    try dsimp only
-    rw [d1, __eo_list_erase_rec.eq_1]; kside
-    exact Sim.stuck hI
-  have kneg1 := m__eo_list_erase_rec_1_none hI h1 hm1
-  refine kcase_sim (fun _ hm2 => ?_) (fun hm2 => ?_)
-  · have d1 := m__eo_list_erase_rec_2_some hI h1 h2 hm2
-    try dsimp only
-    have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [d1, e1])
-    rw [d1, __eo_list_erase_rec.eq_2]; kside
-    exact Sim.stuck hI
-  have kneg2 := m__eo_list_erase_rec_2_none hI h2 hm2
-  refine kcase_sim (fun v hm3 => ?_) (fun hm3 => ?_)
-  · obtain ⟨f, x, y⟩ := v
-    obtain ⟨hb_f, hb_x, hb_y, d1⟩ := m__eo_list_erase_rec_3_some hI h1 h2 hm3
-    have hΓb := Ctx.arg hb_y (Ctx.arg hb_x (Ctx.arg hb_f (hΓ)))
-    try dsimp only
-    have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [d1, e1])
-    rw [d1, __eo_list_erase_rec.eq_3]; kside
-    refine Sim.step hΓb (C__eo_eq (allS__eo_eq kn) hI hΓb (.tail _ (.head _)) (.tail _ (.tail _ (.tail _ (.head _))))) fun kt9 σ10 hI11 hΓ12 => ?_
-    exact k_ite_sim hI11 hΓ12 (.head _) (by exact Sim.ret hI11 hΓ12 (.tail _ (.head _))) (by apply Sim.step hΓ12 (intern_Apply hI11 hΓ12 (.tail _ (.tail _ (.tail _ (.head _)))) (.tail _ (.tail _ (.head _)))); intro kt13 σ14 hI15 hΓ16 ; apply Sim.step hΓ16 (C__eo_list_erase_rec ih.s__eo_list_erase_rec hI15 hΓ16 (.tail _ (.tail _ (.head _))) (.tail _ (.tail _ (.tail _ (.tail _ (.tail _ (.head _))))))); intro kt17 σ18 hI19 hΓ20 ; exact C__eo_mk_apply (allS__eo_mk_apply kn) hI19 hΓ20 (.tail _ (.head _)) (.head _))
-  have kneg3 := m__eo_list_erase_rec_3_none hI hm3
-  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
-  have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [e1])
-  have o3 : ∀ (q_f : Term) (q_x : Term) (q_y : Term), (σ.decode arg1) = (Term.Apply (Term.Apply q_f q_x) q_y) → False := fun q_f q_x q_y e1 => kneg3 q_f q_x q_y (by simp only [e1])
-  rw [__eo_list_erase_rec.eq_4]; kside
-  exact Sim.ret hI hΓ (.tail _ (.head _))
+  exact Native.erase_sim hI h1 h2
 
-theorem spec189 : ∀ n, Spec189 n
-  | 0 => {
-    s__eo_list_erase_rec := fun _ _ _ => by simp only [k__eo_list_erase_rec]; exact Ok.throw
-    }
-  | n + 1 =>
-    have ih := spec189 n
-    {
-    s__eo_list_erase_rec := step__eo_list_erase_rec ih
-    }
-
-theorem allS__eo_list_erase_rec (n : Nat) : S__eo_list_erase_rec n := (spec189 n).s__eo_list_erase_rec
+theorem allS__eo_list_erase_rec : ∀ n, S__eo_list_erase_rec n
+  | 0 => fun _ _ _ => by simp only [k__eo_list_erase_rec]; exact Ok.throw
+  | _ + 1 => step__eo_list_erase_rec
 
 /-! ### 1 program: __eo_list_erase -/
 
@@ -85762,7 +85444,7 @@ theorem allS__eo_list_erase : ∀ n, S__eo_list_erase n
   | 0 => fun _ _ _ _ => by simp only [k__eo_list_erase]; exact Ok.throw
   | _ + 1 => step__eo_list_erase
 
-/-! ### Recursive component 1 program: __eo_list_erase_all_rec -/
+/-! ### 1 program: __eo_list_erase_all_rec -/
 
 abbrev S__eo_list_erase_all_rec (n : Nat) : Prop :=
   ∀ {σ : Store} {arg1 : Id} {arg2 : Id}, Inv sem σ → arg1 < σ.size → arg2 < σ.size →
@@ -85774,56 +85456,14 @@ theorem C__eo_list_erase_all_rec {n : Nat} (hf : S__eo_list_erase_all_rec n) {σ
     Sim sem σ (k__eo_list_erase_all_rec n arg1 arg2) (__eo_list_erase_all_rec A1 A2) :=
   (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
 
-structure Spec191 (n : Nat) : Prop where
-  s__eo_list_erase_all_rec : S__eo_list_erase_all_rec n
-
-theorem step__eo_list_erase_all_rec {kn : Nat} (ih : Spec191 kn) : S__eo_list_erase_all_rec (kn + 1) := by
+theorem step__eo_list_erase_all_rec {kn : Nat} : S__eo_list_erase_all_rec (kn + 1) := by
   intro σ arg1 arg2 hI h1 h2
-  have hΓ := Ctx.arg h2 (Ctx.arg h1 (Ctx.stuck hI))
   simp only [k__eo_list_erase_all_rec]
-  apply Sim.withStore
-  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
-  · have d1 := m__eo_list_erase_all_rec_1_some hI h1 h2 hm1
-    try dsimp only
-    rw [d1, __eo_list_erase_all_rec.eq_1]; kside
-    exact Sim.stuck hI
-  have kneg1 := m__eo_list_erase_all_rec_1_none hI h1 hm1
-  refine kcase_sim (fun _ hm2 => ?_) (fun hm2 => ?_)
-  · have d1 := m__eo_list_erase_all_rec_2_some hI h1 h2 hm2
-    try dsimp only
-    have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [d1, e1])
-    rw [d1, __eo_list_erase_all_rec.eq_2]; kside
-    exact Sim.stuck hI
-  have kneg2 := m__eo_list_erase_all_rec_2_none hI h2 hm2
-  refine kcase_sim (fun v hm3 => ?_) (fun hm3 => ?_)
-  · obtain ⟨f, x, y⟩ := v
-    obtain ⟨hb_f, hb_x, hb_y, d1⟩ := m__eo_list_erase_all_rec_3_some hI h1 h2 hm3
-    have hΓb := Ctx.arg hb_y (Ctx.arg hb_x (Ctx.arg hb_f (hΓ)))
-    try dsimp only
-    have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [d1, e1])
-    rw [d1, __eo_list_erase_all_rec.eq_3]; kside
-    refine Sim.step hΓb (C__eo_eq (allS__eo_eq kn) hI hΓb (.tail _ (.tail _ (.tail _ (.head _)))) (.tail _ (.head _))) fun kt9 σ10 hI11 hΓ12 => ?_
-    refine Sim.step hΓ12 (C__eo_not (allS__eo_not kn) hI11 hΓ12 (.head _)) fun kt13 σ14 hI15 hΓ16 => ?_
-    refine Sim.step hΓ16 (C__eo_list_erase_all_rec ih.s__eo_list_erase_all_rec hI15 hΓ16 (.tail _ (.tail _ (.head _))) (.tail _ (.tail _ (.tail _ (.tail _ (.tail _ (.head _))))))) fun kt17 σ18 hI19 hΓ20 => ?_
-    exact C__eo_prepend_if (allS__eo_prepend_if kn) hI19 hΓ20 (.tail _ (.head _)) (.tail _ (.tail _ (.tail _ (.tail _ (.tail _ (.head _)))))) (.tail _ (.tail _ (.tail _ (.tail _ (.head _))))) (.head _)
-  have kneg3 := m__eo_list_erase_all_rec_3_none hI hm3
-  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
-  have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [e1])
-  have o3 : ∀ (q_f : Term) (q_x : Term) (q_y : Term), (σ.decode arg1) = (Term.Apply (Term.Apply q_f q_x) q_y) → False := fun q_f q_x q_y e1 => kneg3 q_f q_x q_y (by simp only [e1])
-  rw [__eo_list_erase_all_rec.eq_4]; kside
-  exact Sim.ret hI hΓ (.tail _ (.head _))
+  exact Native.eraseAll_sim hI h1 h2
 
-theorem spec191 : ∀ n, Spec191 n
-  | 0 => {
-    s__eo_list_erase_all_rec := fun _ _ _ => by simp only [k__eo_list_erase_all_rec]; exact Ok.throw
-    }
-  | n + 1 =>
-    have ih := spec191 n
-    {
-    s__eo_list_erase_all_rec := step__eo_list_erase_all_rec ih
-    }
-
-theorem allS__eo_list_erase_all_rec (n : Nat) : S__eo_list_erase_all_rec n := (spec191 n).s__eo_list_erase_all_rec
+theorem allS__eo_list_erase_all_rec : ∀ n, S__eo_list_erase_all_rec n
+  | 0 => fun _ _ _ => by simp only [k__eo_list_erase_all_rec]; exact Ok.throw
+  | _ + 1 => step__eo_list_erase_all_rec
 
 /-! ### 1 program: __eo_list_erase_all -/
 
@@ -85853,7 +85493,7 @@ theorem allS__eo_list_erase_all : ∀ n, S__eo_list_erase_all n
   | 0 => fun _ _ _ _ => by simp only [k__eo_list_erase_all]; exact Ok.throw
   | _ + 1 => step__eo_list_erase_all
 
-/-! ### Recursive component 1 program: __eo_list_setof_rec -/
+/-! ### 1 program: __eo_list_setof_rec -/
 
 abbrev S__eo_list_setof_rec (n : Nat) : Prop :=
   ∀ {σ : Store} {arg1 : Id}, Inv sem σ → arg1 < σ.size →
@@ -85864,47 +85504,14 @@ theorem C__eo_list_setof_rec {n : Nat} (hf : S__eo_list_setof_rec n) {σ : Store
     Sim sem σ (k__eo_list_setof_rec n arg1) (__eo_list_setof_rec A1) :=
   (hf hI (hΓ.valid p1)).congr (by rw [hΓ.dec p1])
 
-structure Spec193 (n : Nat) : Prop where
-  s__eo_list_setof_rec : S__eo_list_setof_rec n
-
-theorem step__eo_list_setof_rec {kn : Nat} (ih : Spec193 kn) : S__eo_list_setof_rec (kn + 1) := by
+theorem step__eo_list_setof_rec {kn : Nat} : S__eo_list_setof_rec (kn + 1) := by
   intro σ arg1 hI h1
-  have hΓ := Ctx.arg h1 (Ctx.stuck hI)
   simp only [k__eo_list_setof_rec]
-  apply Sim.withStore
-  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
-  · have d1 := m__eo_list_setof_rec_1_some hI h1 hm1
-    try dsimp only
-    rw [d1, __eo_list_setof_rec.eq_1]; kside
-    exact Sim.stuck hI
-  have kneg1 := m__eo_list_setof_rec_1_none hI h1 hm1
-  refine kcase_sim (fun v hm2 => ?_) (fun hm2 => ?_)
-  · obtain ⟨f, x, y⟩ := v
-    obtain ⟨hb_f, hb_x, hb_y, d1⟩ := m__eo_list_setof_rec_2_some hI h1 hm2
-    have hΓb := Ctx.arg hb_y (Ctx.arg hb_x (Ctx.arg hb_f (hΓ)))
-    try dsimp only
-    rw [d1, __eo_list_setof_rec.eq_2]; kside
-    refine Sim.step hΓb (intern_Apply hI hΓb (.tail _ (.tail _ (.head _))) (.tail _ (.head _))) fun kt9 σ10 hI11 hΓ12 => ?_
-    refine Sim.step hΓ12 (C__eo_list_setof_rec ih.s__eo_list_setof_rec hI11 hΓ12 (.tail _ (.head _))) fun kt13 σ14 hI15 hΓ16 => ?_
-    refine Sim.step hΓ16 (C__eo_list_erase_all_rec (allS__eo_list_erase_all_rec kn) hI15 hΓ16 (.head _) (.tail _ (.tail _ (.tail _ (.head _))))) fun kt17 σ18 hI19 hΓ20 => ?_
-    exact C__eo_mk_apply (allS__eo_mk_apply kn) hI19 hΓ20 (.tail _ (.tail _ (.head _))) (.head _)
-  have kneg2 := m__eo_list_setof_rec_2_none hI hm2
-  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
-  have o2 : ∀ (q_f : Term) (q_x : Term) (q_y : Term), (σ.decode arg1) = (Term.Apply (Term.Apply q_f q_x) q_y) → False := fun q_f q_x q_y e1 => kneg2 q_f q_x q_y (by simp only [e1])
-  rw [__eo_list_setof_rec.eq_3]; kside
-  exact Sim.ret hI hΓ (.head _)
+  exact Native.setof_sim hI h1
 
-theorem spec193 : ∀ n, Spec193 n
-  | 0 => {
-    s__eo_list_setof_rec := fun _ _ => by simp only [k__eo_list_setof_rec]; exact Ok.throw
-    }
-  | n + 1 =>
-    have ih := spec193 n
-    {
-    s__eo_list_setof_rec := step__eo_list_setof_rec ih
-    }
-
-theorem allS__eo_list_setof_rec (n : Nat) : S__eo_list_setof_rec n := (spec193 n).s__eo_list_setof_rec
+theorem allS__eo_list_setof_rec : ∀ n, S__eo_list_setof_rec n
+  | 0 => fun _ _ => by simp only [k__eo_list_setof_rec]; exact Ok.throw
+  | _ + 1 => step__eo_list_setof_rec
 
 /-! ### 1 program: __eo_list_setof -/
 
@@ -86080,7 +85687,7 @@ theorem allS__eo_list_meq : ∀ n, S__eo_list_meq n
   | 0 => fun _ _ _ _ => by simp only [k__eo_list_meq]; exact Ok.throw
   | _ + 1 => step__eo_list_meq
 
-/-! ### Recursive component 1 program: __eo_list_diff_rec -/
+/-! ### 1 program: __eo_list_diff_rec -/
 
 abbrev S__eo_list_diff_rec (n : Nat) : Prop :=
   ∀ {σ : Store} {arg1 : Id} {arg2 : Id}, Inv sem σ → arg1 < σ.size → arg2 < σ.size →
@@ -86092,56 +85699,14 @@ theorem C__eo_list_diff_rec {n : Nat} (hf : S__eo_list_diff_rec n) {σ : Store} 
     Sim sem σ (k__eo_list_diff_rec n arg1 arg2) (__eo_list_diff_rec A1 A2) :=
   (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
 
-structure Spec198 (n : Nat) : Prop where
-  s__eo_list_diff_rec : S__eo_list_diff_rec n
-
-theorem step__eo_list_diff_rec {kn : Nat} (ih : Spec198 kn) : S__eo_list_diff_rec (kn + 1) := by
+theorem step__eo_list_diff_rec {kn : Nat} : S__eo_list_diff_rec (kn + 1) := by
   intro σ arg1 arg2 hI h1 h2
-  have hΓ := Ctx.arg h2 (Ctx.arg h1 (Ctx.stuck hI))
   simp only [k__eo_list_diff_rec]
-  apply Sim.withStore
-  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
-  · have d1 := m__eo_list_diff_rec_1_some hI h1 h2 hm1
-    try dsimp only
-    rw [d1, __eo_list_diff_rec.eq_1]; kside
-    exact Sim.stuck hI
-  have kneg1 := m__eo_list_diff_rec_1_none hI h1 hm1
-  refine kcase_sim (fun _ hm2 => ?_) (fun hm2 => ?_)
-  · have d1 := m__eo_list_diff_rec_2_some hI h1 h2 hm2
-    try dsimp only
-    have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [d1, e1])
-    rw [d1, __eo_list_diff_rec.eq_2]; kside
-    exact Sim.stuck hI
-  have kneg2 := m__eo_list_diff_rec_2_none hI h2 hm2
-  refine kcase_sim (fun v hm3 => ?_) (fun hm3 => ?_)
-  · obtain ⟨f, x, y⟩ := v
-    obtain ⟨hb_f, hb_x, hb_y, d1⟩ := m__eo_list_diff_rec_3_some hI h1 h2 hm3
-    have hΓb := Ctx.arg hb_y (Ctx.arg hb_x (Ctx.arg hb_f (hΓ)))
-    try dsimp only
-    have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [d1, e1])
-    rw [d1, __eo_list_diff_rec.eq_3]; kside
-    refine Sim.step hΓb (C__eo_list_erase_rec (allS__eo_list_erase_rec kn) hI hΓb (.tail _ (.tail _ (.tail _ (.head _)))) (.tail _ (.head _))) fun kt9 σ10 hI11 hΓ12 => ?_
-    refine Sim.step hΓ12 (C__eo_eq (allS__eo_eq kn) hI11 hΓ12 (.head _) (.tail _ (.tail _ (.tail _ (.tail _ (.head _)))))) fun kt13 σ14 hI15 hΓ16 => ?_
-    refine Sim.step hΓ16 (C__eo_list_diff_rec ih.s__eo_list_diff_rec hI15 hΓ16 (.tail _ (.tail _ (.head _))) (.tail _ (.head _))) fun kt17 σ18 hI19 hΓ20 => ?_
-    exact C__eo_prepend_if (allS__eo_prepend_if kn) hI19 hΓ20 (.tail _ (.head _)) (.tail _ (.tail _ (.tail _ (.tail _ (.tail _ (.head _)))))) (.tail _ (.tail _ (.tail _ (.tail _ (.head _))))) (.head _)
-  have kneg3 := m__eo_list_diff_rec_3_none hI hm3
-  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
-  have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [e1])
-  have o3 : ∀ (q_f : Term) (q_x : Term) (q_y : Term), (σ.decode arg1) = (Term.Apply (Term.Apply q_f q_x) q_y) → False := fun q_f q_x q_y e1 => kneg3 q_f q_x q_y (by simp only [e1])
-  rw [__eo_list_diff_rec.eq_4]; kside
-  exact Sim.ret hI hΓ (.tail _ (.head _))
+  exact Native.diff_sim hI h1 h2
 
-theorem spec198 : ∀ n, Spec198 n
-  | 0 => {
-    s__eo_list_diff_rec := fun _ _ _ => by simp only [k__eo_list_diff_rec]; exact Ok.throw
-    }
-  | n + 1 =>
-    have ih := spec198 n
-    {
-    s__eo_list_diff_rec := step__eo_list_diff_rec ih
-    }
-
-theorem allS__eo_list_diff_rec (n : Nat) : S__eo_list_diff_rec n := (spec198 n).s__eo_list_diff_rec
+theorem allS__eo_list_diff_rec : ∀ n, S__eo_list_diff_rec n
+  | 0 => fun _ _ _ => by simp only [k__eo_list_diff_rec]; exact Ok.throw
+  | _ + 1 => step__eo_list_diff_rec
 
 /-! ### 1 program: __eo_list_diff -/
 
