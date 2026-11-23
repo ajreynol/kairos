@@ -63,6 +63,12 @@ jobs:
       - name: Build the checker
         run: lake build
 
+      - name: Build the executables
+        run: lake build kairos Cpc/logos
+
+      - name: Kairos and Logos agree on Logos's regressions
+        run: scripts/compare-logos.sh
+
   # Kairos's proofs: that its checker computes what Logos's does. They need
   # Logos's definitions only. Logos's own proofs (its verification/ project,
   # and Mathlib) are not built here, nor is ../soundness, which needs them.

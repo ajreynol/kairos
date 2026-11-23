@@ -34,7 +34,23 @@ project.
 `kairos-eoc` generates the term programs (1111 of 1140; 19 of them lifted,
 i.e. computed by Logos on decoded arguments, and listed in the generated
 file), the rule dispatch, and all their proofs. The checker's template part is
-mirrored by hand (`Kairos/Checker/`). There is no parser or executable yet.
+mirrored by hand (`Kairos/Checker/`).
+
+## The executable
+
+```sh
+lake build kairos
+lake exe kairos [--time] [--compare] [--no-translation] proof.cpc
+```
+
+`kairos` reads a CPC proof in s-expression syntax with Logos's parser, checks
+it with Kairos's checker, and runs Logos's two translation side conditions, so
+its verdicts and exit codes are those of Logos's `logos`: `correct` (0),
+`incorrect` (1), `incomplete` (2). `--time` reports each phase on stderr;
+`--compare` also runs Logos's checker in the same process and exits 3 if they
+disagree; `--no-translation` skips the side conditions, to time the checker
+alone. `scripts/compare-logos.sh [paths]` runs both executables over a set of
+proofs and reports any difference (CI runs it on Logos's regressions).
 
 ## Three projects
 

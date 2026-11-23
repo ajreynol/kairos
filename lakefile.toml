@@ -18,3 +18,9 @@ name = "Kairos"
 moreLeanArgs = ["-DwarningAsError=true", "-DmaxRecDepth=100000"]
 
 
+
+[[lean_exe]]
+# The command-line checker: Logos's parser and translation checks, Kairos's
+# refutation check. `lake build kairos`; `lake exe kairos <proof.cpc>`.
+name = "kairos"
+root = "KairosMain"
