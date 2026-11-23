@@ -41,43 +41,74 @@ theorem simR_of {m : K Id} {t : Term} (h : Sim sem σ m t) : SimR termRep sem σ
     · rintro ⟨h1, h2⟩; exact ⟨x, l, ⟨rfl, rfl⟩, h1, h2⟩
     · rintro ⟨x', l', ⟨rfl, rfl⟩, h1, h2⟩; exact ⟨h1, h2⟩
 
-theorem k_state_proven_nth_sim (hI : Inv sem σ) :
-    ∀ (s : KState) (n : Int), s.valid σ →
-      Sim sem σ (k_state_proven_nth s n) (__eo_state_proven_nth (s.dec σ) n)
-  | .cons so s, n, ⟨hso, hs⟩ => by
-    simp only [k_state_proven_nth, KState.dec]
-    by_cases h : n = 0
-    · subst h
-      simp only [↓reduceIte]
-      rw [__eo_state_proven_nth.eq_1]
-      exact Sim.pure hI hso (by cases so <;> rfl)
-    · simp only [h, ↓reduceIte]
-      rw [__eo_state_proven_nth.eq_2]; kside
-      exact k_state_proven_nth_sim hI s _ hs
-  | .nil, n, _ => by
-    simp only [k_state_proven_nth, KState.dec]
-    rw [__eo_state_proven_nth.eq_3]; kside
-    exact intern_leaf hI rfl
-  | .Stuck, n, _ => by
-    simp only [k_state_proven_nth, KState.dec]
-    rw [__eo_state_proven_nth.eq_3]; kside
+theorem StateObj_proven_dec (so : KStateObj) : __eo_StateObj_proven (so.dec σ) = σ.decode so.id := by
+  cases so <;> rfl
+
+/-- Logos's walk down a state, as indexing the list it decodes. -/
+theorem proven_nth_decL (b : Bool) : ∀ (l : List KStateObj) (n : Int),
+    __eo_state_proven_nth (KState.decL σ b l) n =
+      if 0 ≤ n then (match l[n.toNat]? with
+        | some so => σ.decode so.id
+        | none => .Boolean true) else .Boolean true
+  | [], n => by
+    rw [__eo_state_proven_nth.eq_3] <;> (try (cases b <;> simp [KState.decL])) <;> split <;> rfl
+  | so :: l, n => by
+    by_cases h0 : n = 0
+    · subst h0
+      simp [KState.decL, __eo_state_proven_nth, StateObj_proven_dec]
+    · simp only [KState.decL]
+      rw [__eo_state_proven_nth.eq_2 _ _ _ h0, proven_nth_decL b l]
+      simp only [native_zplus, native_zneg]
+      rcases Int.lt_or_gt_of_ne h0 with h | h
+      · simp [show ¬ (0 ≤ n + -1) by omega, show ¬ (0 ≤ n) by omega]
+      · have e : n.toNat = (n + -1).toNat + 1 := by omega
+        simp [show 0 ≤ n + -1 by omega, show 0 ≤ n by omega, e]
+
+theorem k_state_proven_nth_sim (hI : Inv sem σ) (s : KState) (n : Int) (hs : s.valid σ) :
+    Sim sem σ (k_state_proven_nth s n) (__eo_state_proven_nth (s.dec σ) n) := by
+  rw [KState.dec, proven_nth_decL]
+  unfold k_state_proven_nth
+  by_cases h : 0 ≤ n ∧ n.toNat < s.objs.size
+  · have e : s.objs.toList.reverse[n.toNat]? = s.objs[s.objs.size - 1 - n.toNat]? := by
+      rw [List.getElem?_reverse (by simpa using h.2)]; simp
+    simp only [h, and_self, ↓reduceIte, e]
+    match hm : s.objs[s.objs.size - 1 - n.toNat]? with
+    | some so =>
+      exact Sim.pure hI (hs so (Array.mem_toList_iff.mpr (Array.mem_of_getElem? hm))) rfl
+    | none => exact intern_leaf hI rfl
+  · simp only [h, ↓reduceIte]
+    have : (if 0 ≤ n then (match s.objs.toList.reverse[n.toNat]? with
+        | some so => σ.decode so.id
+        | none => Term.Boolean true) else Term.Boolean true) = Term.Boolean true := by
+      split
+      · rw [List.getElem?_eq_none (by simp; omega)]
+      · rfl
+    rw [this]
     exact intern_leaf hI rfl
 
-theorem k_state_is_closed_eq : ∀ s : KState, k_state_is_closed s = __eo_state_is_closed (s.dec σ)
-  | .cons (.assume_push F) s => by simp [k_state_is_closed, KState.dec, KStateObj.dec, __eo_state_is_closed]
-  | .cons (.assume F) s => by
-    simp only [k_state_is_closed, KState.dec, KStateObj.dec]
-    rw [__eo_state_is_closed.eq_2]; kside
-    exact k_state_is_closed_eq s
-  | .cons (.proven F) s => by
-    simp only [k_state_is_closed, KState.dec, KStateObj.dec]
-    rw [__eo_state_is_closed.eq_2]; kside
-    exact k_state_is_closed_eq s
-  | .nil => by simp [k_state_is_closed, KState.dec, __eo_state_is_closed]
-  | .Stuck => by
-    simp only [k_state_is_closed, KState.dec]
-    rw [__eo_state_is_closed.eq_4]; kside
+theorem is_closed_decL (b : Bool) : ∀ l : List KStateObj,
+    __eo_state_is_closed (KState.decL σ b l) = (!b && l.all (fun so => !so.isPush))
+  | [] => by
+    cases b
+    · simp [KState.decL, __eo_state_is_closed]
+    · simp only [KState.decL]; rw [__eo_state_is_closed.eq_4] <;> simp
+  | so :: l => by
+    cases so with
+    | assume_push F => simp [KState.decL, KStateObj.dec, __eo_state_is_closed, KStateObj.isPush]
+    | assume F =>
+      simp only [KState.decL, KStateObj.dec]
+      rw [__eo_state_is_closed.eq_2]; kside
+      rw [is_closed_decL b l]; simp [KStateObj.isPush]
+    | proven F =>
+      simp only [KState.decL, KStateObj.dec]
+      rw [__eo_state_is_closed.eq_2]; kside
+      rw [is_closed_decL b l]; simp [KStateObj.isPush]
 
+theorem k_state_is_closed_eq (s : KState) : k_state_is_closed s = __eo_state_is_closed (s.dec σ) := by
+  rw [KState.dec, is_closed_decL]
+  simp [k_state_is_closed, List.all_reverse, Array.all_toList]
+
+/-! ## Pushing onto a state -/
 theorem k_push_check_sim {mk : Id → KStateObj} {lmk : Term → CStateObj}
     (hmk : ∀ σ F, (mk F).dec σ = lmk (σ.decode F)) (hid : ∀ F, (mk F).id = F)
     {g : Term → Term → CState → CState}
@@ -89,11 +120,11 @@ theorem k_push_check_sim {mk : Id → KStateObj} {lmk : Term → CStateObj}
   by_cases hv : σ.view b = .Boolean true
   · simp only [hv, ↓reduceIte]
     rw [decode_of_view hI hv]
-    refine SimR.pure hI ⟨by simp [KStateObj.valid, hid, hF], hs⟩ ?_
-    show KState.dec σ (.cons (mk F) s) = _
-    simp [KState.dec, hmk, Node.toTerm, g1]
+    refine SimR.pure hI (KState.valid_push hs (by simp [KStateObj.valid, hid, hF])) ?_
+    show KState.dec σ (s.push (mk F)) = _
+    simp [hmk, Node.toTerm, g1]
   · simp only [hv, ↓reduceIte]
-    refine SimR.pure hI trivial ?_
+    refine SimR.pure hI (KState.valid_Stuck σ) ?_
     show KState.dec σ .Stuck = _
     rw [g2]
     · rfl
@@ -135,13 +166,20 @@ theorem k_mk_premise_list_sim (fuel : Nat) {f : Id} :
       (by rw [hf1.2, hS1.2])) fun r σ2 hI2 hΓ2 => ?_
     exact C__eo_cons (allS__eo_cons fuel) hI2 hΓ2 (.tail _ (.tail _ (.head _))) (.tail _ (.head _)) (.head _)
 
-theorem k_invoke_cmd_check_proven_sim (fuel : Nat) (hI : Inv sem σ) :
-    ∀ (s : KState) {p : Id}, s.valid σ → p < σ.size →
-      SimR stateRep sem σ (k_invoke_cmd_check_proven fuel s p)
-        (__eo_invoke_cmd_check_proven (s.dec σ) (σ.decode p))
-  | .cons (.proven F) S, p, ⟨hF, hS⟩, hp => by
-    have hΓ := Ctx.arg hp (Ctx.arg hF (Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ)))
-    simp only [k_invoke_cmd_check_proven, KState.dec, KStateObj.dec]
+theorem k_invoke_cmd_check_proven_sim (fuel : Nat) (hI : Inv sem σ)
+    (s : KState) {p : Id} (hs : s.valid σ) (hp : p < σ.size) :
+    SimR stateRep sem σ (k_invoke_cmd_check_proven fuel s p)
+      (__eo_invoke_cmd_check_proven (s.dec σ) (σ.decode p)) := by
+  unfold k_invoke_cmd_check_proven
+  match hb : s.objs.back? with
+  | some (.proven F) =>
+    have e := KState.back_view hb
+    obtain ⟨hS, hF⟩ := KState.valid_push_inv (e ▸ hs)
+    rw [show s.dec σ = _ from congrArg (KState.dec σ) e, KState.dec_push]
+    simp only [KStateObj.dec]
+    generalize ({ s with objs := s.objs.pop } : KState) = S at hS ⊢
+    have hΓ := Ctx.arg hp (Ctx.arg (show F < σ.size from hF)
+      (Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ)))
     rw [__eo_invoke_cmd_check_proven.eq_1]
     refine SimR.step hΓ (simR_of (C__eo_eq (allS__eo_eq fuel) hI hΓ (.tail _ (.head _)) (.head _)))
       fun e σ1 hI1 hΓ1 => ?_
@@ -153,22 +191,22 @@ theorem k_invoke_cmd_check_proven_sim (fuel : Nat) (hI : Inv sem σ) :
       hI1 hF1.1 hS1.1 (b := e)
     rw [he.2, hF1.2, hS1.2] at this
     exact this
-  | .cons (.assume F) S, p, _, _ => by
-    simp only [k_invoke_cmd_check_proven, KState.dec, KStateObj.dec]
+  | some (.assume F) =>
+    rw [KState.back_view hb, KState.dec_push]
+    simp only [KStateObj.dec]
     rw [__eo_invoke_cmd_check_proven.eq_2]; kside
-    exact SimR.pure hI trivial rfl
-  | .cons (.assume_push F) S, p, _, _ => by
-    simp only [k_invoke_cmd_check_proven, KState.dec, KStateObj.dec]
+    exact SimR.pure hI (KState.valid_Stuck σ) rfl
+  | some (.assume_push F) =>
+    rw [KState.back_view hb, KState.dec_push]
+    simp only [KStateObj.dec]
     rw [__eo_invoke_cmd_check_proven.eq_2]; kside
-    exact SimR.pure hI trivial rfl
-  | .nil, p, _, _ => by
-    simp only [k_invoke_cmd_check_proven, KState.dec]
-    rw [__eo_invoke_cmd_check_proven.eq_2]; kside
-    exact SimR.pure hI trivial rfl
-  | .Stuck, p, _, _ => by
-    simp only [k_invoke_cmd_check_proven, KState.dec]
-    rw [__eo_invoke_cmd_check_proven.eq_2]; kside
-    exact SimR.pure hI trivial rfl
+    exact SimR.pure hI (KState.valid_Stuck σ) rfl
+  | none =>
+    have hz : s.objs.size = 0 := by simp [Array.back?_eq_getElem?] at hb; omega
+    have h0 : s.objs.toList.reverse = [] := by simp [Array.size_eq_zero_iff.mp hz]
+    simp only [KState.dec, h0, KState.decL]
+    rw [__eo_invoke_cmd_check_proven.eq_2] <;> (try split) <;> (try simp) <;>
+      exact SimR.pure hI (KState.valid_Stuck σ) rfl
 
 /-! ## Call lemmas, for the generated dispatch -/
 theorem C_state_proven_nth (hI : Inv sem σ) (hΓ : Ctx σ Γ) {S : KState} {S' : CState}

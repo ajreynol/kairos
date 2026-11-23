@@ -12,13 +12,23 @@ open Eo Kairos Store SmtEval Kairos.Gen
 
 /-! ## Commands -/
 
-def k_invoke_cmd_step_pop (fuel : Nat) (s : KState) :
-    KState → CRule → KArgList → CIndexList → K KState
-  | .cons (.assume_push A) s2, r, args, prems => do
+/-- The index and formula of the most recent `assume_push` below index `i`. -/
+def findPush (a : Array KStateObj) : Nat → Option (Nat × Id)
+  | 0 => none
+  | i + 1 =>
+    match a[i]? with
+    | some (.assume_push A) => some (i, A)
+    | _ => findPush a i
+
+/-- Pop to the most recent `assume_push`, and push what the step proves. The
+state is shrunk in place once the step has read its premises. -/
+def k_invoke_cmd_step_pop (fuel : Nat) (s : KState) (r : CRule) (args : KArgList)
+    (prems : CIndexList) : K KState :=
+  match findPush s.objs s.objs.size with
+  | some (i, A) => do
     let t ← k__eo_cmd_step_pop_proven fuel s r args A prems
-    k_push_proven fuel t s2
-  | .cons _ s2, r, args, prems => k_invoke_cmd_step_pop fuel s s2 r args prems
-  | _, _, _, _ => pure .Stuck
+    k_push_proven fuel t { s with objs := s.objs.shrink i }
+  | none => pure .Stuck
 
 /-- `__eo_and (__eo_is_bool_type F) (__eo_is_closed F)`, the guard of an
 assumption. -/
@@ -27,16 +37,17 @@ def k_assume_guard (fuel : Nat) (F : Id) : K Id := do
   let c ← k__eo_is_closed fuel F
   k__eo_and fuel b c
 
-def k_invoke_cmd (fuel : Nat) : KState → KCmd → K KState
-  | .Stuck, _ => pure .Stuck
-  | S, .assume_push F => do
+def k_invoke_cmd (fuel : Nat) (S : KState) (c : KCmd) : K KState :=
+  if S.stuck && S.objs.isEmpty then pure .Stuck else
+  match c with
+  | .assume_push F => do
     let a ← k_assume_guard fuel F
     k_push_check .assume_push a F S
-  | S, .check_proven F => k_invoke_cmd_check_proven fuel S F
-  | S, .step r args prems => do
+  | .check_proven F => k_invoke_cmd_check_proven fuel S F
+  | .step r args prems => do
     let t ← k__eo_cmd_step_proven fuel S r args prems
     k_push_proven fuel t S
-  | S, .step_pop r args prems => k_invoke_cmd_step_pop fuel S S r args prems
+  | .step_pop r args prems => k_invoke_cmd_step_pop fuel S r args prems
 
 def k_invoke_cmd_list (fuel : Nat) : KState → KCmdList → K KState
   | S, .nil => pure S

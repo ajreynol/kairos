@@ -19,10 +19,17 @@ inductive KStateObj where
   | assume_push (F : Id)
   | proven (F : Id)
 
-inductive KState where
-  | nil
-  | cons (so : KStateObj) (s : KState)
-  | Stuck
+/-- Logos's `CState` with its objects in an array, the most recent last, so
+that a premise is found by indexing rather than by walking the state. `stuck`
+says whether the state's bottom is `Stuck` rather than `nil`: Logos pushes onto
+a `Stuck` state when an input assumption fails its guard. -/
+structure KState where
+  stuck : Bool
+  objs : Array KStateObj
+
+def KState.nil : KState := ⟨false, #[]⟩
+def KState.Stuck : KState := ⟨true, #[]⟩
+@[inline] def KState.push (s : KState) (so : KStateObj) : KState := { s with objs := s.objs.push so }
 
 inductive KCmd where
   | assume_push (F : Id)
@@ -38,5 +45,9 @@ def KStateObj.id : KStateObj → Id
   | .assume F => F
   | .assume_push F => F
   | .proven F => F
+
+def KStateObj.isPush : KStateObj → Bool
+  | .assume_push _ => true
+  | _ => false
 
 end Kairos

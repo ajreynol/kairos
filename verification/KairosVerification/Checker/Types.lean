@@ -27,15 +27,62 @@ def KStateObj.dec (σ : Store) : KStateObj → CStateObj
 
 def KStateObj.valid (σ : Store) (so : KStateObj) : Prop := so.id < σ.size
 
-def KState.dec (σ : Store) : KState → CState
-  | .nil => .nil
-  | .cons so s => .cons (so.dec σ) (s.dec σ)
-  | .Stuck => .Stuck
+/-- A state's objects read top first, onto its bottom. -/
+def KState.decL (σ : Store) (b : Bool) : List KStateObj → CState
+  | [] => if b then .Stuck else .nil
+  | so :: l => .cons (so.dec σ) (KState.decL σ b l)
 
-def KState.valid (σ : Store) : KState → Prop
-  | .nil => True
-  | .cons so s => so.valid σ ∧ s.valid σ
-  | .Stuck => True
+def KState.dec (σ : Store) (s : KState) : CState := KState.decL σ s.stuck s.objs.toList.reverse
+
+def KState.valid (σ : Store) (s : KState) : Prop := ∀ so ∈ s.objs.toList, so.valid σ
+
+@[simp] theorem KState.dec_push (σ : Store) (s : KState) (so : KStateObj) :
+    (s.push so).dec σ = .cons (so.dec σ) (s.dec σ) := by
+  simp [KState.dec, KState.push, KState.decL]
+
+@[simp] theorem KState.dec_Stuck (σ : Store) : KState.Stuck.dec σ = .Stuck := rfl
+@[simp] theorem KState.dec_nil (σ : Store) : KState.nil.dec σ = .nil := rfl
+
+theorem KState.valid_push {σ : Store} {s : KState} {so : KStateObj} (hs : s.valid σ)
+    (hso : so.valid σ) : (s.push so).valid σ := by
+  intro x hx
+  simp only [KState.push, Array.toList_push, List.mem_append, List.mem_singleton] at hx
+  rcases hx with hx | rfl
+  · exact hs x hx
+  · exact hso
+
+theorem KState.valid_push_inv {σ : Store} {s : KState} {so : KStateObj}
+    (h : (s.push so).valid σ) : s.valid σ ∧ so.valid σ :=
+  ⟨fun x hx => h x (by simp [KState.push, hx]), h so (by simp [KState.push])⟩
+
+/-- A state whose top is `x`, as that push. -/
+theorem KState.back_view {s : KState} {x : KStateObj} (h : s.objs.back? = some x) :
+    s = ({ s with objs := s.objs.pop } : KState).push x := by
+  rw [← Array.getLast?_toList, List.getLast?_eq_some_iff] at h
+  obtain ⟨ys, hys⟩ := h
+  cases s with
+  | mk b a =>
+    simp only [KState.push, KState.mk.injEq, true_and]
+    apply Array.toList_inj.mp
+    simp only at hys
+    simp [Array.toList_pop, hys]
+
+theorem KState.dec_eq_Stuck {σ : Store} {s : KState} :
+    s.dec σ = .Stuck ↔ (s.stuck && s.objs.isEmpty) = true := by
+  cases s with
+  | mk b a =>
+    simp only [KState.dec, Bool.and_eq_true, Array.isEmpty_iff]
+    rcases hl : a.toList.reverse with _ | ⟨x, l⟩
+    · have : a = #[] := by
+        apply Array.toList_inj.mp; simpa using hl
+      cases b <;> simp [KState.decL, this]
+    · have : a ≠ #[] := by rintro rfl; simp at hl
+      simp [KState.decL, this]
+
+theorem KState.valid_Stuck (σ : Store) : KState.Stuck.valid σ := by
+  intro x hx; simp [KState.Stuck] at hx
+theorem KState.valid_nil (σ : Store) : KState.nil.valid σ := by
+  intro x hx; simp [KState.nil] at hx
 
 def KCmd.dec (σ : Store) : KCmd → CCmd
   | .assume_push F => .assume_push (σ.decode F)
@@ -72,14 +119,17 @@ theorem KStateObj.mono (hE : Extends σ σ') (so : KStateObj) (h : so.valid σ) 
   cases so <;> simp only [KStateObj.valid, KStateObj.id] at h <;>
     simp [KStateObj.dec, decode_extends hE _ h]
 
-theorem KState.mono (hE : Extends σ σ') :
-    ∀ s : KState, s.valid σ → s.valid σ' ∧ s.dec σ' = s.dec σ
-  | .nil, _ => ⟨trivial, rfl⟩
-  | .Stuck, _ => ⟨trivial, rfl⟩
-  | .cons so s, ⟨hso, hs⟩ =>
-    have h1 := KStateObj.mono hE so hso
-    have ih := KState.mono hE s hs
-    ⟨⟨h1.1, ih.1⟩, by simp [KState.dec, h1.2, ih.2]⟩
+theorem KState.decL_mono (hE : Extends σ σ') (b : Bool) :
+    ∀ l : List KStateObj, (∀ so ∈ l, so.valid σ) → KState.decL σ' b l = KState.decL σ b l
+  | [], _ => rfl
+  | so :: l, h => by
+    simp only [KState.decL, (KStateObj.mono hE so (h so (.head _))).2,
+      KState.decL_mono hE b l (fun x hx => h x (.tail _ hx))]
+
+theorem KState.mono (hE : Extends σ σ') (s : KState) (h : s.valid σ) :
+    s.valid σ' ∧ s.dec σ' = s.dec σ :=
+  ⟨fun so hso => (KStateObj.mono hE so (h so hso)).1,
+   KState.decL_mono hE _ _ (fun so hso => h so (List.mem_reverse.mp hso))⟩
 
 theorem KCmd.mono (hE : Extends σ σ') (c : KCmd) (h : c.valid σ) :
     c.valid σ' ∧ c.dec σ' = c.dec σ := by

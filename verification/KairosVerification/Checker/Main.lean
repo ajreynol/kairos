@@ -11,36 +11,74 @@ namespace Kairos.Checker
 open Eo Kairos Store SmtEval Kairos.Gen
 
 variable {σ : Store} {Γ : List Fact}
+theorem findPush_some {a : Array KStateObj} :
+    ∀ {i j : Nat} {A : Id}, findPush a i = some (j, A) → a[j]? = some (.assume_push A)
+  | 0, _, _, h => by simp [findPush] at h
+  | i + 1, j, A, h => by
+    simp only [findPush] at h
+    split at h
+    · rename_i A' h'
+      simp only [Option.some.injEq, Prod.mk.injEq] at h
+      obtain ⟨rfl, rfl⟩ := h
+      exact h'
+    · exact findPush_some h
+
+/-- Logos's walk down to the most recent `assume_push`, from the top `i`
+objects of a state, as `findPush`. -/
+theorem step_pop_decL (S : CState) (r : CRule) (args : CArgList) (prems : CIndexList)
+    (a : Array KStateObj) (b : Bool) : ∀ i, i ≤ a.size →
+    __eo_invoke_cmd_step_pop S (KState.decL σ b (a.toList.take i).reverse) r args prems =
+      match findPush a i with
+      | some (j, A) => __eo_push_proven (__eo_cmd_step_pop_proven S r args (σ.decode A) prems)
+          (KState.decL σ b (a.toList.take j).reverse)
+      | none => .Stuck
+  | 0, _ => by
+    simp only [List.take_zero, List.reverse_nil, findPush, KState.decL]
+    rw [__eo_invoke_cmd_step_pop.eq_3] <;> cases b <;> simp
+  | i + 1, hi => by
+    have hget : a.toList[i]? = some a[i] := by simp
+    rw [List.take_add_one, hget]
+    simp only [Option.toList_some, List.reverse_append, List.reverse_cons, List.reverse_nil,
+      List.nil_append, List.cons_append, KState.decL, findPush,
+      show a[i]? = some a[i] from by simp]
+    cases h : a[i] with
+    | assume_push A => simp only [KStateObj.dec]; rw [__eo_invoke_cmd_step_pop.eq_1]
+    | assume F =>
+      simp only [KStateObj.dec]
+      rw [__eo_invoke_cmd_step_pop.eq_2]; kside
+      exact step_pop_decL S r args prems a b i (by omega)
+    | proven F =>
+      simp only [KStateObj.dec]
+      rw [__eo_invoke_cmd_step_pop.eq_2]; kside
+      exact step_pop_decL S r args prems a b i (by omega)
+
 theorem k_invoke_cmd_step_pop_sim (fuel : Nat) (hI : Inv sem σ) {s : KState} (hs : s.valid σ)
     (r : CRule) {args : KArgList} (hargs : args.valid σ) (prems : CIndexList) :
-    ∀ s2 : KState, s2.valid σ →
-      SimR stateRep sem σ (k_invoke_cmd_step_pop fuel s s2 r args prems)
-        (__eo_invoke_cmd_step_pop (s.dec σ) (s2.dec σ) r (args.dec σ) prems)
-  | .cons (.assume_push A) s2, ⟨hA, hs2⟩ => by
-    have hΓ := Ctx.cons (f := Fact.state s2 (s2.dec σ)) ⟨hs2, rfl⟩ (Ctx.nil σ)
-    simp only [k_invoke_cmd_step_pop, KState.dec, KStateObj.dec]
-    rw [__eo_invoke_cmd_step_pop.eq_1]
+    SimR stateRep sem σ (k_invoke_cmd_step_pop fuel s r args prems)
+      (__eo_invoke_cmd_step_pop (s.dec σ) (s.dec σ) r (args.dec σ) prems) := by
+  have e : KState.decL σ s.stuck (s.objs.toList.take s.objs.size).reverse = s.dec σ := by
+    simp only [KState.dec]; rw [List.take_of_length_le (by simp)]
+  have := step_pop_decL (σ := σ) (s.dec σ) r (args.dec σ) prems s.objs s.stuck s.objs.size (Nat.le_refl _)
+  rw [e] at this
+  rw [this]
+  unfold k_invoke_cmd_step_pop
+  match hf : findPush s.objs s.objs.size with
+  | some (j, A) =>
+    have hA : A < σ.size :=
+      hs (.assume_push A) (Array.mem_toList_iff.mpr (Array.mem_of_getElem? (findPush_some hf)))
+    have hs2 : ({ s with objs := s.objs.shrink j } : KState).valid σ :=
+      fun x hx => hs x (List.mem_of_mem_take (by simpa [Array.toList_shrink] using hx))
+    have hd2 : ({ s with objs := s.objs.shrink j } : KState).dec σ =
+        KState.decL σ s.stuck (s.objs.toList.take j).reverse := by
+      simp [KState.dec]
+    have hΓ := Ctx.cons (f := Fact.state ({ s with objs := s.objs.shrink j } : KState)
+      (({ s with objs := s.objs.shrink j } : KState).dec σ)) ⟨hs2, rfl⟩ (Ctx.nil σ)
     refine SimR.step hΓ (simR_of (k__eo_cmd_step_pop_proven_sim fuel hI hs r hargs hA prems))
       fun t σ1 hI1 hΓ1 => ?_
     have ht := hΓ1.term (.head _)
     have hs21 := Ctx.state hΓ1 (.tail _ (.head _))
-    exact (k_push_proven_sim fuel hI1 ht.1 hs21.1).congr (by rw [ht.2, hs21.2]; rfl)
-  | .cons (.assume F) s2, ⟨_, hs2⟩ => by
-    simp only [k_invoke_cmd_step_pop, KState.dec, KStateObj.dec]
-    rw [__eo_invoke_cmd_step_pop.eq_2]; kside
-    exact k_invoke_cmd_step_pop_sim fuel hI hs r hargs prems s2 hs2
-  | .cons (.proven F) s2, ⟨_, hs2⟩ => by
-    simp only [k_invoke_cmd_step_pop, KState.dec, KStateObj.dec]
-    rw [__eo_invoke_cmd_step_pop.eq_2]; kside
-    exact k_invoke_cmd_step_pop_sim fuel hI hs r hargs prems s2 hs2
-  | .nil, _ => by
-    simp only [k_invoke_cmd_step_pop, KState.dec]
-    rw [__eo_invoke_cmd_step_pop.eq_3]; kside
-    exact SimR.pure hI trivial rfl
-  | .Stuck, _ => by
-    simp only [k_invoke_cmd_step_pop, KState.dec]
-    rw [__eo_invoke_cmd_step_pop.eq_3]; kside
-    exact SimR.pure hI trivial rfl
+    exact (k_push_proven_sim fuel hI1 ht.1 hs21.1).congr (by rw [ht.2, hs21.2, hd2])
+  | none => exact SimR.pure hI (KState.valid_Stuck σ) rfl
 
 theorem k_assume_guard_sim (fuel : Nat) (hI : Inv sem σ) {F : Id} (hF : F < σ.size) :
     Sim sem σ (k_assume_guard fuel F)
@@ -51,59 +89,48 @@ theorem k_assume_guard_sim (fuel : Nat) (hI : Inv sem σ) {F : Id} (hF : F < σ.
     fun c σ2 hI2 hΓ2 => ?_
   exact C__eo_and (allS__eo_and fuel) hI2 hΓ2 (.tail _ (.head _)) (.head _)
 
-theorem k_invoke_cmd_sim (fuel : Nat) (hI : Inv sem σ) :
-    ∀ (S : KState) (c : KCmd), S.valid σ → c.valid σ →
-      SimR stateRep sem σ (k_invoke_cmd fuel S c) (__eo_invoke_cmd (S.dec σ) (c.dec σ))
-  | .Stuck, c, _, _ => by
-    simp only [k_invoke_cmd, KState.dec]
-    rw [__eo_invoke_cmd.eq_1]
-    exact SimR.pure hI trivial rfl
-  | S, .assume_push F, hS, hF => by
-    have hΓ := Ctx.arg hF (Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ))
-    cases S with
-    | Stuck => simp only [k_invoke_cmd, KState.dec]; rw [__eo_invoke_cmd.eq_1]; exact SimR.pure hI trivial rfl
-    | _ =>
-      all_goals
-        simp only [k_invoke_cmd, KState.dec, KCmd.dec]
-        rw [__eo_invoke_cmd.eq_2] <;> try (intros; simp_all; done)
-        refine SimR.step hΓ (simR_of (k_assume_guard_sim fuel hI hF)) fun a σ1 hI1 hΓ1 => ?_
-        have ha := hΓ1.term (.head _)
-        have hF1 := hΓ1.term (.tail _ (.head _))
-        have hS1 := Ctx.state hΓ1 (.tail _ (.tail _ (.head _)))
-        have := k_push_check_sim (mk := .assume_push) (lmk := .assume_push) (fun _ _ => rfl)
-          (fun _ => rfl) __eo_push_assume_check.eq_1
-          (fun b F S h => by rw [__eo_push_assume_check.eq_2]; exact h) hI1 hF1.1 hS1.1 (b := a)
-        rw [ha.2, hF1.2, hS1.2] at this
-        exact this
-  | S, .check_proven F, hS, hF => by
-    cases S with
-    | Stuck => simp only [k_invoke_cmd, KState.dec]; rw [__eo_invoke_cmd.eq_1]; exact SimR.pure hI trivial rfl
-    | _ =>
-      all_goals
-        simp only [k_invoke_cmd, KState.dec, KCmd.dec]
-        rw [__eo_invoke_cmd.eq_3] <;> try (intros; simp_all; done)
-        exact k_invoke_cmd_check_proven_sim fuel hI _ hS hF
-  | S, .step r args prems, hS, hargs => by
-    have hΓ := Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ)
-    cases S with
-    | Stuck => simp only [k_invoke_cmd, KState.dec]; rw [__eo_invoke_cmd.eq_1]; exact SimR.pure hI trivial rfl
-    | _ =>
-      all_goals
-        simp only [k_invoke_cmd, KState.dec, KCmd.dec]
-        rw [__eo_invoke_cmd.eq_4] <;> try (intros; simp_all; done)
-        refine SimR.step hΓ (simR_of (k__eo_cmd_step_proven_sim fuel hI hS r hargs prems))
-          fun t σ1 hI1 hΓ1 => ?_
-        have ht := hΓ1.term (.head _)
-        have hS1 := Ctx.state hΓ1 (.tail _ (.head _))
-        exact (k_push_proven_sim fuel hI1 ht.1 hS1.1).congr (by rw [ht.2, hS1.2] <;> rfl)
-  | S, .step_pop r args prems, hS, hargs => by
-    cases S with
-    | Stuck => simp only [k_invoke_cmd, KState.dec]; rw [__eo_invoke_cmd.eq_1]; exact SimR.pure hI trivial rfl
-    | _ =>
-      all_goals
-        simp only [k_invoke_cmd, KState.dec, KCmd.dec]
-        rw [__eo_invoke_cmd.eq_5] <;> try (intros; simp_all; done)
-        exact k_invoke_cmd_step_pop_sim fuel hI hS r hargs prems _ hS
+theorem k_invoke_cmd_sim (fuel : Nat) (hI : Inv sem σ) (S : KState) (c : KCmd) (hS : S.valid σ)
+    (hc : c.valid σ) :
+    SimR stateRep sem σ (k_invoke_cmd fuel S c) (__eo_invoke_cmd (S.dec σ) (c.dec σ)) := by
+  unfold k_invoke_cmd
+  by_cases hst : (S.stuck && S.objs.isEmpty) = true
+  · simp only [hst, ↓reduceIte]
+    rw [KState.dec_eq_Stuck.mpr hst, __eo_invoke_cmd.eq_1]
+    exact SimR.pure hI (KState.valid_Stuck σ) rfl
+  · have hne : S.dec σ = .Stuck → False := fun h => hst (KState.dec_eq_Stuck.mp h)
+    simp only [hst, Bool.false_eq_true, ↓reduceIte]
+    cases c with
+    | assume_push F =>
+      have hΓ := Ctx.arg (show F < σ.size from hc)
+        (Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ))
+      simp only [KCmd.dec]
+      rw [__eo_invoke_cmd.eq_2 _ _ hne]
+      refine SimR.step hΓ (simR_of (k_assume_guard_sim fuel hI hc)) fun a σ1 hI1 hΓ1 => ?_
+      have ha := hΓ1.term (.head _)
+      have hF1 := hΓ1.term (.tail _ (.head _))
+      have hS1 := Ctx.state hΓ1 (.tail _ (.tail _ (.head _)))
+      have := k_push_check_sim (mk := .assume_push) (lmk := .assume_push) (fun _ _ => rfl)
+        (fun _ => rfl) __eo_push_assume_check.eq_1
+        (fun b F S h => by rw [__eo_push_assume_check.eq_2]; exact h) hI1 hF1.1 hS1.1 (b := a)
+      rw [ha.2, hF1.2, hS1.2] at this
+      exact this
+    | check_proven F =>
+      simp only [KCmd.dec]
+      rw [__eo_invoke_cmd.eq_3 _ _ hne]
+      exact k_invoke_cmd_check_proven_sim fuel hI _ hS hc
+    | step r args prems =>
+      have hΓ := Ctx.cons (f := Fact.state S (S.dec σ)) ⟨hS, rfl⟩ (Ctx.nil σ)
+      simp only [KCmd.dec]
+      rw [__eo_invoke_cmd.eq_4 _ _ _ _ hne]
+      refine SimR.step hΓ (simR_of (k__eo_cmd_step_proven_sim fuel hI hS r hc prems))
+        fun t σ1 hI1 hΓ1 => ?_
+      have ht := hΓ1.term (.head _)
+      have hS1 := Ctx.state hΓ1 (.tail _ (.head _))
+      exact (k_push_proven_sim fuel hI1 ht.1 hS1.1).congr (by rw [ht.2, hS1.2])
+    | step_pop r args prems =>
+      simp only [KCmd.dec]
+      rw [__eo_invoke_cmd.eq_5 _ _ _ _ hne]
+      exact k_invoke_cmd_step_pop_sim fuel hI hS r hc prems
 
 theorem k_invoke_cmd_list_sim (fuel : Nat) :
     ∀ (cs : KCmdList) {σ : Store} {S : KState}, Inv sem σ → S.valid σ → cs.valid σ →
@@ -163,7 +190,7 @@ theorem k_checker_is_refutation_sim (fuel : Nat) (hI : Inv sem σ) {as : KArgLis
       (__eo_checker_is_refutation (as.dec σ) (cs.dec σ)) := by
   have hΓ := Ctx.cons (f := ⟨cmdsRep, cs, cs.dec σ⟩) ⟨hcs, rfl⟩ (Ctx.nil σ)
   rw [__eo_checker_is_refutation]
-  refine SimR.step hΓ (k_invoke_assume_list_sim fuel as hI trivial has) fun s σ1 hI1 hΓ1 => ?_
+  refine SimR.step hΓ (k_invoke_assume_list_sim fuel as hI (KState.valid_nil σ) has) fun s σ1 hI1 hΓ1 => ?_
   have hs := Ctx.state hΓ1 (.head _)
   have hcs1 : cs.valid σ1 ∧ cs.dec σ1 = cs.dec σ := hΓ1 _ (.tail _ (.head _))
   refine SimR.step hΓ1 ((k_invoke_cmd_list_sim fuel cs hI1 hs.1 hcs1.1).congr

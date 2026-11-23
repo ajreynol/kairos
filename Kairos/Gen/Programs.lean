@@ -11467,7 +11467,7 @@ mutual
 
 def k__eo_list_nth_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 4 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_nth_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -12699,7 +12699,7 @@ mutual
 
 def k__eo_list_len_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 2 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => withStore fun σ =>
     kcase (m__eo_list_len_rec_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -12834,7 +12834,7 @@ mutual
 
 def k__eo_typeof : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 180 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 168 [arg1] <| withStore fun σ =>
     kcase (m__eo_typeof_1 σ arg1) (fun b => do
         intern .Bool)
     <|
@@ -13918,7 +13918,7 @@ mutual
 
 def k__eo_get_elements_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 1 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => withStore fun σ =>
     kcase (m__eo_get_elements_rec_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -13952,7 +13952,7 @@ mutual
 
 def k__eo_list_concat_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 3 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_concat_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -13990,7 +13990,7 @@ mutual
 
 def k__eo_list_find_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 5 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => withStore fun σ =>
     kcase (m__eo_list_find_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -14029,7 +14029,7 @@ mutual
 
 def k__eo_list_rev_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 6 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_rev_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14066,7 +14066,7 @@ mutual
 
 def k__eo_list_erase_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 7 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_erase_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14101,7 +14101,7 @@ mutual
 
 def k__eo_list_erase_all_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 8 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_erase_all_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14138,7 +14138,7 @@ mutual
 
 def k__eo_list_setof_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 9 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => withStore fun σ =>
     kcase (m__eo_list_setof_rec_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -14172,7 +14172,7 @@ mutual
 
 def k__eo_list_minclude_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 10 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => withStore fun σ =>
     kcase (m__eo_list_minclude_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -14237,7 +14237,7 @@ mutual
 
 def k__eo_list_diff_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 11 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_diff_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14276,7 +14276,7 @@ mutual
 
 def k__eo_list_inter_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 12 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => withStore fun σ =>
     kcase (m__eo_list_inter_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14666,7 +14666,7 @@ mutual
 
 def k__get_arg_list_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 13 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 1 [arg1, arg2] <| withStore fun σ =>
     kcase (m__get_arg_list_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14691,7 +14691,7 @@ mutual
 
 def k__is_app : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 14 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 2 [arg1, arg2] <| withStore fun σ =>
     kcase (m__is_app_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14713,7 +14713,7 @@ mutual
 
 def k__is_var_list : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 15 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 3 [arg1] <| withStore fun σ =>
     kcase (m__is_var_list_1 σ arg1) (fun (x, xs) => do
         let kt10 ← (k__eo_is_var kfuel x)
         k_ite kt10 (do k__is_var_list kfuel xs) (do intern (.Boolean false)))
@@ -14747,7 +14747,7 @@ mutual
 
 def k__eo_l_1___extract_antec_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 16 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 4 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___extract_antec_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14763,7 +14763,7 @@ def k__eo_l_1___extract_antec_rec : Nat → Id → Id → K Id
 
 def k__extract_antec_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 17 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 5 [arg1, arg2] <| withStore fun σ =>
     kcase (m__extract_antec_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -14874,7 +14874,7 @@ mutual
 
 def k__eo_l_1___assoc_nil_nth_type : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 18 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 6 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___assoc_nil_nth_type_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -14895,7 +14895,7 @@ def k__eo_l_1___assoc_nil_nth_type : Nat → Id → Id → Id → K Id
 
 def k__assoc_nil_nth_type : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 19 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 7 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__assoc_nil_nth_type_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -14921,7 +14921,7 @@ mutual
 
 def k__eo_l_1___assoc_nil_nth : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 20 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 8 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___assoc_nil_nth_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -14942,7 +14942,7 @@ def k__eo_l_1___assoc_nil_nth : Nat → Id → Id → Id → K Id
 
 def k__assoc_nil_nth : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 21 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 9 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__assoc_nil_nth_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -14968,7 +14968,7 @@ mutual
 
 def k__iota_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 22 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 10 [arg1, arg2] <| withStore fun σ =>
     kcase (m__iota_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -15104,7 +15104,7 @@ mutual
 
 def k__chain_m_resolve_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 23 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 11 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__chain_m_resolve_rec_1 σ arg1 arg2 arg3) (fun _ => do
         let kt0 ← (intern (.UOp UserOp._at__at_pair))
         let kt4 ← (intern (.Boolean false))
@@ -15593,7 +15593,7 @@ mutual
 
 def k__lower_not_and : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 24 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 12 [arg1] <| withStore fun σ =>
     kcase (m__lower_not_and_1 σ arg1) (fun _ => do
         intern (.Boolean false))
     <|
@@ -16229,7 +16229,7 @@ mutual
 
 def k__dt_get_constructors : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 25 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 13 [arg1] <| withStore fun σ =>
     kcase (m__dt_get_constructors_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -16262,7 +16262,7 @@ mutual
 
 def k__tuple_get_selectors_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 26 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 14 [arg1, arg2] <| withStore fun σ =>
     kcase (m__tuple_get_selectors_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16315,7 +16315,7 @@ mutual
 
 def k__dt_get_selectors_of_app : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 27 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 15 [arg1, arg2] <| withStore fun σ =>
     kcase (m__dt_get_selectors_of_app_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16337,7 +16337,7 @@ mutual
 
 def k__is_cons_app : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 28 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 16 [arg1] <| withStore fun σ =>
     kcase (m__is_cons_app_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -16358,7 +16358,7 @@ mutual
 
 def k__tuple_arg_list : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 29 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 17 [arg1] <| withStore fun σ =>
     kcase (m__tuple_arg_list_1 σ arg1) (fun (t1, t2) => do
         let kt10 ← (intern .__eo_List_cons)
         let kt14 ← (intern (.Apply kt10 t1))
@@ -16399,7 +16399,7 @@ mutual
 
 def k__dt_eq_cons : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 30 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 18 [arg1, arg2] <| withStore fun σ =>
     kcase (m__dt_eq_cons_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16448,7 +16448,7 @@ mutual
 
 def k__set_is_not_subset : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 31 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 19 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__set_is_not_subset_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -16482,7 +16482,7 @@ def k__set_is_not_subset : Nat → Id → Id → Id → K Id
 
 def k__are_distinct_terms_type : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 34 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 22 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__are_distinct_terms_type_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -16533,7 +16533,7 @@ def k__are_distinct_terms_type : Nat → Id → Id → Id → K Id
 
 def k__dt_distinct_terms : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 33 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 21 [arg1, arg2] <| withStore fun σ =>
     kcase (m__dt_distinct_terms_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16565,7 +16565,7 @@ def k__dt_distinct_terms : Nat → Id → Id → K Id
 
 def k__seq_distinct_terms : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 32 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 20 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__seq_distinct_terms_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -16612,7 +16612,7 @@ mutual
 
 def k__are_distinct_terms_list_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 35 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 23 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__are_distinct_terms_list_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -16641,7 +16641,7 @@ mutual
 
 def k__eo_l_1___are_distinct_terms_list : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 36 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 24 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___are_distinct_terms_list_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16655,7 +16655,7 @@ def k__eo_l_1___are_distinct_terms_list : Nat → Id → Id → K Id
 
 def k__are_distinct_terms_list : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 37 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 25 [arg1, arg2] <| withStore fun σ =>
     kcase (m__are_distinct_terms_list_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16722,7 +16722,7 @@ mutual
 
 def k__mk_trans : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 38 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 26 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_trans_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -16777,7 +16777,7 @@ mutual
 
 def k__mk_cong_rhs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 39 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 27 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_cong_rhs_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16832,7 +16832,7 @@ mutual
 
 def k__mk_nary_cong_rhs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 40 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 28 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_nary_cong_rhs_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -16939,7 +16939,7 @@ mutual
 
 def k__mk_ho_cong : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 41 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 29 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_ho_cong_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -16980,7 +16980,7 @@ mutual
 
 def k__mk_distinct_elim_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 42 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 30 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_distinct_elim_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -17013,7 +17013,7 @@ mutual
 
 def k__mk_distinct_elim : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 43 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 31 [arg1] <| withStore fun σ =>
     kcase (m__mk_distinct_elim_1 σ arg1) (fun (x, xs) => do
         let kt16 ← (intern (.UOp UserOp.distinct))
         let kt20 ← (intern (.Apply kt16 xs))
@@ -17095,7 +17095,7 @@ mutual
 
 def k__poly_neg : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 44 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 32 [arg1] <| withStore fun σ =>
     kcase (m__poly_neg_1 σ arg1) (fun _ => do
         intern (.UOp UserOp._at__at_poly_zero))
     <|
@@ -17121,7 +17121,7 @@ mutual
 
 def k__poly_mod_coeffs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 45 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 33 [arg1, arg2] <| withStore fun σ =>
     kcase (m__poly_mod_coeffs_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -17147,7 +17147,7 @@ mutual
 
 def k__poly_add : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 46 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 34 [arg1, arg2] <| withStore fun σ =>
     kcase (m__poly_add_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -17176,7 +17176,7 @@ mutual
 
 def k__mvar_mul_mvar : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 47 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 35 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mvar_mul_mvar_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -17221,7 +17221,7 @@ mutual
 
 def k__poly_mul_mon : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 48 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 36 [arg1, arg2] <| withStore fun σ =>
     kcase (m__poly_mul_mon_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -17249,7 +17249,7 @@ mutual
 
 def k__poly_mul : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 49 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 37 [arg1, arg2] <| withStore fun σ =>
     kcase (m__poly_mul_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -17279,7 +17279,7 @@ mutual
 
 def k__get_arith_poly_norm : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 50 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 38 [arg1] <| withStore fun σ =>
     kcase (m__get_arith_poly_norm_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -17332,7 +17332,7 @@ mutual
 
 def k__get_bv_poly_norm_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 51 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 39 [arg1] <| withStore fun σ =>
     kcase (m__get_bv_poly_norm_rec_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -17429,7 +17429,7 @@ mutual
 
 def k__mk_arith_sum_ub_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 52 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 40 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_arith_sum_ub_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -17990,7 +17990,7 @@ mutual
 
 def k__strip_even_exponent : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 53 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 41 [arg1, arg2] <| withStore fun σ =>
     kcase (m__strip_even_exponent_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -18035,7 +18035,7 @@ mutual
 
 def k__eo_l_2___mk_arith_mult_sign_sgn : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 54 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 42 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_2___mk_arith_mult_sign_sgn_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -18055,7 +18055,7 @@ def k__eo_l_2___mk_arith_mult_sign_sgn : Nat → Id → Id → Id → K Id
 
 def k__mk_arith_mult_sign_sgn : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 56 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 44 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_arith_mult_sign_sgn_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -18077,7 +18077,7 @@ def k__mk_arith_mult_sign_sgn : Nat → Id → Id → Id → K Id
 
 def k__eo_l_1___mk_arith_mult_sign_sgn : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 55 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 43 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___mk_arith_mult_sign_sgn_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -18167,7 +18167,7 @@ mutual
 
 def k__eo_l_1___mk_arith_mult_abs_comparison_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 57 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 45 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___mk_arith_mult_abs_comparison_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -18184,7 +18184,7 @@ def k__eo_l_1___mk_arith_mult_abs_comparison_rec : Nat → Id → Id → K Id
 
 def k__mk_arith_mult_abs_comparison_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 58 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 46 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_arith_mult_abs_comparison_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -18719,7 +18719,7 @@ mutual
 
 def k__bv_eval_concat : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 59 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 47 [arg1] <| withStore fun σ =>
     kcase (m__bv_eval_concat_1 σ arg1) (fun (b, bs) => do
         let kt10 ← (k__bv_eval_concat kfuel bs)
         k__eo_concat kfuel b kt10)
@@ -18739,7 +18739,7 @@ mutual
 
 def k__bv_get_first_const_child : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 60 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 48 [arg1] <| withStore fun σ =>
     kcase (m__bv_get_first_const_child_1 σ arg1) (fun (f, a, b) => do
         let kt9 ← (k__eo_is_bin kfuel a)
         k_ite kt9 (do pure a) (do k__bv_get_first_const_child kfuel b))
@@ -18756,7 +18756,7 @@ mutual
 
 def k__bv_bitblast_concat : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 61 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 49 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_bitblast_concat_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -18822,7 +18822,7 @@ mutual
 
 def k__bv_bitblast_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 62 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 50 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_bitblast_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -18879,7 +18879,7 @@ mutual
 
 def k__bv_bitblast_subsequence : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 63 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 51 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__bv_bitblast_subsequence_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -18915,7 +18915,7 @@ mutual
 
 def k__bv_bitblast_apply_unary : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 64 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 52 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_bitblast_apply_unary_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -18941,7 +18941,7 @@ mutual
 
 def k__bv_bitblast_apply_binary : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 65 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 53 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__bv_bitblast_apply_binary_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -18967,7 +18967,7 @@ mutual
 
 def k__bv_bitblast_apply_ite : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 66 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 54 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__bv_bitblast_apply_ite_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -18996,7 +18996,7 @@ mutual
 
 def k__bv_mk_bitblast_step_eq_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 67 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 55 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_eq_rec_1 σ arg1 arg2) (fun _ => do
         intern (.Boolean true))
     <|
@@ -19021,7 +19021,7 @@ mutual
 
 def k__bv_bitblast_ult_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 68 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 56 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__bv_bitblast_ult_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -19122,7 +19122,7 @@ mutual
 
 def k__bv_mk_bitblast_step_concat : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 69 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 57 [arg1] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_concat_1 σ arg1) (fun _ => do
         intern (.Binary 0 0))
     <|
@@ -19165,7 +19165,7 @@ mutual
 
 def k__bv_mk_bitblast_step_bitwise : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 70 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 58 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_bitwise_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19194,7 +19194,7 @@ mutual
 
 def k__bv_ripple_carry_adder_2 : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 71 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 59 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__bv_ripple_carry_adder_2_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19247,7 +19247,7 @@ mutual
 
 def k__bv_mk_bitblast_step_add : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 72 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 60 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_add_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -19275,7 +19275,7 @@ mutual
 
 def k__bv_shift_add_multiplier_rec_step : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 73 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 61 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__bv_shift_add_multiplier_rec_step_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -19343,7 +19343,7 @@ mutual
 
 def k__bv_shift_add_multiplier_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 74 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 62 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__bv_shift_add_multiplier_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19397,7 +19397,7 @@ mutual
 
 def k__bv_mk_bitblast_step_mul : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 75 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 63 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_mul_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -19422,7 +19422,7 @@ mutual
 
 def k__eo_l_1___bv_div_mod_impl : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 76 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 64 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__eo_l_1___bv_div_mod_impl_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19497,7 +19497,7 @@ def k__eo_l_1___bv_div_mod_impl : Nat → Id → Id → Id → Id → K Id
 
 def k__bv_div_mod_impl : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 77 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 65 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__bv_div_mod_impl_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19528,7 +19528,7 @@ mutual
 
 def k__bv_mk_bitblast_step_ite : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 78 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 66 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_ite_1 σ arg1 arg2 arg3) (fun (bc, b1, a1, b2, a2) => do
         let kt31 ← (intern (.UOp UserOp._at_from_bools))
         let kt35 ← (intern (.UOp UserOp.and))
@@ -19571,7 +19571,7 @@ mutual
 
 def k__bv_const_to_bitlist_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 79 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 67 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_const_to_bitlist_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -19599,7 +19599,7 @@ mutual
 
 def k__bv_mk_bitblast_step_shl_rec_step : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 80 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 68 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_shl_rec_step_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19648,7 +19648,7 @@ mutual
 
 def k__eo_l_1___bv_mk_bitblast_step_shl_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 81 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 69 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__eo_l_1___bv_mk_bitblast_step_shl_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19672,7 +19672,7 @@ def k__eo_l_1___bv_mk_bitblast_step_shl_rec : Nat → Id → Id → Id → Id �
 
 def k__bv_mk_bitblast_step_shl_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 82 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 70 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_shl_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -19698,7 +19698,7 @@ mutual
 
 def k__bv_mk_bitblast_step_shr_rec_step : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 83 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 71 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_shr_rec_step_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -19759,7 +19759,7 @@ mutual
 
 def k__eo_l_1___bv_mk_bitblast_step_shr_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 84 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 72 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__eo_l_1___bv_mk_bitblast_step_shr_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -19786,7 +19786,7 @@ def k__eo_l_1___bv_mk_bitblast_step_shr_rec : Nat → Id → Id → Id → Id �
 
 def k__bv_mk_bitblast_step_shr_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 85 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 73 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_shr_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -19815,7 +19815,7 @@ mutual
 
 def k__bv_mk_bitblast_step_var_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 86 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 74 [arg1, arg2] <| withStore fun σ =>
     kcase (m__bv_mk_bitblast_step_var_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -20110,7 +20110,7 @@ mutual
 
 def k__bv_smulo_elim_rec : Nat → Id → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5, arg6 => cached 87 [arg1, arg2, arg3, arg4, arg5, arg6] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5, arg6 => cached 75 [arg1, arg2, arg3, arg4, arg5, arg6] <| withStore fun σ =>
     kcase (m__bv_smulo_elim_rec_1 σ arg1 arg2 arg3 arg4 arg5 arg6) (fun _ => do
         pure 0)
     <|
@@ -20192,7 +20192,7 @@ mutual
 
 def k__bv_umulo_elim_rec : Nat → Id → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5, arg6 => cached 88 [arg1, arg2, arg3, arg4, arg5, arg6] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5, arg6 => cached 76 [arg1, arg2, arg3, arg4, arg5, arg6] <| withStore fun σ =>
     kcase (m__bv_umulo_elim_rec_1 σ arg1 arg2 arg3 arg4 arg5 arg6) (fun _ => do
         pure 0)
     <|
@@ -20273,7 +20273,7 @@ mutual
 
 def k__bv_mk_bitwise_slicing_rec : Nat → Id → Id → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5, arg6, arg7 => cached 89 [arg1, arg2, arg3, arg4, arg5, arg6, arg7] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5, arg6, arg7 => cached 77 [arg1, arg2, arg3, arg4, arg5, arg6, arg7] <| withStore fun σ =>
     kcase (m__bv_mk_bitwise_slicing_rec_1 σ arg1 arg2 arg3 arg4 arg5 arg6 arg7) (fun _ => do
         pure 0)
     <|
@@ -20486,7 +20486,7 @@ mutual
 
 def k__beta_reduce_type : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 90 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 78 [arg1, arg2] <| withStore fun σ =>
     kcase (m__beta_reduce_type_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -20508,7 +20508,7 @@ mutual
 
 def k__beta_reduce : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 91 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 79 [arg1, arg2] <| withStore fun σ =>
     kcase (m__beta_reduce_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -20582,7 +20582,7 @@ mutual
 
 def k__is_seq_const_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 92 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 80 [arg1] <| withStore fun σ =>
     kcase (m__is_seq_const_rec_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -20635,7 +20635,7 @@ mutual
 
 def k__str_fixed_len_re : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 93 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 81 [arg1] <| withStore fun σ =>
     kcase (m__str_fixed_len_re_1 σ arg1) (fun (r, r1) => do
         let kt10 ← (k__str_fixed_len_re kfuel r)
         let kt14 ← (k__str_fixed_len_re kfuel r1)
@@ -20696,7 +20696,7 @@ mutual
 
 def k__re_nullable : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 94 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 82 [arg1] <| withStore fun σ =>
     kcase (m__re_nullable_1 σ arg1) (fun _ => do
         intern (.Boolean true))
     <|
@@ -20912,7 +20912,7 @@ mutual
 
 def k__derivative : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 95 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 83 [arg1, arg2] <| withStore fun σ =>
     kcase (m__derivative_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -20986,7 +20986,7 @@ mutual
 
 def k__str_eval_str_in_re_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 96 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 84 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_eval_str_in_re_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21015,7 +21015,7 @@ mutual
 
 def k__str_first_match_rec_smallest : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 97 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 85 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_first_match_rec_smallest_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -21043,7 +21043,7 @@ mutual
 
 def k__str_first_match_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 98 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 86 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__str_first_match_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -21352,7 +21352,7 @@ mutual
 
 def k__re_unfold_pos_concat_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 99 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 87 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__re_unfold_pos_concat_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -21414,7 +21414,7 @@ mutual
 
 def k__str_flatten_word_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 100 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 88 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_flatten_word_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21440,7 +21440,7 @@ mutual
 
 def k__str_flatten : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 101 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 89 [arg1] <| withStore fun σ =>
     kcase (m__str_flatten_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21492,7 +21492,7 @@ mutual
 
 def k__str_collect : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 102 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 90 [arg1] <| withStore fun σ =>
     kcase (m__str_collect_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21533,7 +21533,7 @@ mutual
 
 def k__str_strip_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 103 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 91 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_strip_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21556,7 +21556,7 @@ mutual
 
 def k__str_mk_re_loop_elim_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 104 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 92 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_mk_re_loop_elim_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -21593,7 +21593,7 @@ mutual
 
 def k__str_mk_str_in_re_concat_star_char : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 105 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 93 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_mk_str_in_re_concat_star_char_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21621,7 +21621,7 @@ mutual
 
 def k__str_mk_str_in_re_sigma_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 106 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 94 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__str_mk_str_in_re_sigma_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -21655,7 +21655,7 @@ mutual
 
 def k__str_mk_str_in_re_sigma_star_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 107 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 95 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_mk_str_in_re_sigma_star_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -21693,7 +21693,7 @@ mutual
 
 def k__re_split_str_to_re : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 108 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 96 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_split_str_to_re_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21720,7 +21720,7 @@ mutual
 
 def k__re_rev_map_rev : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 109 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 97 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_rev_map_rev_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21740,7 +21740,7 @@ def k__re_rev_map_rev : Nat → Id → Id → K Id
 
 def k__re_rev_comp : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 110 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 98 [arg1] <| withStore fun σ =>
     kcase (m__re_rev_comp_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21790,7 +21790,7 @@ mutual
 
 def k__re_flatten : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 111 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 99 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_flatten_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21889,7 +21889,7 @@ mutual
 
 def k__re_unflatten : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 112 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 100 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_unflatten_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21949,7 +21949,7 @@ def k__re_unflatten : Nat → Id → Id → K Id
 
 def k__re_unflatten_str : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 113 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 101 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_unflatten_str_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21983,7 +21983,7 @@ mutual
 
 def k__re_is_unbound_wildcard : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 117 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 105 [arg1] <| withStore fun σ =>
     kcase (m__re_is_unbound_wildcard_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -22005,7 +22005,7 @@ mutual
 
 def k__str_re_includes_lhs_union : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 114 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 102 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_lhs_union_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22023,7 +22023,7 @@ def k__str_re_includes_lhs_union : Nat → Id → Id → K Id
 
 def k__str_re_includes_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 120 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 108 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22073,7 +22073,7 @@ def k__str_re_includes_rec : Nat → Id → Id → K Id
 
 def k__str_re_includes_base_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 118 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 106 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_base_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22127,7 +22127,7 @@ def k__str_re_includes_base_rec : Nat → Id → Id → K Id
 
 def k__str_re_includes_lhs_star : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 116 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 104 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_lhs_star_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22151,7 +22151,7 @@ def k__str_re_includes_lhs_star : Nat → Id → Id → K Id
 
 def k__str_re_includes_rhs_inter : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 115 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 103 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_rhs_inter_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22169,7 +22169,7 @@ def k__str_re_includes_rhs_inter : Nat → Id → Id → K Id
 
 def k__str_re_includes_concat : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 119 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 107 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__str_re_includes_concat_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -22197,7 +22197,7 @@ mutual
 
 def k__str_arith_entail_simple_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 121 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 109 [arg1] <| withStore fun σ =>
     kcase (m__str_arith_entail_simple_rec_1 σ arg1) (fun _ => do
         intern (.Boolean true))
     <|
@@ -22292,7 +22292,7 @@ mutual
 
 def k__eo_l_1___str_arith_entail_is_approx : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 122 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 110 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___str_arith_entail_is_approx_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22330,7 +22330,7 @@ def k__eo_l_1___str_arith_entail_is_approx : Nat → Id → Id → Id → K Id
 
 def k__str_arith_entail_is_approx : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 123 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 111 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_arith_entail_is_approx_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22353,7 +22353,7 @@ mutual
 
 def k__str_re_consume_inter : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 124 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 112 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_re_consume_inter_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22375,7 +22375,7 @@ def k__str_re_consume_inter : Nat → Id → Id → Id → K Id
 
 def k__str_re_consume_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 126 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 114 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_re_consume_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22469,7 +22469,7 @@ def k__str_re_consume_rec : Nat → Id → Id → Id → K Id
 
 def k__str_re_consume_union : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 125 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 113 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_re_consume_union_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22567,7 +22567,7 @@ mutual
 
 def k__str_is_compatible : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 127 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 115 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_is_compatible_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22590,7 +22590,7 @@ mutual
 
 def k__str_overlap_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 128 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 116 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_overlap_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22616,7 +22616,7 @@ mutual
 
 def k__str_from_int_eval_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 129 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 117 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_from_int_eval_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22653,7 +22653,7 @@ mutual
 
 def k__str_to_int_eval_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 130 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 118 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_to_int_eval_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22686,7 +22686,7 @@ mutual
 
 def k__str_case_conv_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 131 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 119 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_case_conv_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22733,7 +22733,7 @@ mutual
 
 def k__str_leq_eval_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 132 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 120 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_leq_eval_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22777,7 +22777,7 @@ mutual
 
 def k__str_is_prefix_flat : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 133 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 121 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_is_prefix_flat_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22803,7 +22803,7 @@ mutual
 
 def k__str_eval_replace_all_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 134 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 122 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__str_eval_replace_all_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -23226,7 +23226,7 @@ mutual
 
 def k__mk_re_concat : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 135 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 123 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_re_concat_1 σ arg1 arg2) (fun (s, r, Es, s1, r1) => do
         let kt31 ← (intern (.UOp UserOp.str_in_re))
         let kt35 ← (intern (.UOp UserOp.str_concat))
@@ -23809,7 +23809,7 @@ mutual
 
 def k__str_multiset_overapprox_word : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 136 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 124 [arg1] <| withStore fun σ =>
     kcase (m__str_multiset_overapprox_word_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -23832,7 +23832,7 @@ mutual
 
 def k__str_multiset_overapprox : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 137 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 125 [arg1] <| withStore fun σ =>
     kcase (m__str_multiset_overapprox_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -23864,7 +23864,7 @@ mutual
 
 def k__str_is_multiset_subset_strict_done : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 138 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 126 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_is_multiset_subset_strict_done_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -23892,7 +23892,7 @@ mutual
 
 def k__str_is_multiset_subset_strict : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 139 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 127 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_is_multiset_subset_strict_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24320,7 +24320,7 @@ mutual
 
 def k__str_eval_replace_re_all_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 140 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 128 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__str_eval_replace_re_all_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -24438,7 +24438,7 @@ mutual
 
 def k__eo_l_1___seq_is_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 141 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 129 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___seq_is_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24455,7 +24455,7 @@ def k__eo_l_1___seq_is_prefix : Nat → Id → Id → K Id
 
 def k__seq_is_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 142 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 130 [arg1, arg2] <| withStore fun σ =>
     kcase (m__seq_is_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24475,7 +24475,7 @@ mutual
 
 def k__eo_l_1___seq_find : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 143 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 131 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___seq_find_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24498,7 +24498,7 @@ def k__eo_l_1___seq_find : Nat → Id → Id → Id → K Id
 
 def k__seq_find : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 144 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 132 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__seq_find_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24521,7 +24521,7 @@ mutual
 
 def k__seq_subsequence_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 145 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 133 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__seq_subsequence_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24569,7 +24569,7 @@ mutual
 
 def k__seq_eval_replace_all_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 146 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 134 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__seq_eval_replace_all_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -24611,7 +24611,7 @@ mutual
 
 def k__seq_eval : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 147 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 135 [arg1] <| withStore fun σ =>
     kcase (m__seq_eval_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -24816,7 +24816,7 @@ mutual
 
 def k__set_union_to_list : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 148 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 136 [arg1] <| withStore fun σ =>
     kcase (m__set_union_to_list_1 σ arg1) (fun (e, t) => do
         let kt16 ← (intern (.UOp UserOp._at__at_TypedList_cons))
         let kt20 ← (intern (.Apply kt16 e))
@@ -24846,7 +24846,7 @@ mutual
 
 def k__eval_sets_inter : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 149 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 137 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eval_sets_inter_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24872,7 +24872,7 @@ mutual
 
 def k__eval_sets_minus : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 150 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 138 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eval_sets_minus_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24974,7 +24974,7 @@ mutual
 
 def k__abconv_ubv_to_int_elim : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 151 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 139 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__abconv_ubv_to_int_elim_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25045,7 +25045,7 @@ mutual
 
 def k__abconv_int_to_bv_elim : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 152 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 140 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__abconv_int_to_bv_elim_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25139,7 +25139,7 @@ mutual
 
 def k__mk_skolems : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 153 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 141 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_skolems_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25418,7 +25418,7 @@ mutual
 
 def k__mk_quant_merge_prenex : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 154 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 142 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_quant_merge_prenex_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25470,7 +25470,7 @@ mutual
 
 def k__mk_quant_miniscope_and : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 155 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 143 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_quant_miniscope_and_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -25538,7 +25538,7 @@ mutual
 
 def k__eo_l_2___is_quant_miniscope_or : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 156 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 144 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_2___is_quant_miniscope_or_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25560,7 +25560,7 @@ def k__eo_l_2___is_quant_miniscope_or : Nat → Id → Id → Id → K Id
 
 def k__is_quant_miniscope_or : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 158 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 146 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__is_quant_miniscope_or_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25580,7 +25580,7 @@ def k__is_quant_miniscope_or : Nat → Id → Id → Id → K Id
 
 def k__eo_l_1___is_quant_miniscope_or : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 157 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 145 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___is_quant_miniscope_or_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25737,7 +25737,7 @@ mutual
 
 def k__eo_l_1___is_quant_dt_split_conj : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 159 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 147 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__eo_l_1___is_quant_dt_split_conj_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -25801,7 +25801,7 @@ def k__eo_l_1___is_quant_dt_split_conj : Nat → Id → Id → Id → Id → Id 
 
 def k__is_quant_dt_split_conj : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 160 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 148 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__is_quant_dt_split_conj_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -25833,7 +25833,7 @@ mutual
 
 def k__is_quant_dt_split : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 161 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 149 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__is_quant_dt_split_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -25897,7 +25897,7 @@ mutual
 
 def k__mk_dt_split : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 162 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 150 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_dt_split_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -25940,7 +25940,7 @@ mutual
 
 def k__mk_dt_inst_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 163 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 151 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_dt_inst_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25967,7 +25967,7 @@ mutual
 
 def k__mk_dt_inst_tuple_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 164 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 152 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_dt_inst_tuple_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26159,7 +26159,7 @@ mutual
 
 def k__mk_dt_cons_eq : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 165 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 153 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_dt_cons_eq_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -26245,7 +26245,7 @@ mutual
 
 def k__eo_l_1___dt_find_cycle : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 166 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 154 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__eo_l_1___dt_find_cycle_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -26270,7 +26270,7 @@ def k__eo_l_1___dt_find_cycle : Nat → Id → Id → Id → Id → K Id
 
 def k__dt_find_cycle : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 167 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 155 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__dt_find_cycle_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -26317,7 +26317,7 @@ mutual
 
 def k__dt_collapse_updater_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 168 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 156 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__dt_collapse_updater_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26345,7 +26345,7 @@ mutual
 
 def k__tuple_collapse_updater_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 169 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 157 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__tuple_collapse_updater_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26416,7 +26416,7 @@ mutual
 
 def k__eo_l_1___dt_updater_elim_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 170 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 158 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___dt_updater_elim_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26437,7 +26437,7 @@ def k__eo_l_1___dt_updater_elim_rhs : Nat → Id → Id → Id → K Id
 
 def k__dt_updater_elim_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 171 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 159 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__dt_updater_elim_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26463,7 +26463,7 @@ mutual
 
 def k__eo_l_1___tuple_updater_elim_rhs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 172 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 160 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___tuple_updater_elim_rhs_1 σ arg1 arg2) (fun (n, t, a, s, ss) => do
         let kt24 ← (intern (.UOp UserOp.tuple))
         let kt28 ← (intern (.Apply s t))
@@ -26483,7 +26483,7 @@ def k__eo_l_1___tuple_updater_elim_rhs : Nat → Id → Id → K Id
 
 def k__tuple_updater_elim_rhs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 173 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 161 [arg1, arg2] <| withStore fun σ =>
     kcase (m__tuple_updater_elim_rhs_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -42634,7 +42634,7 @@ mutual
 
 def k__get_ai_norm_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 174 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 162 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__get_ai_norm_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -42715,7 +42715,7 @@ mutual
 
 def k__get_a_norm_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 175 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 163 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__get_a_norm_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -42827,7 +42827,7 @@ mutual
 
 def k__run_evaluate : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 176 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 164 [arg1] <| withStore fun σ =>
     kcase (m__run_evaluate_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -43393,7 +43393,7 @@ mutual
 
 def k__evaluate_list : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 177 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 165 [arg1] <| withStore fun σ =>
     kcase (m__evaluate_list_1 σ arg1) (fun (t, ts) => do
         let kt10 ← (intern .__eo_List_cons)
         let kt14 ← (k__run_evaluate kfuel t)
@@ -43584,7 +43584,7 @@ mutual
 
 def k__eo_l_1___is_absorb_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 178 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 166 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___is_absorb_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -43604,7 +43604,7 @@ def k__eo_l_1___is_absorb_rec : Nat → Id → Id → Id → K Id
 
 def k__is_absorb_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 179 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 167 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__is_absorb_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -43755,7 +43755,7 @@ mutual
 
 def k__eo_is_closed_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 181 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 169 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_is_closed_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|

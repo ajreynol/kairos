@@ -3566,7 +3566,14 @@ void KairosMetaReduce::finalize()
     }
   }
   // recursion, by reachability in the call graph; cache recursive programs
-  // over terms only (the cache is keyed by ids)
+  // over terms only (the cache is keyed by ids), except the walkers of
+  // Eunoia's list operations: each call walks its list once and the same
+  // (list, argument) pair rarely recurs, so a cache costs a lookup and an
+  // insert per element for few hits (4-18% on resolution proofs, which then
+  // check twice as fast uncached)
+  auto isListWalker = [](const std::string& lname) {
+    return lname.compare(0, 10, "__eo_list_") == 0 || lname == "__eo_get_elements_rec";
+  };
   size_t pid = 0;
   for (const std::string& n : d_names)
   {
@@ -3600,7 +3607,7 @@ void KairosMetaReduce::finalize()
     {
       allTerms &= (a.sort == Sort::TERM);
     }
-    if (p.recursive && allTerms && !p.lifted)
+    if (p.recursive && allTerms && !p.lifted && !isListWalker(p.lname))
     {
       p.cached = true;
       p.pid = pid++;
