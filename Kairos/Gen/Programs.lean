@@ -11,7 +11,7 @@ set_option maxRecDepth 100000
 namespace Kairos.Gen
 open Eo Kairos Store SmtEval
 
-/-! Generated 1111 of 1140 programs (19 lifted); 4 over native values are Logos's own. Left out:
+/-! Generated 1116 of 1145 programs (20 lifted); 4 over native values are Logos's own. Left out:
   __eo_Numeral: defined by a non-program definition
   __eo_Rational: defined by a non-program definition
   __eo_Binary: defined by a non-program definition
@@ -41,6 +41,7 @@ Lifted (Logos computes them on decoded arguments):
   __eo_datatype_constructors_rec: a native argument matched against a value
   __eo_datatype_cons_selectors_rec: a native argument matched against a value
   __eo_list_repeat_rec: a native argument matched against a value
+  __get_lambda_type: pattern kind VARIABLE
   __get_var_type: pattern kind VARIABLE
   __is_closed_rec: pattern kind VARIABLE
   __contains_atomic_term_list_free_rec: pattern kind VARIABLE
@@ -630,6 +631,15 @@ def m__eo_typeof_ite_2 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option
 def m__eo_typeof_ite_3 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
   σ.leaf arg1 .Bool (some ())
 
+def m__eo_typeof_lambda_1 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
+  Store.stuck arg2 (some ())
+
+def m__eo_typeof_lambda_2 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
+  Store.stuck arg3 (some ())
+
+def m__eo_typeof_lambda_3 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
+  σ.leaf arg1 .__eo_List (some ())
+
 def m__eo_typeof_not_1 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 .Bool (some ())
 
@@ -948,523 +958,526 @@ def m__eo_typeof_33 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
 def m__eo_typeof_34 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
   σ.m_Apply arg1 fun kp276 __eo_x2 => σ.m_Apply kp276 fun kp280 __eo_x1 => σ.leaf kp280 (.UOp UserOp.eq) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_35 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp294 __eo_x1 => σ.leaf kp294 (.UOp UserOp.distinct) (some __eo_x1)
+def m__eo_typeof_35 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp294 __eo_x2 => σ.m_Apply kp294 fun kp298 __eo_x1 => σ.leaf kp298 (.UOp UserOp.lambda) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_36 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp303 __eo_x1 => σ.leaf kp303 (.UOp UserOp._at_purify) (some __eo_x1)
+  σ.m_Apply arg1 fun kp312 __eo_x1 => σ.leaf kp312 (.UOp UserOp.distinct) (some __eo_x1)
 
-def m__eo_typeof_37 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp312 __eo_x2 => σ.m_Apply kp312 fun kp316 __eo_x1 => σ.leaf kp316 (.UOp UserOp.plus) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_37 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp321 __eo_x1 => σ.leaf kp321 (.UOp UserOp._at_purify) (some __eo_x1)
 
 def m__eo_typeof_38 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp330 __eo_x2 => σ.m_Apply kp330 fun kp334 __eo_x1 => σ.leaf kp334 (.UOp UserOp.neg) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp330 __eo_x2 => σ.m_Apply kp330 fun kp334 __eo_x1 => σ.leaf kp334 (.UOp UserOp.plus) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_39 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp348 __eo_x2 => σ.m_Apply kp348 fun kp352 __eo_x1 => σ.leaf kp352 (.UOp UserOp.mult) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp348 __eo_x2 => σ.m_Apply kp348 fun kp352 __eo_x1 => σ.leaf kp352 (.UOp UserOp.neg) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_40 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp366 __eo_x2 => σ.m_Apply kp366 fun kp370 __eo_x1 => σ.leaf kp370 (.UOp UserOp.lt) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp366 __eo_x2 => σ.m_Apply kp366 fun kp370 __eo_x1 => σ.leaf kp370 (.UOp UserOp.mult) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_41 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp384 __eo_x2 => σ.m_Apply kp384 fun kp388 __eo_x1 => σ.leaf kp388 (.UOp UserOp.leq) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp384 __eo_x2 => σ.m_Apply kp384 fun kp388 __eo_x1 => σ.leaf kp388 (.UOp UserOp.lt) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_42 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp402 __eo_x2 => σ.m_Apply kp402 fun kp406 __eo_x1 => σ.leaf kp406 (.UOp UserOp.gt) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp402 __eo_x2 => σ.m_Apply kp402 fun kp406 __eo_x1 => σ.leaf kp406 (.UOp UserOp.leq) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_43 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp420 __eo_x2 => σ.m_Apply kp420 fun kp424 __eo_x1 => σ.leaf kp424 (.UOp UserOp.geq) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp420 __eo_x2 => σ.m_Apply kp420 fun kp424 __eo_x1 => σ.leaf kp424 (.UOp UserOp.gt) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_44 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp438 __eo_x1 => σ.leaf kp438 (.UOp UserOp.to_real) (some __eo_x1)
+def m__eo_typeof_44 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp438 __eo_x2 => σ.m_Apply kp438 fun kp442 __eo_x1 => σ.leaf kp442 (.UOp UserOp.geq) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_45 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp447 __eo_x1 => σ.leaf kp447 (.UOp UserOp.to_int) (some __eo_x1)
+  σ.m_Apply arg1 fun kp456 __eo_x1 => σ.leaf kp456 (.UOp UserOp.to_real) (some __eo_x1)
 
 def m__eo_typeof_46 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp456 __eo_x1 => σ.leaf kp456 (.UOp UserOp.is_int) (some __eo_x1)
+  σ.m_Apply arg1 fun kp465 __eo_x1 => σ.leaf kp465 (.UOp UserOp.to_int) (some __eo_x1)
 
 def m__eo_typeof_47 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp465 __eo_x1 => σ.leaf kp465 (.UOp UserOp.abs) (some __eo_x1)
+  σ.m_Apply arg1 fun kp474 __eo_x1 => σ.leaf kp474 (.UOp UserOp.is_int) (some __eo_x1)
 
 def m__eo_typeof_48 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp474 __eo_x1 => σ.leaf kp474 (.UOp UserOp.__eoo_neg_2) (some __eo_x1)
+  σ.m_Apply arg1 fun kp483 __eo_x1 => σ.leaf kp483 (.UOp UserOp.abs) (some __eo_x1)
 
-def m__eo_typeof_49 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp483 __eo_x2 => σ.m_Apply kp483 fun kp487 __eo_x1 => σ.leaf kp487 (.UOp UserOp.div) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_49 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp492 __eo_x1 => σ.leaf kp492 (.UOp UserOp.__eoo_neg_2) (some __eo_x1)
 
 def m__eo_typeof_50 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp501 __eo_x2 => σ.m_Apply kp501 fun kp505 __eo_x1 => σ.leaf kp505 (.UOp UserOp.mod) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp501 __eo_x2 => σ.m_Apply kp501 fun kp505 __eo_x1 => σ.leaf kp505 (.UOp UserOp.div) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_51 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp519 __eo_x2 => σ.m_Apply kp519 fun kp523 __eo_x1 => σ.leaf kp523 (.UOp UserOp.divisible) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp519 __eo_x2 => σ.m_Apply kp519 fun kp523 __eo_x1 => σ.leaf kp523 (.UOp UserOp.mod) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_52 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp537 __eo_x1 => σ.leaf kp537 (.UOp UserOp.int_pow2) (some __eo_x1)
+def m__eo_typeof_52 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp537 __eo_x2 => σ.m_Apply kp537 fun kp541 __eo_x1 => σ.leaf kp541 (.UOp UserOp.divisible) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_53 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp546 __eo_x1 => σ.leaf kp546 (.UOp UserOp.int_log2) (some __eo_x1)
+  σ.m_Apply arg1 fun kp555 __eo_x1 => σ.leaf kp555 (.UOp UserOp.int_pow2) (some __eo_x1)
 
 def m__eo_typeof_54 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp555 __eo_x1 => σ.leaf kp555 (.UOp UserOp.int_ispow2) (some __eo_x1)
+  σ.m_Apply arg1 fun kp564 __eo_x1 => σ.leaf kp564 (.UOp UserOp.int_log2) (some __eo_x1)
 
-def m__eo_typeof_55 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp564 __eo_x2 => σ.m_Apply kp564 fun kp568 __eo_x1 => σ.leaf kp568 (.UOp UserOp.div_total) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_55 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp573 __eo_x1 => σ.leaf kp573 (.UOp UserOp.int_ispow2) (some __eo_x1)
 
 def m__eo_typeof_56 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp582 __eo_x2 => σ.m_Apply kp582 fun kp586 __eo_x1 => σ.leaf kp586 (.UOp UserOp.mod_total) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp582 __eo_x2 => σ.m_Apply kp582 fun kp586 __eo_x1 => σ.leaf kp586 (.UOp UserOp.div_total) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_57 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp600 __eo_x1 => σ.leaf kp600 (.UOp UserOp._at_int_div_by_zero) (some __eo_x1)
+def m__eo_typeof_57 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp600 __eo_x2 => σ.m_Apply kp600 fun kp604 __eo_x1 => σ.leaf kp604 (.UOp UserOp.mod_total) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_58 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp609 __eo_x1 => σ.leaf kp609 (.UOp UserOp._at_mod_by_zero) (some __eo_x1)
+  σ.m_Apply arg1 fun kp618 __eo_x1 => σ.leaf kp618 (.UOp UserOp._at_int_div_by_zero) (some __eo_x1)
 
-def m__eo_typeof_59 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp618 __eo_x2 => σ.m_Apply kp618 fun kp622 __eo_x1 => σ.leaf kp622 (.UOp UserOp.Array) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_59 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp627 __eo_x1 => σ.leaf kp627 (.UOp UserOp._at_mod_by_zero) (some __eo_x1)
 
 def m__eo_typeof_60 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp636 __eo_x2 => σ.m_Apply kp636 fun kp640 __eo_x1 => σ.leaf kp640 (.UOp UserOp.select) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp636 __eo_x2 => σ.m_Apply kp636 fun kp640 __eo_x1 => σ.leaf kp640 (.UOp UserOp.Array) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_61 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp654 __eo_x3 => σ.m_Apply kp654 fun kp658 __eo_x2 => σ.m_Apply kp658 fun kp662 __eo_x1 => σ.leaf kp662 (.UOp UserOp.store) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_61 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp654 __eo_x2 => σ.m_Apply kp654 fun kp658 __eo_x1 => σ.leaf kp658 (.UOp UserOp.select) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_62 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp681 __eo_x2 => σ.m_Apply kp681 fun kp685 __eo_x1 => σ.leaf kp685 (.UOp UserOp._at_array_deq_diff) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_62 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp672 __eo_x3 => σ.m_Apply kp672 fun kp676 __eo_x2 => σ.m_Apply kp676 fun kp680 __eo_x1 => σ.leaf kp680 (.UOp UserOp.store) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_63 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp699 __eo_x1 => σ.leaf kp699 (.UOp UserOp._at_bvsize) (some __eo_x1)
+def m__eo_typeof_63 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp699 __eo_x2 => σ.m_Apply kp699 fun kp703 __eo_x1 => σ.leaf kp703 (.UOp UserOp._at_array_deq_diff) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_64 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp708 __eo_x2 => σ.m_Apply kp708 fun kp712 __eo_x1 => σ.leaf kp712 (.UOp UserOp.concat) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_64 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp717 __eo_x1 => σ.leaf kp717 (.UOp UserOp._at_bvsize) (some __eo_x1)
 
-def m__eo_typeof_65 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp726 __eo_x3 => σ.m_UOp2 kp726 fun ko730 __eo_x1 __eo_x2 => kguard (ko730 = UserOp2.extract) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_65 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp726 __eo_x2 => σ.m_Apply kp726 fun kp730 __eo_x1 => σ.leaf kp730 (.UOp UserOp.concat) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_66 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp749 __eo_x2 => σ.m_UOp1 kp749 fun ko753 __eo_x1 => kguard (ko753 = UserOp1.repeat) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_66 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp744 __eo_x3 => σ.m_UOp2 kp744 fun ko748 __eo_x1 __eo_x2 => kguard (ko748 = UserOp2.extract) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_67 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp766 __eo_x1 => σ.leaf kp766 (.UOp UserOp.bvnot) (some __eo_x1)
+def m__eo_typeof_67 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp767 __eo_x2 => σ.m_UOp1 kp767 fun ko771 __eo_x1 => kguard (ko771 = UserOp1.repeat) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_68 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp775 __eo_x2 => σ.m_Apply kp775 fun kp779 __eo_x1 => σ.leaf kp779 (.UOp UserOp.bvand) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_68 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp784 __eo_x1 => σ.leaf kp784 (.UOp UserOp.bvnot) (some __eo_x1)
 
 def m__eo_typeof_69 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp793 __eo_x2 => σ.m_Apply kp793 fun kp797 __eo_x1 => σ.leaf kp797 (.UOp UserOp.bvor) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp793 __eo_x2 => σ.m_Apply kp793 fun kp797 __eo_x1 => σ.leaf kp797 (.UOp UserOp.bvand) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_70 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp811 __eo_x2 => σ.m_Apply kp811 fun kp815 __eo_x1 => σ.leaf kp815 (.UOp UserOp.bvnand) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp811 __eo_x2 => σ.m_Apply kp811 fun kp815 __eo_x1 => σ.leaf kp815 (.UOp UserOp.bvor) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_71 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp829 __eo_x2 => σ.m_Apply kp829 fun kp833 __eo_x1 => σ.leaf kp833 (.UOp UserOp.bvnor) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp829 __eo_x2 => σ.m_Apply kp829 fun kp833 __eo_x1 => σ.leaf kp833 (.UOp UserOp.bvnand) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_72 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp847 __eo_x2 => σ.m_Apply kp847 fun kp851 __eo_x1 => σ.leaf kp851 (.UOp UserOp.bvxor) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp847 __eo_x2 => σ.m_Apply kp847 fun kp851 __eo_x1 => σ.leaf kp851 (.UOp UserOp.bvnor) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_73 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp865 __eo_x2 => σ.m_Apply kp865 fun kp869 __eo_x1 => σ.leaf kp869 (.UOp UserOp.bvxnor) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp865 __eo_x2 => σ.m_Apply kp865 fun kp869 __eo_x1 => σ.leaf kp869 (.UOp UserOp.bvxor) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_74 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp883 __eo_x2 => σ.m_Apply kp883 fun kp887 __eo_x1 => σ.leaf kp887 (.UOp UserOp.bvcomp) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp883 __eo_x2 => σ.m_Apply kp883 fun kp887 __eo_x1 => σ.leaf kp887 (.UOp UserOp.bvxnor) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_75 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp901 __eo_x1 => σ.leaf kp901 (.UOp UserOp.bvneg) (some __eo_x1)
+def m__eo_typeof_75 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp901 __eo_x2 => σ.m_Apply kp901 fun kp905 __eo_x1 => σ.leaf kp905 (.UOp UserOp.bvcomp) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_76 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp910 __eo_x2 => σ.m_Apply kp910 fun kp914 __eo_x1 => σ.leaf kp914 (.UOp UserOp.bvadd) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_76 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp919 __eo_x1 => σ.leaf kp919 (.UOp UserOp.bvneg) (some __eo_x1)
 
 def m__eo_typeof_77 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp928 __eo_x2 => σ.m_Apply kp928 fun kp932 __eo_x1 => σ.leaf kp932 (.UOp UserOp.bvmul) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp928 __eo_x2 => σ.m_Apply kp928 fun kp932 __eo_x1 => σ.leaf kp932 (.UOp UserOp.bvadd) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_78 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp946 __eo_x2 => σ.m_Apply kp946 fun kp950 __eo_x1 => σ.leaf kp950 (.UOp UserOp.bvudiv) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp946 __eo_x2 => σ.m_Apply kp946 fun kp950 __eo_x1 => σ.leaf kp950 (.UOp UserOp.bvmul) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_79 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp964 __eo_x2 => σ.m_Apply kp964 fun kp968 __eo_x1 => σ.leaf kp968 (.UOp UserOp.bvurem) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp964 __eo_x2 => σ.m_Apply kp964 fun kp968 __eo_x1 => σ.leaf kp968 (.UOp UserOp.bvudiv) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_80 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp982 __eo_x2 => σ.m_Apply kp982 fun kp986 __eo_x1 => σ.leaf kp986 (.UOp UserOp.bvsub) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp982 __eo_x2 => σ.m_Apply kp982 fun kp986 __eo_x1 => σ.leaf kp986 (.UOp UserOp.bvurem) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_81 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1000 __eo_x2 => σ.m_Apply kp1000 fun kp1004 __eo_x1 => σ.leaf kp1004 (.UOp UserOp.bvsdiv) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1000 __eo_x2 => σ.m_Apply kp1000 fun kp1004 __eo_x1 => σ.leaf kp1004 (.UOp UserOp.bvsub) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_82 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1018 __eo_x2 => σ.m_Apply kp1018 fun kp1022 __eo_x1 => σ.leaf kp1022 (.UOp UserOp.bvsrem) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1018 __eo_x2 => σ.m_Apply kp1018 fun kp1022 __eo_x1 => σ.leaf kp1022 (.UOp UserOp.bvsdiv) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_83 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1036 __eo_x2 => σ.m_Apply kp1036 fun kp1040 __eo_x1 => σ.leaf kp1040 (.UOp UserOp.bvsmod) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1036 __eo_x2 => σ.m_Apply kp1036 fun kp1040 __eo_x1 => σ.leaf kp1040 (.UOp UserOp.bvsrem) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_84 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1054 __eo_x2 => σ.m_Apply kp1054 fun kp1058 __eo_x1 => σ.leaf kp1058 (.UOp UserOp.bvult) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1054 __eo_x2 => σ.m_Apply kp1054 fun kp1058 __eo_x1 => σ.leaf kp1058 (.UOp UserOp.bvsmod) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_85 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1072 __eo_x2 => σ.m_Apply kp1072 fun kp1076 __eo_x1 => σ.leaf kp1076 (.UOp UserOp.bvule) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1072 __eo_x2 => σ.m_Apply kp1072 fun kp1076 __eo_x1 => σ.leaf kp1076 (.UOp UserOp.bvult) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_86 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1090 __eo_x2 => σ.m_Apply kp1090 fun kp1094 __eo_x1 => σ.leaf kp1094 (.UOp UserOp.bvugt) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1090 __eo_x2 => σ.m_Apply kp1090 fun kp1094 __eo_x1 => σ.leaf kp1094 (.UOp UserOp.bvule) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_87 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1108 __eo_x2 => σ.m_Apply kp1108 fun kp1112 __eo_x1 => σ.leaf kp1112 (.UOp UserOp.bvuge) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1108 __eo_x2 => σ.m_Apply kp1108 fun kp1112 __eo_x1 => σ.leaf kp1112 (.UOp UserOp.bvugt) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_88 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1126 __eo_x2 => σ.m_Apply kp1126 fun kp1130 __eo_x1 => σ.leaf kp1130 (.UOp UserOp.bvslt) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1126 __eo_x2 => σ.m_Apply kp1126 fun kp1130 __eo_x1 => σ.leaf kp1130 (.UOp UserOp.bvuge) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_89 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1144 __eo_x2 => σ.m_Apply kp1144 fun kp1148 __eo_x1 => σ.leaf kp1148 (.UOp UserOp.bvsle) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1144 __eo_x2 => σ.m_Apply kp1144 fun kp1148 __eo_x1 => σ.leaf kp1148 (.UOp UserOp.bvslt) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_90 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1162 __eo_x2 => σ.m_Apply kp1162 fun kp1166 __eo_x1 => σ.leaf kp1166 (.UOp UserOp.bvsgt) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1162 __eo_x2 => σ.m_Apply kp1162 fun kp1166 __eo_x1 => σ.leaf kp1166 (.UOp UserOp.bvsle) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_91 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1180 __eo_x2 => σ.m_Apply kp1180 fun kp1184 __eo_x1 => σ.leaf kp1184 (.UOp UserOp.bvsge) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1180 __eo_x2 => σ.m_Apply kp1180 fun kp1184 __eo_x1 => σ.leaf kp1184 (.UOp UserOp.bvsgt) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_92 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1198 __eo_x2 => σ.m_Apply kp1198 fun kp1202 __eo_x1 => σ.leaf kp1202 (.UOp UserOp.bvshl) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1198 __eo_x2 => σ.m_Apply kp1198 fun kp1202 __eo_x1 => σ.leaf kp1202 (.UOp UserOp.bvsge) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_93 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1216 __eo_x2 => σ.m_Apply kp1216 fun kp1220 __eo_x1 => σ.leaf kp1220 (.UOp UserOp.bvlshr) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1216 __eo_x2 => σ.m_Apply kp1216 fun kp1220 __eo_x1 => σ.leaf kp1220 (.UOp UserOp.bvshl) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_94 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1234 __eo_x2 => σ.m_Apply kp1234 fun kp1238 __eo_x1 => σ.leaf kp1238 (.UOp UserOp.bvashr) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1234 __eo_x2 => σ.m_Apply kp1234 fun kp1238 __eo_x1 => σ.leaf kp1238 (.UOp UserOp.bvlshr) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_95 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1252 __eo_x2 => σ.m_UOp1 kp1252 fun ko1256 __eo_x1 => kguard (ko1256 = UserOp1.zero_extend) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1252 __eo_x2 => σ.m_Apply kp1252 fun kp1256 __eo_x1 => σ.leaf kp1256 (.UOp UserOp.bvashr) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_96 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1269 __eo_x2 => σ.m_UOp1 kp1269 fun ko1273 __eo_x1 => kguard (ko1273 = UserOp1.sign_extend) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1270 __eo_x2 => σ.m_UOp1 kp1270 fun ko1274 __eo_x1 => kguard (ko1274 = UserOp1.zero_extend) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_97 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1286 __eo_x2 => σ.m_UOp1 kp1286 fun ko1290 __eo_x1 => kguard (ko1290 = UserOp1.rotate_left) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1287 __eo_x2 => σ.m_UOp1 kp1287 fun ko1291 __eo_x1 => kguard (ko1291 = UserOp1.sign_extend) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_98 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1303 __eo_x2 => σ.m_UOp1 kp1303 fun ko1307 __eo_x1 => kguard (ko1307 = UserOp1.rotate_right) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1304 __eo_x2 => σ.m_UOp1 kp1304 fun ko1308 __eo_x1 => kguard (ko1308 = UserOp1.rotate_left) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_99 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1320 __eo_x3 => σ.m_Apply kp1320 fun kp1324 __eo_x2 => σ.m_Apply kp1324 fun kp1328 __eo_x1 => σ.leaf kp1328 (.UOp UserOp.bvite) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_99 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1321 __eo_x2 => σ.m_UOp1 kp1321 fun ko1325 __eo_x1 => kguard (ko1325 = UserOp1.rotate_right) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_100 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1347 __eo_x2 => σ.m_Apply kp1347 fun kp1351 __eo_x1 => σ.leaf kp1351 (.UOp UserOp.bvuaddo) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_100 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp1338 __eo_x3 => σ.m_Apply kp1338 fun kp1342 __eo_x2 => σ.m_Apply kp1342 fun kp1346 __eo_x1 => σ.leaf kp1346 (.UOp UserOp.bvite) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_101 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1365 __eo_x1 => σ.leaf kp1365 (.UOp UserOp.bvnego) (some __eo_x1)
+def m__eo_typeof_101 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1365 __eo_x2 => σ.m_Apply kp1365 fun kp1369 __eo_x1 => σ.leaf kp1369 (.UOp UserOp.bvuaddo) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_102 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1374 __eo_x2 => σ.m_Apply kp1374 fun kp1378 __eo_x1 => σ.leaf kp1378 (.UOp UserOp.bvsaddo) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_102 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp1383 __eo_x1 => σ.leaf kp1383 (.UOp UserOp.bvnego) (some __eo_x1)
 
 def m__eo_typeof_103 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1392 __eo_x2 => σ.m_Apply kp1392 fun kp1396 __eo_x1 => σ.leaf kp1396 (.UOp UserOp.bvumulo) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1392 __eo_x2 => σ.m_Apply kp1392 fun kp1396 __eo_x1 => σ.leaf kp1396 (.UOp UserOp.bvsaddo) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_104 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1410 __eo_x2 => σ.m_Apply kp1410 fun kp1414 __eo_x1 => σ.leaf kp1414 (.UOp UserOp.bvsmulo) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1410 __eo_x2 => σ.m_Apply kp1410 fun kp1414 __eo_x1 => σ.leaf kp1414 (.UOp UserOp.bvumulo) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_105 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1428 __eo_x2 => σ.m_Apply kp1428 fun kp1432 __eo_x1 => σ.leaf kp1432 (.UOp UserOp.bvusubo) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1428 __eo_x2 => σ.m_Apply kp1428 fun kp1432 __eo_x1 => σ.leaf kp1432 (.UOp UserOp.bvsmulo) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_106 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1446 __eo_x2 => σ.m_Apply kp1446 fun kp1450 __eo_x1 => σ.leaf kp1450 (.UOp UserOp.bvssubo) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1446 __eo_x2 => σ.m_Apply kp1446 fun kp1450 __eo_x1 => σ.leaf kp1450 (.UOp UserOp.bvusubo) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_107 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1464 __eo_x2 => σ.m_Apply kp1464 fun kp1468 __eo_x1 => σ.leaf kp1468 (.UOp UserOp.bvsdivo) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1464 __eo_x2 => σ.m_Apply kp1464 fun kp1468 __eo_x1 => σ.leaf kp1468 (.UOp UserOp.bvssubo) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_108 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1482 __eo_x2 => σ.m_Apply kp1482 fun kp1486 __eo_x1 => σ.leaf kp1486 (.UOp UserOp.bvultbv) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1482 __eo_x2 => σ.m_Apply kp1482 fun kp1486 __eo_x1 => σ.leaf kp1486 (.UOp UserOp.bvsdivo) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_109 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1500 __eo_x2 => σ.m_Apply kp1500 fun kp1504 __eo_x1 => σ.leaf kp1504 (.UOp UserOp.bvsltbv) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1500 __eo_x2 => σ.m_Apply kp1500 fun kp1504 __eo_x1 => σ.leaf kp1504 (.UOp UserOp.bvultbv) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_110 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1518 __eo_x1 => σ.leaf kp1518 (.UOp UserOp.bvredand) (some __eo_x1)
+def m__eo_typeof_110 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1518 __eo_x2 => σ.m_Apply kp1518 fun kp1522 __eo_x1 => σ.leaf kp1522 (.UOp UserOp.bvsltbv) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_111 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1527 __eo_x1 => σ.leaf kp1527 (.UOp UserOp.bvredor) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1536 __eo_x1 => σ.leaf kp1536 (.UOp UserOp.bvredand) (some __eo_x1)
 
-def m__eo_typeof_112 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1536 __eo_x2 => σ.m_UOp1 kp1536 fun ko1540 __eo_x1 => kguard (ko1540 = UserOp1._at_bit) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_112 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp1545 __eo_x1 => σ.leaf kp1545 (.UOp UserOp.bvredor) (some __eo_x1)
 
 def m__eo_typeof_113 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1553 __eo_x2 => σ.m_Apply kp1553 fun kp1557 __eo_x1 => σ.leaf kp1557 (.UOp UserOp._at_from_bools) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1554 __eo_x2 => σ.m_UOp1 kp1554 fun ko1558 __eo_x1 => kguard (ko1558 = UserOp1._at_bit) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_114 (σ : Store) (arg1 : Id) : Option Unit :=
+def m__eo_typeof_114 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1571 __eo_x2 => σ.m_Apply kp1571 fun kp1575 __eo_x1 => σ.leaf kp1575 (.UOp UserOp._at_from_bools) (some (__eo_x1, __eo_x2))
+
+def m__eo_typeof_115 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp.RegLan) (some ())
 
-def m__eo_typeof_115 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_UOp1 arg1 fun ko1571 __eo_x1 => kguard (ko1571 = UserOp1.seq_empty) (some __eo_x1)
-
 def m__eo_typeof_116 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1579 __eo_x1 => σ.leaf kp1579 (.UOp UserOp.str_len) (some __eo_x1)
+  σ.m_UOp1 arg1 fun ko1589 __eo_x1 => kguard (ko1589 = UserOp1.seq_empty) (some __eo_x1)
 
-def m__eo_typeof_117 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1588 __eo_x2 => σ.m_Apply kp1588 fun kp1592 __eo_x1 => σ.leaf kp1592 (.UOp UserOp.str_concat) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_117 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp1597 __eo_x1 => σ.leaf kp1597 (.UOp UserOp.str_len) (some __eo_x1)
 
-def m__eo_typeof_118 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1606 __eo_x3 => σ.m_Apply kp1606 fun kp1610 __eo_x2 => σ.m_Apply kp1610 fun kp1614 __eo_x1 => σ.leaf kp1614 (.UOp UserOp.str_substr) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_118 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1606 __eo_x2 => σ.m_Apply kp1606 fun kp1610 __eo_x1 => σ.leaf kp1610 (.UOp UserOp.str_concat) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_119 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1633 __eo_x2 => σ.m_Apply kp1633 fun kp1637 __eo_x1 => σ.leaf kp1637 (.UOp UserOp.str_contains) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_119 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp1624 __eo_x3 => σ.m_Apply kp1624 fun kp1628 __eo_x2 => σ.m_Apply kp1628 fun kp1632 __eo_x1 => σ.leaf kp1632 (.UOp UserOp.str_substr) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_120 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1651 __eo_x3 => σ.m_Apply kp1651 fun kp1655 __eo_x2 => σ.m_Apply kp1655 fun kp1659 __eo_x1 => σ.leaf kp1659 (.UOp UserOp.str_replace) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_120 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1651 __eo_x2 => σ.m_Apply kp1651 fun kp1655 __eo_x1 => σ.leaf kp1655 (.UOp UserOp.str_contains) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_121 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1678 __eo_x3 => σ.m_Apply kp1678 fun kp1682 __eo_x2 => σ.m_Apply kp1682 fun kp1686 __eo_x1 => σ.leaf kp1686 (.UOp UserOp.str_indexof) (some (__eo_x1, __eo_x2, __eo_x3))
+  σ.m_Apply arg1 fun kp1669 __eo_x3 => σ.m_Apply kp1669 fun kp1673 __eo_x2 => σ.m_Apply kp1673 fun kp1677 __eo_x1 => σ.leaf kp1677 (.UOp UserOp.str_replace) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_122 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1705 __eo_x2 => σ.m_Apply kp1705 fun kp1709 __eo_x1 => σ.leaf kp1709 (.UOp UserOp.str_at) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_122 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp1696 __eo_x3 => σ.m_Apply kp1696 fun kp1700 __eo_x2 => σ.m_Apply kp1700 fun kp1704 __eo_x1 => σ.leaf kp1704 (.UOp UserOp.str_indexof) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_123 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1723 __eo_x2 => σ.m_Apply kp1723 fun kp1727 __eo_x1 => σ.leaf kp1727 (.UOp UserOp.str_prefixof) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1723 __eo_x2 => σ.m_Apply kp1723 fun kp1727 __eo_x1 => σ.leaf kp1727 (.UOp UserOp.str_at) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_124 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1741 __eo_x2 => σ.m_Apply kp1741 fun kp1745 __eo_x1 => σ.leaf kp1745 (.UOp UserOp.str_suffixof) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1741 __eo_x2 => σ.m_Apply kp1741 fun kp1745 __eo_x1 => σ.leaf kp1745 (.UOp UserOp.str_prefixof) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_125 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1759 __eo_x1 => σ.leaf kp1759 (.UOp UserOp.str_rev) (some __eo_x1)
+def m__eo_typeof_125 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1759 __eo_x2 => σ.m_Apply kp1759 fun kp1763 __eo_x1 => σ.leaf kp1763 (.UOp UserOp.str_suffixof) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_126 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1768 __eo_x3 => σ.m_Apply kp1768 fun kp1772 __eo_x2 => σ.m_Apply kp1772 fun kp1776 __eo_x1 => σ.leaf kp1776 (.UOp UserOp.str_update) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_126 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp1777 __eo_x1 => σ.leaf kp1777 (.UOp UserOp.str_rev) (some __eo_x1)
 
-def m__eo_typeof_127 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1795 __eo_x1 => σ.leaf kp1795 (.UOp UserOp.str_to_lower) (some __eo_x1)
+def m__eo_typeof_127 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp1786 __eo_x3 => σ.m_Apply kp1786 fun kp1790 __eo_x2 => σ.m_Apply kp1790 fun kp1794 __eo_x1 => σ.leaf kp1794 (.UOp UserOp.str_update) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_128 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1804 __eo_x1 => σ.leaf kp1804 (.UOp UserOp.str_to_upper) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1813 __eo_x1 => σ.leaf kp1813 (.UOp UserOp.str_to_lower) (some __eo_x1)
 
 def m__eo_typeof_129 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1813 __eo_x1 => σ.leaf kp1813 (.UOp UserOp.str_to_code) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1822 __eo_x1 => σ.leaf kp1822 (.UOp UserOp.str_to_upper) (some __eo_x1)
 
 def m__eo_typeof_130 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1822 __eo_x1 => σ.leaf kp1822 (.UOp UserOp.str_from_code) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1831 __eo_x1 => σ.leaf kp1831 (.UOp UserOp.str_to_code) (some __eo_x1)
 
 def m__eo_typeof_131 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1831 __eo_x1 => σ.leaf kp1831 (.UOp UserOp.str_is_digit) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1840 __eo_x1 => σ.leaf kp1840 (.UOp UserOp.str_from_code) (some __eo_x1)
 
 def m__eo_typeof_132 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1840 __eo_x1 => σ.leaf kp1840 (.UOp UserOp.str_to_int) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1849 __eo_x1 => σ.leaf kp1849 (.UOp UserOp.str_is_digit) (some __eo_x1)
 
 def m__eo_typeof_133 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp1849 __eo_x1 => σ.leaf kp1849 (.UOp UserOp.str_from_int) (some __eo_x1)
+  σ.m_Apply arg1 fun kp1858 __eo_x1 => σ.leaf kp1858 (.UOp UserOp.str_to_int) (some __eo_x1)
 
-def m__eo_typeof_134 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1858 __eo_x2 => σ.m_Apply kp1858 fun kp1862 __eo_x1 => σ.leaf kp1862 (.UOp UserOp.str_lt) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_134 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp1867 __eo_x1 => σ.leaf kp1867 (.UOp UserOp.str_from_int) (some __eo_x1)
 
 def m__eo_typeof_135 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp1876 __eo_x2 => σ.m_Apply kp1876 fun kp1880 __eo_x1 => σ.leaf kp1880 (.UOp UserOp.str_leq) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp1876 __eo_x2 => σ.m_Apply kp1876 fun kp1880 __eo_x1 => σ.leaf kp1880 (.UOp UserOp.str_lt) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_136 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1894 __eo_x3 => σ.m_Apply kp1894 fun kp1898 __eo_x2 => σ.m_Apply kp1898 fun kp1902 __eo_x1 => σ.leaf kp1902 (.UOp UserOp.str_replace_all) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_136 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp1894 __eo_x2 => σ.m_Apply kp1894 fun kp1898 __eo_x1 => σ.leaf kp1898 (.UOp UserOp.str_leq) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_137 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1921 __eo_x3 => σ.m_Apply kp1921 fun kp1925 __eo_x2 => σ.m_Apply kp1925 fun kp1929 __eo_x1 => σ.leaf kp1929 (.UOp UserOp.str_replace_re) (some (__eo_x1, __eo_x2, __eo_x3))
+  σ.m_Apply arg1 fun kp1912 __eo_x3 => σ.m_Apply kp1912 fun kp1916 __eo_x2 => σ.m_Apply kp1916 fun kp1920 __eo_x1 => σ.leaf kp1920 (.UOp UserOp.str_replace_all) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_138 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1948 __eo_x3 => σ.m_Apply kp1948 fun kp1952 __eo_x2 => σ.m_Apply kp1952 fun kp1956 __eo_x1 => σ.leaf kp1956 (.UOp UserOp.str_replace_re_all) (some (__eo_x1, __eo_x2, __eo_x3))
+  σ.m_Apply arg1 fun kp1939 __eo_x3 => σ.m_Apply kp1939 fun kp1943 __eo_x2 => σ.m_Apply kp1943 fun kp1947 __eo_x1 => σ.leaf kp1947 (.UOp UserOp.str_replace_re) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_139 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp1975 __eo_x3 => σ.m_Apply kp1975 fun kp1979 __eo_x2 => σ.m_Apply kp1979 fun kp1983 __eo_x1 => σ.leaf kp1983 (.UOp UserOp.str_indexof_re) (some (__eo_x1, __eo_x2, __eo_x3))
+  σ.m_Apply arg1 fun kp1966 __eo_x3 => σ.m_Apply kp1966 fun kp1970 __eo_x2 => σ.m_Apply kp1970 fun kp1974 __eo_x1 => σ.leaf kp1974 (.UOp UserOp.str_replace_re_all) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_140 (σ : Store) (arg1 : Id) : Option Unit :=
-  σ.leaf arg1 (.UOp UserOp.re_allchar) (some ())
+def m__eo_typeof_140 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp1993 __eo_x3 => σ.m_Apply kp1993 fun kp1997 __eo_x2 => σ.m_Apply kp1997 fun kp2001 __eo_x1 => σ.leaf kp2001 (.UOp UserOp.str_indexof_re) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_141 (σ : Store) (arg1 : Id) : Option Unit :=
-  σ.leaf arg1 (.UOp UserOp.re_none) (some ())
+  σ.leaf arg1 (.UOp UserOp.re_allchar) (some ())
 
 def m__eo_typeof_142 (σ : Store) (arg1 : Id) : Option Unit :=
+  σ.leaf arg1 (.UOp UserOp.re_none) (some ())
+
+def m__eo_typeof_143 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp.re_all) (some ())
 
-def m__eo_typeof_143 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2002 __eo_x1 => σ.leaf kp2002 (.UOp UserOp.str_to_re) (some __eo_x1)
-
 def m__eo_typeof_144 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2011 __eo_x1 => σ.leaf kp2011 (.UOp UserOp.re_mult) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2020 __eo_x1 => σ.leaf kp2020 (.UOp UserOp.str_to_re) (some __eo_x1)
 
 def m__eo_typeof_145 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2020 __eo_x1 => σ.leaf kp2020 (.UOp UserOp.re_plus) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2029 __eo_x1 => σ.leaf kp2029 (.UOp UserOp.re_mult) (some __eo_x1)
 
-def m__eo_typeof_146 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2029 __eo_x2 => σ.m_UOp1 kp2029 fun ko2033 __eo_x1 => kguard (ko2033 = UserOp1.re_exp) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_146 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2038 __eo_x1 => σ.leaf kp2038 (.UOp UserOp.re_plus) (some __eo_x1)
 
-def m__eo_typeof_147 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2046 __eo_x1 => σ.leaf kp2046 (.UOp UserOp.re_opt) (some __eo_x1)
+def m__eo_typeof_147 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2047 __eo_x2 => σ.m_UOp1 kp2047 fun ko2051 __eo_x1 => kguard (ko2051 = UserOp1.re_exp) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_148 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2055 __eo_x1 => σ.leaf kp2055 (.UOp UserOp.re_comp) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2064 __eo_x1 => σ.leaf kp2064 (.UOp UserOp.re_opt) (some __eo_x1)
 
-def m__eo_typeof_149 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2064 __eo_x2 => σ.m_Apply kp2064 fun kp2068 __eo_x1 => σ.leaf kp2068 (.UOp UserOp.re_range) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_149 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2073 __eo_x1 => σ.leaf kp2073 (.UOp UserOp.re_comp) (some __eo_x1)
 
 def m__eo_typeof_150 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2082 __eo_x2 => σ.m_Apply kp2082 fun kp2086 __eo_x1 => σ.leaf kp2086 (.UOp UserOp.re_concat) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2082 __eo_x2 => σ.m_Apply kp2082 fun kp2086 __eo_x1 => σ.leaf kp2086 (.UOp UserOp.re_range) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_151 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2100 __eo_x2 => σ.m_Apply kp2100 fun kp2104 __eo_x1 => σ.leaf kp2104 (.UOp UserOp.re_inter) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2100 __eo_x2 => σ.m_Apply kp2100 fun kp2104 __eo_x1 => σ.leaf kp2104 (.UOp UserOp.re_concat) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_152 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2118 __eo_x2 => σ.m_Apply kp2118 fun kp2122 __eo_x1 => σ.leaf kp2122 (.UOp UserOp.re_union) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2118 __eo_x2 => σ.m_Apply kp2118 fun kp2122 __eo_x1 => σ.leaf kp2122 (.UOp UserOp.re_inter) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_153 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2136 __eo_x2 => σ.m_Apply kp2136 fun kp2140 __eo_x1 => σ.leaf kp2140 (.UOp UserOp.re_diff) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2136 __eo_x2 => σ.m_Apply kp2136 fun kp2140 __eo_x1 => σ.leaf kp2140 (.UOp UserOp.re_union) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_154 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2154 __eo_x3 => σ.m_UOp2 kp2154 fun ko2158 __eo_x1 __eo_x2 => kguard (ko2158 = UserOp2.re_loop) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_154 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2154 __eo_x2 => σ.m_Apply kp2154 fun kp2158 __eo_x1 => σ.leaf kp2158 (.UOp UserOp.re_diff) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_155 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2177 __eo_x2 => σ.m_Apply kp2177 fun kp2181 __eo_x1 => σ.leaf kp2181 (.UOp UserOp.str_in_re) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_155 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp2172 __eo_x3 => σ.m_UOp2 kp2172 fun ko2176 __eo_x1 __eo_x2 => kguard (ko2176 = UserOp2.re_loop) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_156 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2195 __eo_x1 => σ.leaf kp2195 (.UOp UserOp.seq_unit) (some __eo_x1)
+def m__eo_typeof_156 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2195 __eo_x2 => σ.m_Apply kp2195 fun kp2199 __eo_x1 => σ.leaf kp2199 (.UOp UserOp.str_in_re) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_157 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2204 __eo_x2 => σ.m_Apply kp2204 fun kp2208 __eo_x1 => σ.leaf kp2208 (.UOp UserOp.seq_nth) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_157 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2213 __eo_x1 => σ.leaf kp2213 (.UOp UserOp.seq_unit) (some __eo_x1)
 
-def m__eo_typeof_158 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_UOp3 arg1 fun ko2222 __eo_x1 __eo_x2 __eo_x3 => kguard (ko2222 = UserOp3._at_re_unfold_pos_component) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_158 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2222 __eo_x2 => σ.m_Apply kp2222 fun kp2226 __eo_x1 => σ.leaf kp2226 (.UOp UserOp.seq_nth) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_159 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2242 __eo_x2 => σ.m_Apply kp2242 fun kp2246 __eo_x1 => σ.leaf kp2246 (.UOp UserOp._at_strings_deq_diff) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_159 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_UOp3 arg1 fun ko2240 __eo_x1 __eo_x2 __eo_x3 => kguard (ko2240 = UserOp3._at_re_unfold_pos_component) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_160 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2260 __eo_x2 => σ.m_Apply kp2260 fun kp2264 __eo_x1 => σ.leaf kp2264 (.UOp UserOp._at_strings_stoi_result) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2260 __eo_x2 => σ.m_Apply kp2260 fun kp2264 __eo_x1 => σ.leaf kp2264 (.UOp UserOp._at_strings_deq_diff) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_161 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2278 __eo_x1 => σ.leaf kp2278 (.UOp UserOp._at_strings_stoi_non_digit) (some __eo_x1)
+def m__eo_typeof_161 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2278 __eo_x2 => σ.m_Apply kp2278 fun kp2282 __eo_x1 => σ.leaf kp2282 (.UOp UserOp._at_strings_stoi_result) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_162 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2287 __eo_x2 => σ.m_Apply kp2287 fun kp2291 __eo_x1 => σ.leaf kp2291 (.UOp UserOp._at_strings_itos_result) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_162 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2296 __eo_x1 => σ.leaf kp2296 (.UOp UserOp._at_strings_stoi_non_digit) (some __eo_x1)
 
 def m__eo_typeof_163 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2305 __eo_x2 => σ.m_Apply kp2305 fun kp2309 __eo_x1 => σ.leaf kp2309 (.UOp UserOp._at_strings_num_occur) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2305 __eo_x2 => σ.m_Apply kp2305 fun kp2309 __eo_x1 => σ.leaf kp2309 (.UOp UserOp._at_strings_itos_result) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_164 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2323 __eo_x2 => σ.m_Apply kp2323 fun kp2327 __eo_x1 => σ.leaf kp2327 (.UOp UserOp._at_strings_num_occur_re) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2323 __eo_x2 => σ.m_Apply kp2323 fun kp2327 __eo_x1 => σ.leaf kp2327 (.UOp UserOp._at_strings_num_occur) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_165 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2341 __eo_x3 => σ.m_Apply kp2341 fun kp2345 __eo_x2 => σ.m_Apply kp2345 fun kp2349 __eo_x1 => σ.leaf kp2349 (.UOp UserOp._at_strings_occur_index) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_165 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2341 __eo_x2 => σ.m_Apply kp2341 fun kp2345 __eo_x1 => σ.leaf kp2345 (.UOp UserOp._at_strings_num_occur_re) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_166 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2368 __eo_x3 => σ.m_Apply kp2368 fun kp2372 __eo_x2 => σ.m_Apply kp2372 fun kp2376 __eo_x1 => σ.leaf kp2376 (.UOp UserOp._at_strings_occur_index_re) (some (__eo_x1, __eo_x2, __eo_x3))
+  σ.m_Apply arg1 fun kp2359 __eo_x3 => σ.m_Apply kp2359 fun kp2363 __eo_x2 => σ.m_Apply kp2363 fun kp2367 __eo_x1 => σ.leaf kp2367 (.UOp UserOp._at_strings_occur_index) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_167 (σ : Store) (arg1 : Id) : Option (Id × Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2395 __eo_x4 => σ.m_Apply kp2395 fun kp2399 __eo_x3 => σ.m_Apply kp2399 fun kp2403 __eo_x2 => σ.m_Apply kp2403 fun kp2407 __eo_x1 => σ.leaf kp2407 (.UOp UserOp._at_strings_replace_all_result) (some (__eo_x1, __eo_x2, __eo_x3, __eo_x4))
+def m__eo_typeof_167 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp2386 __eo_x3 => σ.m_Apply kp2386 fun kp2390 __eo_x2 => σ.m_Apply kp2390 fun kp2394 __eo_x1 => σ.leaf kp2394 (.UOp UserOp._at_strings_occur_index_re) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_168 (σ : Store) (arg1 : Id) : Option (Id × Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2431 __eo_x4 => σ.m_Apply kp2431 fun kp2435 __eo_x3 => σ.m_Apply kp2435 fun kp2439 __eo_x2 => σ.m_Apply kp2439 fun kp2443 __eo_x1 => σ.leaf kp2443 (.UOp UserOp._at_strings_replace_re_all_result) (some (__eo_x1, __eo_x2, __eo_x3, __eo_x4))
+  σ.m_Apply arg1 fun kp2413 __eo_x4 => σ.m_Apply kp2413 fun kp2417 __eo_x3 => σ.m_Apply kp2417 fun kp2421 __eo_x2 => σ.m_Apply kp2421 fun kp2425 __eo_x1 => σ.leaf kp2425 (.UOp UserOp._at_strings_replace_all_result) (some (__eo_x1, __eo_x2, __eo_x3, __eo_x4))
 
-def m__eo_typeof_169 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_UOp3 arg1 fun ko2467 __eo_x1 __eo_x2 __eo_x3 => kguard (ko2467 = UserOp3._at_witness_string_length) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_169 (σ : Store) (arg1 : Id) : Option (Id × Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp2449 __eo_x4 => σ.m_Apply kp2449 fun kp2453 __eo_x3 => σ.m_Apply kp2453 fun kp2457 __eo_x2 => σ.m_Apply kp2457 fun kp2461 __eo_x1 => σ.leaf kp2461 (.UOp UserOp._at_strings_replace_re_all_result) (some (__eo_x1, __eo_x2, __eo_x3, __eo_x4))
 
-def m__eo_typeof_170 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2487 __eo_x2 => σ.m_UOp1 kp2487 fun ko2491 __eo_x1 => kguard (ko2491 = UserOp1.is) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_170 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_UOp3 arg1 fun ko2485 __eo_x1 __eo_x2 __eo_x3 => kguard (ko2485 = UserOp3._at_witness_string_length) (some (__eo_x1, __eo_x2, __eo_x3))
 
-def m__eo_typeof_171 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2504 __eo_x3 => σ.m_Apply kp2504 fun kp2508 __eo_x2 => σ.m_UOp1 kp2508 fun ko2512 __eo_x1 => kguard (ko2512 = UserOp1.update) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_171 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2505 __eo_x2 => σ.m_UOp1 kp2505 fun ko2509 __eo_x1 => kguard (ko2509 = UserOp1.is) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_172 (σ : Store) (arg1 : Id) : Option Unit :=
+def m__eo_typeof_172 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp2522 __eo_x3 => σ.m_Apply kp2522 fun kp2526 __eo_x2 => σ.m_UOp1 kp2526 fun ko2530 __eo_x1 => kguard (ko2530 = UserOp1.update) (some (__eo_x1, __eo_x2, __eo_x3))
+
+def m__eo_typeof_173 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp.UnitTuple) (some ())
 
-def m__eo_typeof_173 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2530 __eo_x2 => σ.m_Apply kp2530 fun kp2534 __eo_x1 => σ.leaf kp2534 (.UOp UserOp.Tuple) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_174 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2548 __eo_x2 => σ.m_Apply kp2548 fun kp2552 __eo_x1 => σ.leaf kp2552 (.UOp UserOp.Tuple) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_174 (σ : Store) (arg1 : Id) : Option Unit :=
+def m__eo_typeof_175 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp.tuple_unit) (some ())
 
-def m__eo_typeof_175 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2548 __eo_x2 => σ.m_Apply kp2548 fun kp2552 __eo_x1 => σ.leaf kp2552 (.UOp UserOp.tuple) (some (__eo_x1, __eo_x2))
-
 def m__eo_typeof_176 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2566 __eo_x2 => σ.m_UOp1 kp2566 fun ko2570 __eo_x1 => kguard (ko2570 = UserOp1.tuple_select) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2566 __eo_x2 => σ.m_Apply kp2566 fun kp2570 __eo_x1 => σ.leaf kp2570 (.UOp UserOp.tuple) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_177 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp2583 __eo_x3 => σ.m_Apply kp2583 fun kp2587 __eo_x2 => σ.m_UOp1 kp2587 fun ko2591 __eo_x1 => kguard (ko2591 = UserOp1.tuple_update) (some (__eo_x1, __eo_x2, __eo_x3))
+def m__eo_typeof_177 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2584 __eo_x2 => σ.m_UOp1 kp2584 fun ko2588 __eo_x1 => kguard (ko2588 = UserOp1.tuple_select) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_178 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2609 __eo_x1 => σ.leaf kp2609 (.UOp UserOp.Set) (some __eo_x1)
+def m__eo_typeof_178 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp2601 __eo_x3 => σ.m_Apply kp2601 fun kp2605 __eo_x2 => σ.m_UOp1 kp2605 fun ko2609 __eo_x1 => kguard (ko2609 = UserOp1.tuple_update) (some (__eo_x1, __eo_x2, __eo_x3))
 
 def m__eo_typeof_179 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_UOp1 arg1 fun ko2618 __eo_x1 => kguard (ko2618 = UserOp1.set_empty) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2627 __eo_x1 => σ.leaf kp2627 (.UOp UserOp.Set) (some __eo_x1)
 
 def m__eo_typeof_180 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2626 __eo_x1 => σ.leaf kp2626 (.UOp UserOp.set_singleton) (some __eo_x1)
+  σ.m_UOp1 arg1 fun ko2636 __eo_x1 => kguard (ko2636 = UserOp1.set_empty) (some __eo_x1)
 
-def m__eo_typeof_181 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2635 __eo_x2 => σ.m_Apply kp2635 fun kp2639 __eo_x1 => σ.leaf kp2639 (.UOp UserOp.set_union) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_181 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2644 __eo_x1 => σ.leaf kp2644 (.UOp UserOp.set_singleton) (some __eo_x1)
 
 def m__eo_typeof_182 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2653 __eo_x2 => σ.m_Apply kp2653 fun kp2657 __eo_x1 => σ.leaf kp2657 (.UOp UserOp.set_inter) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2653 __eo_x2 => σ.m_Apply kp2653 fun kp2657 __eo_x1 => σ.leaf kp2657 (.UOp UserOp.set_union) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_183 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2671 __eo_x2 => σ.m_Apply kp2671 fun kp2675 __eo_x1 => σ.leaf kp2675 (.UOp UserOp.set_minus) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2671 __eo_x2 => σ.m_Apply kp2671 fun kp2675 __eo_x1 => σ.leaf kp2675 (.UOp UserOp.set_inter) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_184 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2689 __eo_x2 => σ.m_Apply kp2689 fun kp2693 __eo_x1 => σ.leaf kp2693 (.UOp UserOp.set_member) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2689 __eo_x2 => σ.m_Apply kp2689 fun kp2693 __eo_x1 => σ.leaf kp2693 (.UOp UserOp.set_minus) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_185 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2707 __eo_x2 => σ.m_Apply kp2707 fun kp2711 __eo_x1 => σ.leaf kp2711 (.UOp UserOp.set_subset) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2707 __eo_x2 => σ.m_Apply kp2707 fun kp2711 __eo_x1 => σ.leaf kp2711 (.UOp UserOp.set_member) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_186 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2725 __eo_x1 => σ.leaf kp2725 (.UOp UserOp.set_choose) (some __eo_x1)
+def m__eo_typeof_186 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2725 __eo_x2 => σ.m_Apply kp2725 fun kp2729 __eo_x1 => σ.leaf kp2729 (.UOp UserOp.set_subset) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_187 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2734 __eo_x1 => σ.leaf kp2734 (.UOp UserOp.set_is_empty) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2743 __eo_x1 => σ.leaf kp2743 (.UOp UserOp.set_choose) (some __eo_x1)
 
 def m__eo_typeof_188 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2743 __eo_x1 => σ.leaf kp2743 (.UOp UserOp.set_is_singleton) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2752 __eo_x1 => σ.leaf kp2752 (.UOp UserOp.set_is_empty) (some __eo_x1)
 
-def m__eo_typeof_189 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2752 __eo_x2 => σ.m_Apply kp2752 fun kp2756 __eo_x1 => σ.leaf kp2756 (.UOp UserOp.set_insert) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_189 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2761 __eo_x1 => σ.leaf kp2761 (.UOp UserOp.set_is_singleton) (some __eo_x1)
 
 def m__eo_typeof_190 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2770 __eo_x2 => σ.m_Apply kp2770 fun kp2774 __eo_x1 => σ.leaf kp2774 (.UOp UserOp._at_sets_deq_diff) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2770 __eo_x2 => σ.m_Apply kp2770 fun kp2774 __eo_x1 => σ.leaf kp2774 (.UOp UserOp.set_insert) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_191 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2788 __eo_x2 => σ.m_Apply kp2788 fun kp2792 __eo_x1 => σ.leaf kp2792 (.UOp UserOp.qdiv) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2788 __eo_x2 => σ.m_Apply kp2788 fun kp2792 __eo_x1 => σ.leaf kp2792 (.UOp UserOp._at_sets_deq_diff) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_192 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2806 __eo_x2 => σ.m_Apply kp2806 fun kp2810 __eo_x1 => σ.leaf kp2810 (.UOp UserOp.qdiv_total) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2806 __eo_x2 => σ.m_Apply kp2806 fun kp2810 __eo_x1 => σ.leaf kp2810 (.UOp UserOp.qdiv) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_193 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2824 __eo_x1 => σ.leaf kp2824 (.UOp UserOp._at_div_by_zero) (some __eo_x1)
+def m__eo_typeof_193 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2824 __eo_x2 => σ.m_Apply kp2824 fun kp2828 __eo_x1 => σ.leaf kp2828 (.UOp UserOp.qdiv_total) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_194 (σ : Store) (arg1 : Id) : Option Unit :=
+def m__eo_typeof_194 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2842 __eo_x1 => σ.leaf kp2842 (.UOp UserOp._at_div_by_zero) (some __eo_x1)
+
+def m__eo_typeof_195 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp._at__at_Monomial) (some ())
 
-def m__eo_typeof_195 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2833 __eo_x2 => σ.m_Apply kp2833 fun kp2837 __eo_x1 => σ.leaf kp2837 (.UOp UserOp._at__at_mon) (some (__eo_x1, __eo_x2))
-
-def m__eo_typeof_196 (σ : Store) (arg1 : Id) : Option Unit :=
-  σ.leaf arg1 (.UOp UserOp._at__at_Polynomial) (some ())
+def m__eo_typeof_196 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2851 __eo_x2 => σ.m_Apply kp2851 fun kp2855 __eo_x1 => σ.leaf kp2855 (.UOp UserOp._at__at_mon) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_197 (σ : Store) (arg1 : Id) : Option Unit :=
+  σ.leaf arg1 (.UOp UserOp._at__at_Polynomial) (some ())
+
+def m__eo_typeof_198 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp._at__at_poly_zero) (some ())
 
-def m__eo_typeof_198 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2851 __eo_x2 => σ.m_Apply kp2851 fun kp2855 __eo_x1 => σ.leaf kp2855 (.UOp UserOp._at__at_poly) (some (__eo_x1, __eo_x2))
-
 def m__eo_typeof_199 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2869 __eo_x2 => σ.m_Apply kp2869 fun kp2873 __eo_x1 => σ.leaf kp2873 (.UOp UserOp.forall) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2869 __eo_x2 => σ.m_Apply kp2869 fun kp2873 __eo_x1 => σ.leaf kp2873 (.UOp UserOp._at__at_poly) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_200 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2887 __eo_x2 => σ.m_Apply kp2887 fun kp2891 __eo_x1 => σ.leaf kp2891 (.UOp UserOp.exists) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2887 __eo_x2 => σ.m_Apply kp2887 fun kp2891 __eo_x1 => σ.leaf kp2891 (.UOp UserOp.forall) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_201 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_UOp2 arg1 fun ko2905 __eo_x1 __eo_x2 => kguard (ko2905 = UserOp2._at_quantifiers_skolemize) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2905 __eo_x2 => σ.m_Apply kp2905 fun kp2909 __eo_x1 => σ.leaf kp2909 (.UOp UserOp.exists) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_202 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2919 __eo_x2 => σ.m_UOp1 kp2919 fun ko2923 __eo_x1 => kguard (ko2923 = UserOp1.int_to_bv) (some (__eo_x1, __eo_x2))
+  σ.m_UOp2 arg1 fun ko2923 __eo_x1 __eo_x2 => kguard (ko2923 = UserOp2._at_quantifiers_skolemize) (some (__eo_x1, __eo_x2))
 
-def m__eo_typeof_203 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2936 __eo_x1 => σ.leaf kp2936 (.UOp UserOp.ubv_to_int) (some __eo_x1)
+def m__eo_typeof_203 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp2937 __eo_x2 => σ.m_UOp1 kp2937 fun ko2941 __eo_x1 => kguard (ko2941 = UserOp1.int_to_bv) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_204 (σ : Store) (arg1 : Id) : Option Id :=
-  σ.m_Apply arg1 fun kp2945 __eo_x1 => σ.leaf kp2945 (.UOp UserOp.sbv_to_int) (some __eo_x1)
+  σ.m_Apply arg1 fun kp2954 __eo_x1 => σ.leaf kp2954 (.UOp UserOp.ubv_to_int) (some __eo_x1)
 
-def m__eo_typeof_205 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp2954 __eo_x2 => σ.m_Apply kp2954 fun kp2958 __eo_x1 => σ.leaf kp2958 (.UOp UserOp._at__at_aci_sorted) (some (__eo_x1, __eo_x2))
+def m__eo_typeof_205 (σ : Store) (arg1 : Id) : Option Id :=
+  σ.m_Apply arg1 fun kp2963 __eo_x1 => σ.leaf kp2963 (.UOp UserOp.sbv_to_int) (some __eo_x1)
 
 def m__eo_typeof_206 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
-  σ.m_UOp2 arg1 fun ko2972 __eo_x1 __eo_x2 => kguard (ko2972 = UserOp2._at_const) (some (__eo_x1, __eo_x2))
+  σ.m_Apply arg1 fun kp2972 __eo_x2 => σ.m_Apply kp2972 fun kp2976 __eo_x1 => σ.leaf kp2976 (.UOp UserOp._at__at_aci_sorted) (some (__eo_x1, __eo_x2))
 
 def m__eo_typeof_207 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_UOp2 arg1 fun ko2990 __eo_x1 __eo_x2 => kguard (ko2990 = UserOp2._at_const) (some (__eo_x1, __eo_x2))
+
+def m__eo_typeof_208 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
   σ.m_Apply arg1 fun __eo_f __eo_x => some (__eo_f, __eo_x)
 
 def m__eo_dt_constructors_1 (σ : Store) (arg1 : Id) : Option Unit :=
@@ -3408,6 +3421,27 @@ def m__eo_prog_bv_poly_norm_1 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
 def m__eo_prog_bv_poly_norm_eq_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id × Id × Id × Id × Id × Id × Id × Id × Id × Id) :=
   σ.m_Apply arg1 fun kp0 kp1 => σ.m_Apply kp0 fun kp5 kp6 => σ.leaf kp5 (.UOp UserOp.eq) (σ.m_Apply kp6 fun kp11 xb2 => σ.m_Apply kp11 fun kp15 xb1 => σ.leaf kp15 (.UOp UserOp.eq) (σ.m_Apply kp1 fun kp22 yb2 => σ.m_Apply kp22 fun kp26 yb1 => σ.leaf kp26 (.UOp UserOp.eq) (σ.m_Apply arg2 fun kp32 kp33 => σ.m_Apply kp32 fun kp37 kp38 => σ.leaf kp37 (.UOp UserOp.eq) (σ.m_Apply kp38 fun kp43 kp44 => σ.m_Apply kp43 fun kp48 cx => σ.leaf kp48 (.UOp UserOp.bvmul) (σ.m_Apply kp44 fun kp54 one => σ.m_Apply kp54 fun kp58 kp59 => σ.leaf kp58 (.UOp UserOp.bvmul) (σ.m_Apply kp59 fun kp64 __eo_lv_xb2_2 => σ.m_Apply kp64 fun kp68 __eo_lv_xb1_2 => σ.leaf kp68 (.UOp UserOp.bvsub) (σ.m_Apply kp33 fun kp76 kp77 => σ.m_Apply kp76 fun kp81 cy => σ.leaf kp81 (.UOp UserOp.bvmul) (σ.m_Apply kp77 fun kp87 __eo_lv_one_2 => σ.m_Apply kp87 fun kp91 kp92 => σ.leaf kp91 (.UOp UserOp.bvmul) (σ.m_Apply kp92 fun kp97 __eo_lv_yb2_2 => σ.m_Apply kp97 fun kp101 __eo_lv_yb1_2 => σ.leaf kp101 (.UOp UserOp.bvsub) (some (xb1, xb2, yb1, yb2, cx, __eo_lv_xb1_2, __eo_lv_xb2_2, one, cy, __eo_lv_yb1_2, __eo_lv_yb2_2, __eo_lv_one_2)))))))))))
 
+def m__beta_reduce_type_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
+  Store.stuck arg1 (some ())
+
+def m__beta_reduce_type_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp0 U => σ.m_Apply kp0 fun kp1 T => σ.leaf kp1 .FunType (σ.m_Apply arg2 fun kp10 xs => σ.m_Apply kp10 fun kp14 x => σ.leaf kp14 .__eo_List_cons (some (T, U, x, xs)))
+
+def m__beta_reduce_type_3 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
+  σ.leaf arg2 .__eo_List_nil (some ())
+
+def m__beta_reduce_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
+  Store.stuck arg2 (some ())
+
+def m__beta_reduce_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id × Id) :=
+  σ.m_Apply arg1 fun kp0 a => σ.m_Apply kp0 fun kp4 t => σ.m_Apply kp4 fun kp8 kp9 => σ.leaf kp8 (.UOp UserOp.lambda) (σ.m_Apply kp9 fun kp14 xs => σ.m_Apply kp14 fun kp18 x => σ.leaf kp18 .__eo_List_cons (σ.leaf arg2 .__eo_List_nil (some (x, xs, t, a))))
+
+def m__beta_reduce_3 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp106 t => σ.m_Apply kp106 fun kp110 xs => σ.leaf kp110 (.UOp UserOp.lambda) (some (xs, t))
+
+def m__beta_reduce_4 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun f a => some (f, a)
+
 def m__str_is_empty_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
 
@@ -4769,6 +4803,9 @@ def m__eo_prog_alpha_equiv_2 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : 
 
 def m__eo_prog_alpha_equiv_3 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
   Store.stuck arg3 (some ())
+
+def m__eo_prog_beta_reduce_1 (σ : Store) (arg1 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp0 b => σ.m_Apply kp0 fun kp4 a => σ.leaf kp4 (.UOp UserOp.eq) (some (a, b))
 
 def m__eo_prog_quant_var_reordering_1 (σ : Store) (arg1 : Id) : Option (Id × Id × Id × Id) :=
   σ.m_Apply arg1 fun kp0 kp1 => σ.m_Apply kp0 fun kp5 kp6 => σ.leaf kp5 (.UOp UserOp.eq) (σ.m_Apply kp6 fun kp11 F => σ.m_Apply kp11 fun kp15 x => σ.leaf kp15 (.UOp UserOp.forall) (σ.m_Apply kp1 fun kp22 __eo_lv_F_2 => σ.m_Apply kp22 fun kp26 y => σ.leaf kp26 (.UOp UserOp.forall) (some (x, F, y, __eo_lv_F_2))))
@@ -10177,27 +10214,30 @@ def m__eo_is_closed_rec_4 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × I
   σ.m_Var arg1 fun s T => σ.m_Apply arg2 fun kp8 vs => σ.m_Apply kp8 fun kp12 x => σ.leaf kp12 .__eo_List_cons (some (s, T, x, vs))
 
 def m__eo_is_closed_rec_5 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp26 x => σ.m_Apply kp26 fun kp30 vs => σ.leaf kp30 (.UOp UserOp.forall) (some (vs, x))
+  σ.m_Apply arg1 fun kp26 x => σ.m_Apply kp26 fun kp30 vs => σ.leaf kp30 (.UOp UserOp.lambda) (some (vs, x))
 
 def m__eo_is_closed_rec_6 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg1 fun kp44 x => σ.m_Apply kp44 fun kp48 vs => σ.leaf kp48 (.UOp UserOp.exists) (some (vs, x))
+  σ.m_Apply arg1 fun kp44 x => σ.m_Apply kp44 fun kp48 vs => σ.leaf kp48 (.UOp UserOp.forall) (some (vs, x))
 
 def m__eo_is_closed_rec_7 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id) :=
+  σ.m_Apply arg1 fun kp62 x => σ.m_Apply kp62 fun kp66 vs => σ.leaf kp66 (.UOp UserOp.exists) (some (vs, x))
+
+def m__eo_is_closed_rec_8 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id) :=
   σ.m_Apply arg1 fun f x => some (f, x)
 
-def m__eo_is_closed_rec_8 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp1 × Id) :=
+def m__eo_is_closed_rec_9 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp1 × Id) :=
   σ.m_UOp1 arg1 fun u x => some (u, x)
 
-def m__eo_is_closed_rec_9 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp2 × Id × Id) :=
+def m__eo_is_closed_rec_10 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp2 × Id × Id) :=
   σ.m_UOp2 arg1 fun u x x2 => some (u, x, x2)
 
-def m__eo_is_closed_rec_10 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp3 × Id × Id × Id) :=
+def m__eo_is_closed_rec_11 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp3 × Id × Id × Id) :=
   σ.m_UOp3 arg1 fun u x x2 x3 => some (u, x, x2, x3)
 
 def m__eo_is_closed_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
 
-/-! ## Programs, by component of the call graph (148 recursive) -/
+/-! ## Programs, by component of the call graph (150 recursive) -/
 
 /-! ### 1 program: __eo_prepend_if -/
 
@@ -11987,6 +12027,31 @@ def k__eo_typeof_ite : Nat → Id → Id → Id → K Id
      do
       pure 0
 
+/-! ### 1 program: __get_lambda_type -/
+
+/-- Lifted: Logos computes it on decoded arguments. -/
+def k__get_lambda_type : Nat → Id → Id → K Id
+  | 0, _, _ => throw .fuel
+  | _ + 1, arg1, arg2 => withStore fun σ => internTerm (__get_lambda_type (σ.decode arg1) (σ.decode arg2))
+
+/-! ### 1 program: __eo_typeof_lambda -/
+
+def k__eo_typeof_lambda : Nat → Id → Id → Id → K Id
+  | 0, _, _, _ => throw .fuel
+  | kfuel + 1, arg1, arg2, arg3 => withStore fun σ =>
+    kcase (m__eo_typeof_lambda_1 σ arg1 arg2 arg3) (fun _ => do
+        pure 0)
+    <|
+    kcase (m__eo_typeof_lambda_2 σ arg1 arg2 arg3) (fun _ => do
+        pure 0)
+    <|
+    kcase (m__eo_typeof_lambda_3 σ arg1 arg2 arg3) (fun _ => do
+        k__get_lambda_type kfuel arg2 arg3)
+    <|
+    -- default
+     do
+      pure 0
+
 /-! ### 1 program: __eo_typeof_not -/
 
 def k__eo_typeof_not : Nat → Id → K Id
@@ -12769,7 +12834,7 @@ mutual
 
 def k__eo_typeof : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 178 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 180 [arg1] <| withStore fun σ =>
     kcase (m__eo_typeof_1 σ arg1) (fun b => do
         intern .Bool)
     <|
@@ -12803,8 +12868,8 @@ def k__eo_typeof : Nat → Id → K Id
         let kt25 ← (intern (.DatatypeType s dd))
         let kt29 ← (k__eo_typeof_dt_sel_return kfuel (__eo_dd_resolve s dd) i j)
         let kt33 ← (intern .FunType)
-        let kt37 ← (intern (.Apply kt33 kt25))
-        intern (.Apply kt37 kt29))
+        let kt37 ← (k__eo_mk_apply kfuel kt33 kt25)
+        k__eo_mk_apply kfuel kt37 kt29)
     <|
     kcase (m__eo_typeof_10 σ arg1) (fun i => do
         intern .Type)
@@ -12910,18 +12975,18 @@ def k__eo_typeof : Nat → Id → K Id
         let kt290 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_eq kfuel kt286 kt290)
     <|
-    kcase (m__eo_typeof_35 σ arg1) (fun __eo_x1 => do
-        let kt299 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_distinct kfuel kt299)
+    kcase (m__eo_typeof_35 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt304 ← (k__eo_typeof kfuel __eo_x1)
+        let kt308 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_lambda kfuel kt304 __eo_x1 kt308)
     <|
     kcase (m__eo_typeof_36 σ arg1) (fun __eo_x1 => do
-        let kt308 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof__at_purify kfuel kt308)
+        let kt317 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_distinct kfuel kt317)
     <|
-    kcase (m__eo_typeof_37 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt322 ← (k__eo_typeof kfuel __eo_x1)
-        let kt326 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_plus kfuel kt322 kt326)
+    kcase (m__eo_typeof_37 σ arg1) (fun __eo_x1 => do
+        let kt326 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof__at_purify kfuel kt326)
     <|
     kcase (m__eo_typeof_38 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt340 ← (k__eo_typeof kfuel __eo_x1)
@@ -12936,7 +13001,7 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_40 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt376 ← (k__eo_typeof kfuel __eo_x1)
         let kt380 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_lt kfuel kt376 kt380)
+        k__eo_typeof_plus kfuel kt376 kt380)
     <|
     kcase (m__eo_typeof_41 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt394 ← (k__eo_typeof kfuel __eo_x1)
@@ -12953,30 +13018,30 @@ def k__eo_typeof : Nat → Id → K Id
         let kt434 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_lt kfuel kt430 kt434)
     <|
-    kcase (m__eo_typeof_44 σ arg1) (fun __eo_x1 => do
-        let kt443 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_to_real kfuel kt443)
+    kcase (m__eo_typeof_44 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt448 ← (k__eo_typeof kfuel __eo_x1)
+        let kt452 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_lt kfuel kt448 kt452)
     <|
     kcase (m__eo_typeof_45 σ arg1) (fun __eo_x1 => do
-        let kt452 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_to_int kfuel kt452)
+        let kt461 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_to_real kfuel kt461)
     <|
     kcase (m__eo_typeof_46 σ arg1) (fun __eo_x1 => do
-        let kt461 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_is_int kfuel kt461)
+        let kt470 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_to_int kfuel kt470)
     <|
     kcase (m__eo_typeof_47 σ arg1) (fun __eo_x1 => do
-        let kt470 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_abs kfuel kt470)
+        let kt479 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_is_int kfuel kt479)
     <|
     kcase (m__eo_typeof_48 σ arg1) (fun __eo_x1 => do
-        let kt479 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_abs kfuel kt479)
+        let kt488 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_abs kfuel kt488)
     <|
-    kcase (m__eo_typeof_49 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt493 ← (k__eo_typeof kfuel __eo_x1)
-        let kt497 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_div kfuel kt493 kt497)
+    kcase (m__eo_typeof_49 σ arg1) (fun __eo_x1 => do
+        let kt497 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_abs kfuel kt497)
     <|
     kcase (m__eo_typeof_50 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt511 ← (k__eo_typeof kfuel __eo_x1)
@@ -12986,87 +13051,87 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_51 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt529 ← (k__eo_typeof kfuel __eo_x1)
         let kt533 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_divisible kfuel kt529 kt533)
+        k__eo_typeof_div kfuel kt529 kt533)
     <|
-    kcase (m__eo_typeof_52 σ arg1) (fun __eo_x1 => do
-        let kt542 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_int_pow2 kfuel kt542)
+    kcase (m__eo_typeof_52 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt547 ← (k__eo_typeof kfuel __eo_x1)
+        let kt551 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_divisible kfuel kt547 kt551)
     <|
     kcase (m__eo_typeof_53 σ arg1) (fun __eo_x1 => do
-        let kt551 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_int_pow2 kfuel kt551)
+        let kt560 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_int_pow2 kfuel kt560)
     <|
     kcase (m__eo_typeof_54 σ arg1) (fun __eo_x1 => do
-        let kt560 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_int_ispow2 kfuel kt560)
+        let kt569 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_int_pow2 kfuel kt569)
     <|
-    kcase (m__eo_typeof_55 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt574 ← (k__eo_typeof kfuel __eo_x1)
-        let kt578 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_div kfuel kt574 kt578)
+    kcase (m__eo_typeof_55 σ arg1) (fun __eo_x1 => do
+        let kt578 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_int_ispow2 kfuel kt578)
     <|
     kcase (m__eo_typeof_56 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt592 ← (k__eo_typeof kfuel __eo_x1)
         let kt596 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_div kfuel kt592 kt596)
     <|
-    kcase (m__eo_typeof_57 σ arg1) (fun __eo_x1 => do
-        let kt605 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_int_pow2 kfuel kt605)
+    kcase (m__eo_typeof_57 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt610 ← (k__eo_typeof kfuel __eo_x1)
+        let kt614 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_div kfuel kt610 kt614)
     <|
     kcase (m__eo_typeof_58 σ arg1) (fun __eo_x1 => do
-        let kt614 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_int_pow2 kfuel kt614)
+        let kt623 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_int_pow2 kfuel kt623)
     <|
-    kcase (m__eo_typeof_59 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt628 ← (k__eo_typeof kfuel __eo_x1)
-        let kt632 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at__at_Pair kfuel kt628 kt632)
+    kcase (m__eo_typeof_59 σ arg1) (fun __eo_x1 => do
+        let kt632 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_int_pow2 kfuel kt632)
     <|
     kcase (m__eo_typeof_60 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt646 ← (k__eo_typeof kfuel __eo_x1)
         let kt650 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_select kfuel kt646 kt650)
+        k__eo_typeof__at__at_Pair kfuel kt646 kt650)
     <|
-    kcase (m__eo_typeof_61 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt669 ← (k__eo_typeof kfuel __eo_x1)
-        let kt673 ← (k__eo_typeof kfuel __eo_x2)
-        let kt677 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_store kfuel kt669 kt673 kt677)
+    kcase (m__eo_typeof_61 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt664 ← (k__eo_typeof kfuel __eo_x1)
+        let kt668 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_select kfuel kt664 kt668)
     <|
-    kcase (m__eo_typeof_62 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt691 ← (k__eo_typeof kfuel __eo_x1)
-        let kt695 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_array_deq_diff kfuel kt691 kt695)
+    kcase (m__eo_typeof_62 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt687 ← (k__eo_typeof kfuel __eo_x1)
+        let kt691 ← (k__eo_typeof kfuel __eo_x2)
+        let kt695 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_store kfuel kt687 kt691 kt695)
     <|
-    kcase (m__eo_typeof_63 σ arg1) (fun __eo_x1 => do
-        let kt704 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof__at_bvsize kfuel kt704)
+    kcase (m__eo_typeof_63 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt709 ← (k__eo_typeof kfuel __eo_x1)
+        let kt713 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at_array_deq_diff kfuel kt709 kt713)
     <|
-    kcase (m__eo_typeof_64 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt718 ← (k__eo_typeof kfuel __eo_x1)
-        let kt722 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_concat kfuel kt718 kt722)
+    kcase (m__eo_typeof_64 σ arg1) (fun __eo_x1 => do
+        let kt722 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof__at_bvsize kfuel kt722)
     <|
-    kcase (m__eo_typeof_65 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt737 ← (k__eo_typeof kfuel __eo_x1)
-        let kt741 ← (k__eo_typeof kfuel __eo_x2)
-        let kt745 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_extract kfuel kt737 __eo_x1 kt741 __eo_x2 kt745)
+    kcase (m__eo_typeof_65 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt736 ← (k__eo_typeof kfuel __eo_x1)
+        let kt740 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_concat kfuel kt736 kt740)
     <|
-    kcase (m__eo_typeof_66 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt758 ← (k__eo_typeof kfuel __eo_x1)
-        let kt762 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_repeat kfuel kt758 __eo_x1 kt762)
+    kcase (m__eo_typeof_66 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt755 ← (k__eo_typeof kfuel __eo_x1)
+        let kt759 ← (k__eo_typeof kfuel __eo_x2)
+        let kt763 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_extract kfuel kt755 __eo_x1 kt759 __eo_x2 kt763)
     <|
-    kcase (m__eo_typeof_67 σ arg1) (fun __eo_x1 => do
-        let kt771 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_bvnot kfuel kt771)
+    kcase (m__eo_typeof_67 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt776 ← (k__eo_typeof kfuel __eo_x1)
+        let kt780 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_repeat kfuel kt776 __eo_x1 kt780)
     <|
-    kcase (m__eo_typeof_68 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt785 ← (k__eo_typeof kfuel __eo_x1)
-        let kt789 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvand kfuel kt785 kt789)
+    kcase (m__eo_typeof_68 σ arg1) (fun __eo_x1 => do
+        let kt789 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_bvnot kfuel kt789)
     <|
     kcase (m__eo_typeof_69 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt803 ← (k__eo_typeof kfuel __eo_x1)
@@ -13096,16 +13161,16 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_74 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt893 ← (k__eo_typeof kfuel __eo_x1)
         let kt897 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvcomp kfuel kt893 kt897)
+        k__eo_typeof_bvand kfuel kt893 kt897)
     <|
-    kcase (m__eo_typeof_75 σ arg1) (fun __eo_x1 => do
-        let kt906 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_bvnot kfuel kt906)
+    kcase (m__eo_typeof_75 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt911 ← (k__eo_typeof kfuel __eo_x1)
+        let kt915 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_bvcomp kfuel kt911 kt915)
     <|
-    kcase (m__eo_typeof_76 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt920 ← (k__eo_typeof kfuel __eo_x1)
-        let kt924 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvand kfuel kt920 kt924)
+    kcase (m__eo_typeof_76 σ arg1) (fun __eo_x1 => do
+        let kt924 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_bvnot kfuel kt924)
     <|
     kcase (m__eo_typeof_77 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt938 ← (k__eo_typeof kfuel __eo_x1)
@@ -13145,7 +13210,7 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_84 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1064 ← (k__eo_typeof kfuel __eo_x1)
         let kt1068 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvult kfuel kt1064 kt1068)
+        k__eo_typeof_bvand kfuel kt1064 kt1068)
     <|
     kcase (m__eo_typeof_85 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1082 ← (k__eo_typeof kfuel __eo_x1)
@@ -13185,7 +13250,7 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_92 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1208 ← (k__eo_typeof kfuel __eo_x1)
         let kt1212 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvand kfuel kt1208 kt1212)
+        k__eo_typeof_bvult kfuel kt1208 kt1212)
     <|
     kcase (m__eo_typeof_93 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1226 ← (k__eo_typeof kfuel __eo_x1)
@@ -13198,44 +13263,44 @@ def k__eo_typeof : Nat → Id → K Id
         k__eo_typeof_bvand kfuel kt1244 kt1248)
     <|
     kcase (m__eo_typeof_95 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1261 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1265 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_zero_extend kfuel kt1261 __eo_x1 kt1265)
+        let kt1262 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1266 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_bvand kfuel kt1262 kt1266)
     <|
     kcase (m__eo_typeof_96 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1278 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1282 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_zero_extend kfuel kt1278 __eo_x1 kt1282)
+        let kt1279 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1283 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_zero_extend kfuel kt1279 __eo_x1 kt1283)
     <|
     kcase (m__eo_typeof_97 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1295 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1299 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_rotate_left kfuel kt1295 __eo_x1 kt1299)
+        let kt1296 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1300 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_zero_extend kfuel kt1296 __eo_x1 kt1300)
     <|
     kcase (m__eo_typeof_98 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1312 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1316 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_rotate_left kfuel kt1312 __eo_x1 kt1316)
+        let kt1313 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1317 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_rotate_left kfuel kt1313 __eo_x1 kt1317)
     <|
-    kcase (m__eo_typeof_99 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1335 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1339 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1343 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_bvite kfuel kt1335 kt1339 kt1343)
+    kcase (m__eo_typeof_99 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1330 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1334 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_rotate_left kfuel kt1330 __eo_x1 kt1334)
     <|
-    kcase (m__eo_typeof_100 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1357 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1361 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvult kfuel kt1357 kt1361)
+    kcase (m__eo_typeof_100 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt1353 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1357 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1361 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_bvite kfuel kt1353 kt1357 kt1361)
     <|
-    kcase (m__eo_typeof_101 σ arg1) (fun __eo_x1 => do
-        let kt1370 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_bvnego kfuel kt1370)
+    kcase (m__eo_typeof_101 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1375 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1379 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_bvult kfuel kt1375 kt1379)
     <|
-    kcase (m__eo_typeof_102 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1384 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1388 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvult kfuel kt1384 kt1388)
+    kcase (m__eo_typeof_102 σ arg1) (fun __eo_x1 => do
+        let kt1388 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_bvnego kfuel kt1388)
     <|
     kcase (m__eo_typeof_103 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1402 ← (k__eo_typeof kfuel __eo_x1)
@@ -13265,159 +13330,161 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_108 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1492 ← (k__eo_typeof kfuel __eo_x1)
         let kt1496 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_bvcomp kfuel kt1492 kt1496)
+        k__eo_typeof_bvult kfuel kt1492 kt1496)
     <|
     kcase (m__eo_typeof_109 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1510 ← (k__eo_typeof kfuel __eo_x1)
         let kt1514 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_bvcomp kfuel kt1510 kt1514)
     <|
-    kcase (m__eo_typeof_110 σ arg1) (fun __eo_x1 => do
-        let kt1523 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_bvredand kfuel kt1523)
+    kcase (m__eo_typeof_110 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1528 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1532 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_bvcomp kfuel kt1528 kt1532)
     <|
     kcase (m__eo_typeof_111 σ arg1) (fun __eo_x1 => do
-        let kt1532 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_bvredand kfuel kt1532)
+        let kt1541 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_bvredand kfuel kt1541)
     <|
-    kcase (m__eo_typeof_112 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1545 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1549 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_bit kfuel kt1545 kt1549)
+    kcase (m__eo_typeof_112 σ arg1) (fun __eo_x1 => do
+        let kt1550 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_bvredand kfuel kt1550)
     <|
     kcase (m__eo_typeof_113 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1563 ← (k__eo_typeof kfuel __eo_x1)
         let kt1567 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_from_bools kfuel kt1563 kt1567)
+        k__eo_typeof__at_bit kfuel kt1563 kt1567)
     <|
-    kcase (m__eo_typeof_114 σ arg1) (fun _ => do
+    kcase (m__eo_typeof_114 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1581 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1585 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at_from_bools kfuel kt1581 kt1585)
+    <|
+    kcase (m__eo_typeof_115 σ arg1) (fun _ => do
         intern .Type)
     <|
-    kcase (m__eo_typeof_115 σ arg1) (fun __eo_x1 => do
-        let kt1575 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_seq_empty kfuel kt1575 __eo_x1)
-    <|
     kcase (m__eo_typeof_116 σ arg1) (fun __eo_x1 => do
-        let kt1584 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_len kfuel kt1584)
+        let kt1593 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_seq_empty kfuel kt1593 __eo_x1)
     <|
-    kcase (m__eo_typeof_117 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1598 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1602 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_str_concat kfuel kt1598 kt1602)
+    kcase (m__eo_typeof_117 σ arg1) (fun __eo_x1 => do
+        let kt1602 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_len kfuel kt1602)
     <|
-    kcase (m__eo_typeof_118 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1621 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1625 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1629 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_substr kfuel kt1621 kt1625 kt1629)
+    kcase (m__eo_typeof_118 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1616 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1620 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_str_concat kfuel kt1616 kt1620)
     <|
-    kcase (m__eo_typeof_119 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1643 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1647 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_str_contains kfuel kt1643 kt1647)
+    kcase (m__eo_typeof_119 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt1639 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1643 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1647 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_substr kfuel kt1639 kt1643 kt1647)
     <|
-    kcase (m__eo_typeof_120 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1666 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1670 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1674 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_replace kfuel kt1666 kt1670 kt1674)
+    kcase (m__eo_typeof_120 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1661 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1665 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_str_contains kfuel kt1661 kt1665)
     <|
     kcase (m__eo_typeof_121 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1693 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1697 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1701 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_indexof kfuel kt1693 kt1697 kt1701)
+        let kt1684 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1688 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1692 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_replace kfuel kt1684 kt1688 kt1692)
     <|
-    kcase (m__eo_typeof_122 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1715 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1719 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_str_at kfuel kt1715 kt1719)
+    kcase (m__eo_typeof_122 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt1711 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1715 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1719 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_indexof kfuel kt1711 kt1715 kt1719)
     <|
     kcase (m__eo_typeof_123 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1733 ← (k__eo_typeof kfuel __eo_x1)
         let kt1737 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_str_contains kfuel kt1733 kt1737)
+        k__eo_typeof_str_at kfuel kt1733 kt1737)
     <|
     kcase (m__eo_typeof_124 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1751 ← (k__eo_typeof kfuel __eo_x1)
         let kt1755 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_str_contains kfuel kt1751 kt1755)
     <|
-    kcase (m__eo_typeof_125 σ arg1) (fun __eo_x1 => do
-        let kt1764 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_rev kfuel kt1764)
+    kcase (m__eo_typeof_125 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1769 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1773 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_str_contains kfuel kt1769 kt1773)
     <|
-    kcase (m__eo_typeof_126 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1783 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1787 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1791 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_update kfuel kt1783 kt1787 kt1791)
+    kcase (m__eo_typeof_126 σ arg1) (fun __eo_x1 => do
+        let kt1782 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_rev kfuel kt1782)
     <|
-    kcase (m__eo_typeof_127 σ arg1) (fun __eo_x1 => do
-        let kt1800 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_to_lower kfuel kt1800)
+    kcase (m__eo_typeof_127 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt1801 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1805 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1809 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_update kfuel kt1801 kt1805 kt1809)
     <|
     kcase (m__eo_typeof_128 σ arg1) (fun __eo_x1 => do
-        let kt1809 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_to_lower kfuel kt1809)
+        let kt1818 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_to_lower kfuel kt1818)
     <|
     kcase (m__eo_typeof_129 σ arg1) (fun __eo_x1 => do
-        let kt1818 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_to_code kfuel kt1818)
+        let kt1827 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_to_lower kfuel kt1827)
     <|
     kcase (m__eo_typeof_130 σ arg1) (fun __eo_x1 => do
-        let kt1827 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_from_code kfuel kt1827)
+        let kt1836 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_to_code kfuel kt1836)
     <|
     kcase (m__eo_typeof_131 σ arg1) (fun __eo_x1 => do
-        let kt1836 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_is_digit kfuel kt1836)
+        let kt1845 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_from_code kfuel kt1845)
     <|
     kcase (m__eo_typeof_132 σ arg1) (fun __eo_x1 => do
-        let kt1845 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_to_code kfuel kt1845)
+        let kt1854 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_is_digit kfuel kt1854)
     <|
     kcase (m__eo_typeof_133 σ arg1) (fun __eo_x1 => do
-        let kt1854 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_from_code kfuel kt1854)
+        let kt1863 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_to_code kfuel kt1863)
     <|
-    kcase (m__eo_typeof_134 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt1868 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1872 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_str_lt kfuel kt1868 kt1872)
+    kcase (m__eo_typeof_134 σ arg1) (fun __eo_x1 => do
+        let kt1872 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_from_code kfuel kt1872)
     <|
     kcase (m__eo_typeof_135 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt1886 ← (k__eo_typeof kfuel __eo_x1)
         let kt1890 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_str_lt kfuel kt1886 kt1890)
     <|
-    kcase (m__eo_typeof_136 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1909 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1913 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1917 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_replace kfuel kt1909 kt1913 kt1917)
+    kcase (m__eo_typeof_136 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt1904 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1908 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_str_lt kfuel kt1904 kt1908)
     <|
     kcase (m__eo_typeof_137 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1936 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1940 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1944 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_replace_re kfuel kt1936 kt1940 kt1944)
+        let kt1927 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1931 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1935 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_replace kfuel kt1927 kt1931 kt1935)
     <|
     kcase (m__eo_typeof_138 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1963 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1967 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1971 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_replace_re kfuel kt1963 kt1967 kt1971)
+        let kt1954 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1958 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1962 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_replace_re kfuel kt1954 kt1958 kt1962)
     <|
     kcase (m__eo_typeof_139 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt1990 ← (k__eo_typeof kfuel __eo_x1)
-        let kt1994 ← (k__eo_typeof kfuel __eo_x2)
-        let kt1998 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_indexof_re kfuel kt1990 kt1994 kt1998)
+        let kt1981 ← (k__eo_typeof kfuel __eo_x1)
+        let kt1985 ← (k__eo_typeof kfuel __eo_x2)
+        let kt1989 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_replace_re kfuel kt1981 kt1985 kt1989)
     <|
-    kcase (m__eo_typeof_140 σ arg1) (fun _ => do
-        intern (.UOp UserOp.RegLan))
+    kcase (m__eo_typeof_140 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2008 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2012 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2016 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_indexof_re kfuel kt2008 kt2012 kt2016)
     <|
     kcase (m__eo_typeof_141 σ arg1) (fun _ => do
         intern (.UOp UserOp.RegLan))
@@ -13425,40 +13492,38 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_142 σ arg1) (fun _ => do
         intern (.UOp UserOp.RegLan))
     <|
-    kcase (m__eo_typeof_143 σ arg1) (fun __eo_x1 => do
-        let kt2007 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_to_re kfuel kt2007)
+    kcase (m__eo_typeof_143 σ arg1) (fun _ => do
+        intern (.UOp UserOp.RegLan))
     <|
     kcase (m__eo_typeof_144 σ arg1) (fun __eo_x1 => do
-        let kt2016 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_re_mult kfuel kt2016)
+        let kt2025 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_to_re kfuel kt2025)
     <|
     kcase (m__eo_typeof_145 σ arg1) (fun __eo_x1 => do
-        let kt2025 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_re_mult kfuel kt2025)
+        let kt2034 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_re_mult kfuel kt2034)
     <|
-    kcase (m__eo_typeof_146 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2038 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2042 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_re_exp kfuel kt2038 __eo_x1 kt2042)
+    kcase (m__eo_typeof_146 σ arg1) (fun __eo_x1 => do
+        let kt2043 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_re_mult kfuel kt2043)
     <|
-    kcase (m__eo_typeof_147 σ arg1) (fun __eo_x1 => do
-        let kt2051 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_re_mult kfuel kt2051)
+    kcase (m__eo_typeof_147 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2056 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2060 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_re_exp kfuel kt2056 __eo_x1 kt2060)
     <|
     kcase (m__eo_typeof_148 σ arg1) (fun __eo_x1 => do
-        let kt2060 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_re_mult kfuel kt2060)
+        let kt2069 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_re_mult kfuel kt2069)
     <|
-    kcase (m__eo_typeof_149 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2074 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2078 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_re_range kfuel kt2074 kt2078)
+    kcase (m__eo_typeof_149 σ arg1) (fun __eo_x1 => do
+        let kt2078 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_re_mult kfuel kt2078)
     <|
     kcase (m__eo_typeof_150 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2092 ← (k__eo_typeof kfuel __eo_x1)
         let kt2096 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_re_concat kfuel kt2092 kt2096)
+        k__eo_typeof_re_range kfuel kt2092 kt2096)
     <|
     kcase (m__eo_typeof_151 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2110 ← (k__eo_typeof kfuel __eo_x1)
@@ -13475,147 +13540,147 @@ def k__eo_typeof : Nat → Id → K Id
         let kt2150 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_re_concat kfuel kt2146 kt2150)
     <|
-    kcase (m__eo_typeof_154 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2165 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2169 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2173 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_re_loop kfuel kt2165 __eo_x1 kt2169 __eo_x2 kt2173)
+    kcase (m__eo_typeof_154 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2164 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2168 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_re_concat kfuel kt2164 kt2168)
     <|
-    kcase (m__eo_typeof_155 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2187 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2191 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_str_in_re kfuel kt2187 kt2191)
+    kcase (m__eo_typeof_155 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2183 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2187 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2191 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_re_loop kfuel kt2183 __eo_x1 kt2187 __eo_x2 kt2191)
     <|
-    kcase (m__eo_typeof_156 σ arg1) (fun __eo_x1 => do
-        let kt2200 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_seq_unit kfuel kt2200)
+    kcase (m__eo_typeof_156 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2205 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2209 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_str_in_re kfuel kt2205 kt2209)
     <|
-    kcase (m__eo_typeof_157 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2214 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2218 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_seq_nth kfuel kt2214 kt2218)
+    kcase (m__eo_typeof_157 σ arg1) (fun __eo_x1 => do
+        let kt2218 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_seq_unit kfuel kt2218)
     <|
-    kcase (m__eo_typeof_158 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2230 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2234 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2238 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof__at_re_unfold_pos_component kfuel kt2230 kt2234 kt2238)
+    kcase (m__eo_typeof_158 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2232 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2236 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_seq_nth kfuel kt2232 kt2236)
     <|
-    kcase (m__eo_typeof_159 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2252 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2256 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_strings_deq_diff kfuel kt2252 kt2256)
+    kcase (m__eo_typeof_159 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2248 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2252 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2256 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof__at_re_unfold_pos_component kfuel kt2248 kt2252 kt2256)
     <|
     kcase (m__eo_typeof_160 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2270 ← (k__eo_typeof kfuel __eo_x1)
         let kt2274 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_strings_stoi_result kfuel kt2270 kt2274)
+        k__eo_typeof__at_strings_deq_diff kfuel kt2270 kt2274)
     <|
-    kcase (m__eo_typeof_161 σ arg1) (fun __eo_x1 => do
-        let kt2283 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_str_to_code kfuel kt2283)
+    kcase (m__eo_typeof_161 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2288 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2292 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at_strings_stoi_result kfuel kt2288 kt2292)
     <|
-    kcase (m__eo_typeof_162 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2297 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2301 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_div kfuel kt2297 kt2301)
+    kcase (m__eo_typeof_162 σ arg1) (fun __eo_x1 => do
+        let kt2301 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_str_to_code kfuel kt2301)
     <|
     kcase (m__eo_typeof_163 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2315 ← (k__eo_typeof kfuel __eo_x1)
         let kt2319 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_strings_deq_diff kfuel kt2315 kt2319)
+        k__eo_typeof_div kfuel kt2315 kt2319)
     <|
     kcase (m__eo_typeof_164 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2333 ← (k__eo_typeof kfuel __eo_x1)
         let kt2337 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_strings_num_occur_re kfuel kt2333 kt2337)
+        k__eo_typeof__at_strings_deq_diff kfuel kt2333 kt2337)
     <|
-    kcase (m__eo_typeof_165 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2356 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2360 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2364 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_indexof kfuel kt2356 kt2360 kt2364)
+    kcase (m__eo_typeof_165 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2351 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2355 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at_strings_num_occur_re kfuel kt2351 kt2355)
     <|
     kcase (m__eo_typeof_166 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2383 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2387 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2391 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_str_indexof_re kfuel kt2383 kt2387 kt2391)
+        let kt2374 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2378 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2382 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_indexof kfuel kt2374 kt2378 kt2382)
     <|
-    kcase (m__eo_typeof_167 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3, __eo_x4) => do
-        let kt2415 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2419 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2423 ← (k__eo_typeof kfuel __eo_x3)
-        let kt2427 ← (k__eo_typeof kfuel __eo_x4)
-        k__eo_typeof__at_strings_replace_all_result kfuel kt2415 kt2419 kt2423 kt2427)
+    kcase (m__eo_typeof_167 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2401 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2405 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2409 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_str_indexof_re kfuel kt2401 kt2405 kt2409)
     <|
     kcase (m__eo_typeof_168 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3, __eo_x4) => do
-        let kt2451 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2455 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2459 ← (k__eo_typeof kfuel __eo_x3)
-        let kt2463 ← (k__eo_typeof kfuel __eo_x4)
-        k__eo_typeof__at_strings_replace_re_all_result kfuel kt2451 kt2455 kt2459 kt2463)
+        let kt2433 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2437 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2441 ← (k__eo_typeof kfuel __eo_x3)
+        let kt2445 ← (k__eo_typeof kfuel __eo_x4)
+        k__eo_typeof__at_strings_replace_all_result kfuel kt2433 kt2437 kt2441 kt2445)
     <|
-    kcase (m__eo_typeof_169 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2475 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2479 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2483 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof__at_witness_string_length kfuel kt2475 __eo_x1 kt2479 kt2483)
+    kcase (m__eo_typeof_169 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3, __eo_x4) => do
+        let kt2469 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2473 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2477 ← (k__eo_typeof kfuel __eo_x3)
+        let kt2481 ← (k__eo_typeof kfuel __eo_x4)
+        k__eo_typeof__at_strings_replace_re_all_result kfuel kt2469 kt2473 kt2477 kt2481)
     <|
-    kcase (m__eo_typeof_170 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2496 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2500 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_is kfuel kt2496 kt2500)
+    kcase (m__eo_typeof_170 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2493 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2497 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2501 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof__at_witness_string_length kfuel kt2493 __eo_x1 kt2497 kt2501)
     <|
-    kcase (m__eo_typeof_171 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2518 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2522 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2526 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_update kfuel kt2518 kt2522 kt2526)
+    kcase (m__eo_typeof_171 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2514 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2518 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_is kfuel kt2514 kt2518)
     <|
-    kcase (m__eo_typeof_172 σ arg1) (fun _ => do
+    kcase (m__eo_typeof_172 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2536 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2540 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2544 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_update kfuel kt2536 kt2540 kt2544)
+    <|
+    kcase (m__eo_typeof_173 σ arg1) (fun _ => do
         intern .Type)
     <|
-    kcase (m__eo_typeof_173 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2540 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2544 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at__at_Pair kfuel kt2540 kt2544)
-    <|
-    kcase (m__eo_typeof_174 σ arg1) (fun _ => do
-        intern (.UOp UserOp.UnitTuple))
-    <|
-    kcase (m__eo_typeof_175 σ arg1) (fun (__eo_x1, __eo_x2) => do
+    kcase (m__eo_typeof_174 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2558 ← (k__eo_typeof kfuel __eo_x1)
         let kt2562 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_tuple kfuel kt2558 kt2562)
+        k__eo_typeof__at__at_Pair kfuel kt2558 kt2562)
+    <|
+    kcase (m__eo_typeof_175 σ arg1) (fun _ => do
+        intern (.UOp UserOp.UnitTuple))
     <|
     kcase (m__eo_typeof_176 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2575 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2579 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_tuple_select kfuel kt2575 __eo_x1 kt2579)
+        let kt2576 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2580 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_tuple kfuel kt2576 kt2580)
     <|
-    kcase (m__eo_typeof_177 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
-        let kt2597 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2601 ← (k__eo_typeof kfuel __eo_x2)
-        let kt2605 ← (k__eo_typeof kfuel __eo_x3)
-        k__eo_typeof_tuple_update kfuel kt2597 __eo_x1 kt2601 kt2605)
+    kcase (m__eo_typeof_177 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2593 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2597 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_tuple_select kfuel kt2593 __eo_x1 kt2597)
     <|
-    kcase (m__eo_typeof_178 σ arg1) (fun __eo_x1 => do
-        let kt2614 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_Seq kfuel kt2614)
+    kcase (m__eo_typeof_178 σ arg1) (fun (__eo_x1, __eo_x2, __eo_x3) => do
+        let kt2615 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2619 ← (k__eo_typeof kfuel __eo_x2)
+        let kt2623 ← (k__eo_typeof kfuel __eo_x3)
+        k__eo_typeof_tuple_update kfuel kt2615 __eo_x1 kt2619 kt2623)
     <|
     kcase (m__eo_typeof_179 σ arg1) (fun __eo_x1 => do
-        let kt2622 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_set_empty kfuel kt2622 __eo_x1)
+        let kt2632 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_Seq kfuel kt2632)
     <|
     kcase (m__eo_typeof_180 σ arg1) (fun __eo_x1 => do
-        let kt2631 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_set_singleton kfuel kt2631)
+        let kt2640 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_set_empty kfuel kt2640 __eo_x1)
     <|
-    kcase (m__eo_typeof_181 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2645 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2649 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_set_union kfuel kt2645 kt2649)
+    kcase (m__eo_typeof_181 σ arg1) (fun __eo_x1 => do
+        let kt2649 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_set_singleton kfuel kt2649)
     <|
     kcase (m__eo_typeof_182 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2663 ← (k__eo_typeof kfuel __eo_x1)
@@ -13630,72 +13695,72 @@ def k__eo_typeof : Nat → Id → K Id
     kcase (m__eo_typeof_184 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2699 ← (k__eo_typeof kfuel __eo_x1)
         let kt2703 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_set_member kfuel kt2699 kt2703)
+        k__eo_typeof_set_union kfuel kt2699 kt2703)
     <|
     kcase (m__eo_typeof_185 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2717 ← (k__eo_typeof kfuel __eo_x1)
         let kt2721 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_set_subset kfuel kt2717 kt2721)
+        k__eo_typeof_set_member kfuel kt2717 kt2721)
     <|
-    kcase (m__eo_typeof_186 σ arg1) (fun __eo_x1 => do
-        let kt2730 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_set_choose kfuel kt2730)
+    kcase (m__eo_typeof_186 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2735 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2739 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_set_subset kfuel kt2735 kt2739)
     <|
     kcase (m__eo_typeof_187 σ arg1) (fun __eo_x1 => do
-        let kt2739 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_set_is_empty kfuel kt2739)
+        let kt2748 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_set_choose kfuel kt2748)
     <|
     kcase (m__eo_typeof_188 σ arg1) (fun __eo_x1 => do
-        let kt2748 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof_set_is_empty kfuel kt2748)
+        let kt2757 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_set_is_empty kfuel kt2757)
     <|
-    kcase (m__eo_typeof_189 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2762 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2766 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_set_insert kfuel kt2762 kt2766)
+    kcase (m__eo_typeof_189 σ arg1) (fun __eo_x1 => do
+        let kt2766 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof_set_is_empty kfuel kt2766)
     <|
     kcase (m__eo_typeof_190 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2780 ← (k__eo_typeof kfuel __eo_x1)
         let kt2784 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_sets_deq_diff kfuel kt2780 kt2784)
+        k__eo_typeof_set_insert kfuel kt2780 kt2784)
     <|
     kcase (m__eo_typeof_191 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2798 ← (k__eo_typeof kfuel __eo_x1)
         let kt2802 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_qdiv kfuel kt2798 kt2802)
+        k__eo_typeof__at_sets_deq_diff kfuel kt2798 kt2802)
     <|
     kcase (m__eo_typeof_192 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2816 ← (k__eo_typeof kfuel __eo_x1)
         let kt2820 ← (k__eo_typeof kfuel __eo_x2)
         k__eo_typeof_qdiv kfuel kt2816 kt2820)
     <|
-    kcase (m__eo_typeof_193 σ arg1) (fun __eo_x1 => do
-        let kt2829 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof__at_div_by_zero kfuel kt2829)
+    kcase (m__eo_typeof_193 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2834 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2838 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_qdiv kfuel kt2834 kt2838)
     <|
-    kcase (m__eo_typeof_194 σ arg1) (fun _ => do
+    kcase (m__eo_typeof_194 σ arg1) (fun __eo_x1 => do
+        let kt2847 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof__at_div_by_zero kfuel kt2847)
+    <|
+    kcase (m__eo_typeof_195 σ arg1) (fun _ => do
         intern .Type)
     <|
-    kcase (m__eo_typeof_195 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2843 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2847 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at__at_mon kfuel kt2843 kt2847)
-    <|
-    kcase (m__eo_typeof_196 σ arg1) (fun _ => do
-        intern .Type)
-    <|
-    kcase (m__eo_typeof_197 σ arg1) (fun _ => do
-        intern (.UOp UserOp._at__at_Polynomial))
-    <|
-    kcase (m__eo_typeof_198 σ arg1) (fun (__eo_x1, __eo_x2) => do
+    kcase (m__eo_typeof_196 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2861 ← (k__eo_typeof kfuel __eo_x1)
         let kt2865 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at__at_poly kfuel kt2861 kt2865)
+        k__eo_typeof__at__at_mon kfuel kt2861 kt2865)
+    <|
+    kcase (m__eo_typeof_197 σ arg1) (fun _ => do
+        intern .Type)
+    <|
+    kcase (m__eo_typeof_198 σ arg1) (fun _ => do
+        intern (.UOp UserOp._at__at_Polynomial))
     <|
     kcase (m__eo_typeof_199 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2879 ← (k__eo_typeof kfuel __eo_x1)
         let kt2883 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_forall kfuel kt2879 kt2883)
+        k__eo_typeof__at__at_poly kfuel kt2879 kt2883)
     <|
     kcase (m__eo_typeof_200 σ arg1) (fun (__eo_x1, __eo_x2) => do
         let kt2897 ← (k__eo_typeof kfuel __eo_x1)
@@ -13703,37 +13768,42 @@ def k__eo_typeof : Nat → Id → K Id
         k__eo_typeof_forall kfuel kt2897 kt2901)
     <|
     kcase (m__eo_typeof_201 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2911 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2915 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_quantifiers_skolemize kfuel kt2911 __eo_x1 kt2915 __eo_x2)
+        let kt2915 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2919 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_forall kfuel kt2915 kt2919)
     <|
     kcase (m__eo_typeof_202 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2928 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2932 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof_int_to_bv kfuel kt2928 __eo_x1 kt2932)
+        let kt2929 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2933 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at_quantifiers_skolemize kfuel kt2929 __eo_x1 kt2933 __eo_x2)
     <|
-    kcase (m__eo_typeof_203 σ arg1) (fun __eo_x1 => do
-        let kt2941 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof__at_bvsize kfuel kt2941)
+    kcase (m__eo_typeof_203 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2946 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2950 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof_int_to_bv kfuel kt2946 __eo_x1 kt2950)
     <|
     kcase (m__eo_typeof_204 σ arg1) (fun __eo_x1 => do
-        let kt2950 ← (k__eo_typeof kfuel __eo_x1)
-        k__eo_typeof__at_bvsize kfuel kt2950)
+        let kt2959 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof__at_bvsize kfuel kt2959)
     <|
-    kcase (m__eo_typeof_205 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2964 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2968 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at__at_aci_sorted kfuel kt2964 kt2968)
+    kcase (m__eo_typeof_205 σ arg1) (fun __eo_x1 => do
+        let kt2968 ← (k__eo_typeof kfuel __eo_x1)
+        k__eo_typeof__at_bvsize kfuel kt2968)
     <|
     kcase (m__eo_typeof_206 σ arg1) (fun (__eo_x1, __eo_x2) => do
-        let kt2978 ← (k__eo_typeof kfuel __eo_x1)
-        let kt2982 ← (k__eo_typeof kfuel __eo_x2)
-        k__eo_typeof__at_const kfuel kt2978 kt2982 __eo_x2)
+        let kt2982 ← (k__eo_typeof kfuel __eo_x1)
+        let kt2986 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at__at_aci_sorted kfuel kt2982 kt2986)
     <|
-    kcase (m__eo_typeof_207 σ arg1) (fun (__eo_f, __eo_x) => do
-        let kt2990 ← (k__eo_typeof kfuel __eo_f)
-        let kt2994 ← (k__eo_typeof kfuel __eo_x)
-        k__eo_typeof_apply kfuel kt2990 kt2994)
+    kcase (m__eo_typeof_207 σ arg1) (fun (__eo_x1, __eo_x2) => do
+        let kt2996 ← (k__eo_typeof kfuel __eo_x1)
+        let kt3000 ← (k__eo_typeof kfuel __eo_x2)
+        k__eo_typeof__at_const kfuel kt2996 kt3000 __eo_x2)
+    <|
+    kcase (m__eo_typeof_208 σ arg1) (fun (__eo_f, __eo_x) => do
+        let kt3008 ← (k__eo_typeof kfuel __eo_f)
+        let kt3012 ← (k__eo_typeof kfuel __eo_x)
+        k__eo_typeof_apply kfuel kt3008 kt3012)
     <|
     -- default
      do
@@ -20410,6 +20480,72 @@ def k__substitute_simul_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
   | _ + 1, arg1, arg2, arg3, arg4, arg5 => withStore fun σ => internTerm (__substitute_simul_rec (σ.decode arg1) (σ.decode arg2) (σ.decode arg3) (σ.decode arg4) (σ.decode arg5))
 
+/-! ### Recursive component 1 program: __beta_reduce_type -/
+
+mutual
+
+def k__beta_reduce_type : Nat → Id → Id → K Id
+  | 0, _, _ => throw .fuel
+  | kfuel + 1, arg1, arg2 => cached 90 [arg1, arg2] <| withStore fun σ =>
+    kcase (m__beta_reduce_type_1 σ arg1 arg2) (fun _ => do
+        pure 0)
+    <|
+    kcase (m__beta_reduce_type_2 σ arg1 arg2) (fun (T, U, x, xs) => do
+        k__beta_reduce_type kfuel U xs)
+    <|
+    kcase (m__beta_reduce_type_3 σ arg1 arg2) (fun _ => do
+        pure arg1)
+    <|
+    -- default
+     do
+      pure 0
+
+end
+
+/-! ### Recursive component 1 program: __beta_reduce -/
+
+mutual
+
+def k__beta_reduce : Nat → Id → Id → K Id
+  | 0, _, _ => throw .fuel
+  | kfuel + 1, arg1, arg2 => cached 91 [arg1, arg2] <| withStore fun σ =>
+    kcase (m__beta_reduce_1 σ arg1 arg2) (fun _ => do
+        pure 0)
+    <|
+    kcase (m__beta_reduce_2 σ arg1 arg2) (fun (x, xs, t, a) => do
+        let kt26 ← (intern .__eo_List_cons)
+        let kt30 ← (intern (.Apply kt26 x))
+        let kt34 ← (intern (.Apply kt30 xs))
+        let kt38 ← (k__eo_list_setof kfuel kt26 kt34)
+        let kt42 ← (k__eo_eq kfuel kt38 kt34)
+        let kt46 ← (intern (.Boolean true))
+        let kt50 ← (intern .__eo_List_nil)
+        let kt54 ← (k__eo_eq kfuel xs kt50)
+        let kt102 ← (k_ite kt54 (do let kt58 ← (intern (.Boolean false)); let kt62 ← (intern (.Apply kt30 kt50)); let kt66 ← (intern (.Apply kt26 a)); let kt70 ← (intern (.Apply kt66 kt50)); k__substitute_simul_rec kfuel kt58 t kt62 kt70 kt50) (do let kt74 ← (intern (.Boolean false)); let kt78 ← (intern (.UOp UserOp.lambda)); let kt82 ← (intern (.Apply kt78 xs)); let kt86 ← (intern (.Apply kt82 t)); let kt90 ← (intern (.Apply kt30 kt50)); let kt94 ← (intern (.Apply kt26 a)); let kt98 ← (intern (.Apply kt94 kt50)); k__substitute_simul_rec kfuel kt74 kt86 kt90 kt98 kt50))
+        k__eo_requires kfuel kt42 kt46 kt102)
+    <|
+    kcase (m__beta_reduce_3 σ arg1 arg2) (fun (xs, t) => do
+        let kt116 ← (intern .__eo_List_cons)
+        let kt120 ← (k__eo_list_setof kfuel kt116 xs)
+        let kt124 ← (k__eo_eq kfuel kt120 xs)
+        let kt128 ← (intern (.Boolean true))
+        let kt132 ← (intern (.Boolean false))
+        let kt136 ← (intern .__eo_List_nil)
+        let kt140 ← (k__substitute_simul_rec kfuel kt132 t xs arg2 kt136)
+        k__eo_requires kfuel kt124 kt128 kt140)
+    <|
+    kcase (m__beta_reduce_4 σ arg1 arg2) (fun (f, a) => do
+        let kt148 ← (intern .__eo_List_cons)
+        let kt152 ← (intern (.Apply kt148 a))
+        let kt156 ← (intern (.Apply kt152 arg2))
+        k__beta_reduce kfuel f kt156)
+    <|
+    -- default
+     do
+      pure 0
+
+end
+
 /-! ### 1 program: __str_is_empty -/
 
 def k__str_is_empty : Nat → Id → K Id
@@ -20446,7 +20582,7 @@ mutual
 
 def k__is_seq_const_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 90 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 92 [arg1] <| withStore fun σ =>
     kcase (m__is_seq_const_rec_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -20499,7 +20635,7 @@ mutual
 
 def k__str_fixed_len_re : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 91 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 93 [arg1] <| withStore fun σ =>
     kcase (m__str_fixed_len_re_1 σ arg1) (fun (r, r1) => do
         let kt10 ← (k__str_fixed_len_re kfuel r)
         let kt14 ← (k__str_fixed_len_re kfuel r1)
@@ -20560,7 +20696,7 @@ mutual
 
 def k__re_nullable : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 92 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 94 [arg1] <| withStore fun σ =>
     kcase (m__re_nullable_1 σ arg1) (fun _ => do
         intern (.Boolean true))
     <|
@@ -20776,7 +20912,7 @@ mutual
 
 def k__derivative : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 93 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 95 [arg1, arg2] <| withStore fun σ =>
     kcase (m__derivative_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -20850,7 +20986,7 @@ mutual
 
 def k__str_eval_str_in_re_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 94 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 96 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_eval_str_in_re_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -20879,7 +21015,7 @@ mutual
 
 def k__str_first_match_rec_smallest : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 95 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 97 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_first_match_rec_smallest_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -20907,7 +21043,7 @@ mutual
 
 def k__str_first_match_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 96 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 98 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__str_first_match_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -21216,7 +21352,7 @@ mutual
 
 def k__re_unfold_pos_concat_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 97 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 99 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__re_unfold_pos_concat_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -21278,7 +21414,7 @@ mutual
 
 def k__str_flatten_word_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 98 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 100 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_flatten_word_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21304,7 +21440,7 @@ mutual
 
 def k__str_flatten : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 99 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 101 [arg1] <| withStore fun σ =>
     kcase (m__str_flatten_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21356,7 +21492,7 @@ mutual
 
 def k__str_collect : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 100 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 102 [arg1] <| withStore fun σ =>
     kcase (m__str_collect_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21397,7 +21533,7 @@ mutual
 
 def k__str_strip_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 101 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 103 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_strip_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21420,7 +21556,7 @@ mutual
 
 def k__str_mk_re_loop_elim_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 102 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 104 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_mk_re_loop_elim_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -21457,7 +21593,7 @@ mutual
 
 def k__str_mk_str_in_re_concat_star_char : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 103 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 105 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_mk_str_in_re_concat_star_char_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21485,7 +21621,7 @@ mutual
 
 def k__str_mk_str_in_re_sigma_rec : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 104 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 106 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__str_mk_str_in_re_sigma_rec_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -21519,7 +21655,7 @@ mutual
 
 def k__str_mk_str_in_re_sigma_star_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 105 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 107 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_mk_str_in_re_sigma_star_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -21557,7 +21693,7 @@ mutual
 
 def k__re_split_str_to_re : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 106 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 108 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_split_str_to_re_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21584,7 +21720,7 @@ mutual
 
 def k__re_rev_map_rev : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 107 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 109 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_rev_map_rev_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21604,7 +21740,7 @@ def k__re_rev_map_rev : Nat → Id → Id → K Id
 
 def k__re_rev_comp : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 108 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 110 [arg1] <| withStore fun σ =>
     kcase (m__re_rev_comp_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21654,7 +21790,7 @@ mutual
 
 def k__re_flatten : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 109 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 111 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_flatten_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21753,7 +21889,7 @@ mutual
 
 def k__re_unflatten : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 110 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 112 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_unflatten_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21813,7 +21949,7 @@ def k__re_unflatten : Nat → Id → Id → K Id
 
 def k__re_unflatten_str : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 111 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 113 [arg1, arg2] <| withStore fun σ =>
     kcase (m__re_unflatten_str_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21847,7 +21983,7 @@ mutual
 
 def k__re_is_unbound_wildcard : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 115 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 117 [arg1] <| withStore fun σ =>
     kcase (m__re_is_unbound_wildcard_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -21869,7 +22005,7 @@ mutual
 
 def k__str_re_includes_lhs_union : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 112 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 114 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_lhs_union_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21887,7 +22023,7 @@ def k__str_re_includes_lhs_union : Nat → Id → Id → K Id
 
 def k__str_re_includes_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 118 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 120 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21937,7 +22073,7 @@ def k__str_re_includes_rec : Nat → Id → Id → K Id
 
 def k__str_re_includes_base_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 116 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 118 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_base_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -21991,7 +22127,7 @@ def k__str_re_includes_base_rec : Nat → Id → Id → K Id
 
 def k__str_re_includes_lhs_star : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 114 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 116 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_lhs_star_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22015,7 +22151,7 @@ def k__str_re_includes_lhs_star : Nat → Id → Id → K Id
 
 def k__str_re_includes_rhs_inter : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 113 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 115 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_re_includes_rhs_inter_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22033,7 +22169,7 @@ def k__str_re_includes_rhs_inter : Nat → Id → Id → K Id
 
 def k__str_re_includes_concat : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 117 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 119 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__str_re_includes_concat_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -22061,7 +22197,7 @@ mutual
 
 def k__str_arith_entail_simple_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 119 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 121 [arg1] <| withStore fun σ =>
     kcase (m__str_arith_entail_simple_rec_1 σ arg1) (fun _ => do
         intern (.Boolean true))
     <|
@@ -22156,7 +22292,7 @@ mutual
 
 def k__eo_l_1___str_arith_entail_is_approx : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 120 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 122 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___str_arith_entail_is_approx_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22194,7 +22330,7 @@ def k__eo_l_1___str_arith_entail_is_approx : Nat → Id → Id → Id → K Id
 
 def k__str_arith_entail_is_approx : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 121 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 123 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_arith_entail_is_approx_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22217,7 +22353,7 @@ mutual
 
 def k__str_re_consume_inter : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 122 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 124 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_re_consume_inter_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22239,7 +22375,7 @@ def k__str_re_consume_inter : Nat → Id → Id → Id → K Id
 
 def k__str_re_consume_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 124 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 126 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_re_consume_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22333,7 +22469,7 @@ def k__str_re_consume_rec : Nat → Id → Id → Id → K Id
 
 def k__str_re_consume_union : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 123 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 125 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_re_consume_union_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22431,7 +22567,7 @@ mutual
 
 def k__str_is_compatible : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 125 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 127 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_is_compatible_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22454,7 +22590,7 @@ mutual
 
 def k__str_overlap_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 126 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 128 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_overlap_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22480,7 +22616,7 @@ mutual
 
 def k__str_from_int_eval_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 127 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 129 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_from_int_eval_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22517,7 +22653,7 @@ mutual
 
 def k__str_to_int_eval_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 128 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 130 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_to_int_eval_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -22550,7 +22686,7 @@ mutual
 
 def k__str_case_conv_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 129 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 131 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_case_conv_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22597,7 +22733,7 @@ mutual
 
 def k__str_leq_eval_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 130 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 132 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_leq_eval_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22641,7 +22777,7 @@ mutual
 
 def k__str_is_prefix_flat : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 131 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 133 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_is_prefix_flat_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -22667,7 +22803,7 @@ mutual
 
 def k__str_eval_replace_all_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 132 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 134 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__str_eval_replace_all_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -23090,7 +23226,7 @@ mutual
 
 def k__mk_re_concat : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 133 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 135 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_re_concat_1 σ arg1 arg2) (fun (s, r, Es, s1, r1) => do
         let kt31 ← (intern (.UOp UserOp.str_in_re))
         let kt35 ← (intern (.UOp UserOp.str_concat))
@@ -23673,7 +23809,7 @@ mutual
 
 def k__str_multiset_overapprox_word : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 134 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 136 [arg1] <| withStore fun σ =>
     kcase (m__str_multiset_overapprox_word_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -23696,7 +23832,7 @@ mutual
 
 def k__str_multiset_overapprox : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 135 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 137 [arg1] <| withStore fun σ =>
     kcase (m__str_multiset_overapprox_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -23728,7 +23864,7 @@ mutual
 
 def k__str_is_multiset_subset_strict_done : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 136 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 138 [arg1, arg2] <| withStore fun σ =>
     kcase (m__str_is_multiset_subset_strict_done_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -23756,7 +23892,7 @@ mutual
 
 def k__str_is_multiset_subset_strict : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 137 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 139 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__str_is_multiset_subset_strict_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24184,7 +24320,7 @@ mutual
 
 def k__str_eval_replace_re_all_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 138 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 140 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__str_eval_replace_re_all_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -24302,7 +24438,7 @@ mutual
 
 def k__eo_l_1___seq_is_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 139 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 141 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___seq_is_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24319,7 +24455,7 @@ def k__eo_l_1___seq_is_prefix : Nat → Id → Id → K Id
 
 def k__seq_is_prefix : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 140 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 142 [arg1, arg2] <| withStore fun σ =>
     kcase (m__seq_is_prefix_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24339,7 +24475,7 @@ mutual
 
 def k__eo_l_1___seq_find : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 141 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 143 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___seq_find_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24362,7 +24498,7 @@ def k__eo_l_1___seq_find : Nat → Id → Id → Id → K Id
 
 def k__seq_find : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 142 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 144 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__seq_find_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24385,7 +24521,7 @@ mutual
 
 def k__seq_subsequence_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 143 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 145 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__seq_subsequence_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24433,7 +24569,7 @@ mutual
 
 def k__seq_eval_replace_all_rec : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 144 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 146 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__seq_eval_replace_all_rec_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -24475,7 +24611,7 @@ mutual
 
 def k__seq_eval : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 145 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 147 [arg1] <| withStore fun σ =>
     kcase (m__seq_eval_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -24680,7 +24816,7 @@ mutual
 
 def k__set_union_to_list : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 146 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 148 [arg1] <| withStore fun σ =>
     kcase (m__set_union_to_list_1 σ arg1) (fun (e, t) => do
         let kt16 ← (intern (.UOp UserOp._at__at_TypedList_cons))
         let kt20 ← (intern (.Apply kt16 e))
@@ -24710,7 +24846,7 @@ mutual
 
 def k__eval_sets_inter : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 147 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 149 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eval_sets_inter_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24736,7 +24872,7 @@ mutual
 
 def k__eval_sets_minus : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 148 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 150 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eval_sets_minus_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -24838,7 +24974,7 @@ mutual
 
 def k__abconv_ubv_to_int_elim : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 149 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 151 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__abconv_ubv_to_int_elim_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -24909,7 +25045,7 @@ mutual
 
 def k__abconv_int_to_bv_elim : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 150 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 152 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__abconv_int_to_bv_elim_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25003,7 +25139,7 @@ mutual
 
 def k__mk_skolems : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 151 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 153 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_skolems_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25118,6 +25254,23 @@ def k__eo_prog_alpha_equiv : Nat → Id → Id → Id → K Id
       let kt84 ← (k__eo_requires kfuel kt64 kt60 kt80)
       let kt88 ← (k__eo_requires kfuel kt56 kt60 kt84)
       k__eo_requires kfuel kt44 kt48 kt88
+
+/-! ### 1 program: __eo_prog_beta_reduce -/
+
+def k__eo_prog_beta_reduce : Nat → Id → K Id
+  | 0, _ => throw .fuel
+  | kfuel + 1, arg1 => withStore fun σ =>
+    kcase (m__eo_prog_beta_reduce_1 σ arg1) (fun (a, b) => do
+        let kt10 ← (intern .__eo_List_nil)
+        let kt14 ← (k__beta_reduce kfuel a kt10)
+        let kt18 ← (intern (.UOp UserOp.eq))
+        let kt22 ← (intern (.Apply kt18 a))
+        let kt26 ← (intern (.Apply kt22 b))
+        k__eo_requires kfuel kt14 b kt26)
+    <|
+    -- default
+     do
+      pure 0
 
 /-! ### 1 program: __eo_prog_quant_var_reordering -/
 
@@ -25265,7 +25418,7 @@ mutual
 
 def k__mk_quant_merge_prenex : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 152 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 154 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_quant_merge_prenex_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25317,7 +25470,7 @@ mutual
 
 def k__mk_quant_miniscope_and : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 153 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 155 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_quant_miniscope_and_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -25385,7 +25538,7 @@ mutual
 
 def k__eo_l_2___is_quant_miniscope_or : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 154 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 156 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_2___is_quant_miniscope_or_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25407,7 +25560,7 @@ def k__eo_l_2___is_quant_miniscope_or : Nat → Id → Id → Id → K Id
 
 def k__is_quant_miniscope_or : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 156 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 158 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__is_quant_miniscope_or_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25427,7 +25580,7 @@ def k__is_quant_miniscope_or : Nat → Id → Id → Id → K Id
 
 def k__eo_l_1___is_quant_miniscope_or : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 155 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 157 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___is_quant_miniscope_or_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25584,7 +25737,7 @@ mutual
 
 def k__eo_l_1___is_quant_dt_split_conj : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 157 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 159 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__eo_l_1___is_quant_dt_split_conj_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -25648,7 +25801,7 @@ def k__eo_l_1___is_quant_dt_split_conj : Nat → Id → Id → Id → Id → Id 
 
 def k__is_quant_dt_split_conj : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 158 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 160 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__is_quant_dt_split_conj_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -25680,7 +25833,7 @@ mutual
 
 def k__is_quant_dt_split : Nat → Id → Id → Id → Id → Id → K Id
   | 0, _, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 159 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4, arg5 => cached 161 [arg1, arg2, arg3, arg4, arg5] <| withStore fun σ =>
     kcase (m__is_quant_dt_split_1 σ arg1 arg2 arg3 arg4 arg5) (fun _ => do
         pure 0)
     <|
@@ -25744,7 +25897,7 @@ mutual
 
 def k__mk_dt_split : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 160 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 162 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_dt_split_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -25787,7 +25940,7 @@ mutual
 
 def k__mk_dt_inst_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 161 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 163 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_dt_inst_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -25814,7 +25967,7 @@ mutual
 
 def k__mk_dt_inst_tuple_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 162 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 164 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__mk_dt_inst_tuple_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26006,7 +26159,7 @@ mutual
 
 def k__mk_dt_cons_eq : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 163 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 165 [arg1, arg2] <| withStore fun σ =>
     kcase (m__mk_dt_cons_eq_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -26092,7 +26245,7 @@ mutual
 
 def k__eo_l_1___dt_find_cycle : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 164 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 166 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__eo_l_1___dt_find_cycle_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -26117,7 +26270,7 @@ def k__eo_l_1___dt_find_cycle : Nat → Id → Id → Id → Id → K Id
 
 def k__dt_find_cycle : Nat → Id → Id → Id → Id → K Id
   | 0, _, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 165 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3, arg4 => cached 167 [arg1, arg2, arg3, arg4] <| withStore fun σ =>
     kcase (m__dt_find_cycle_1 σ arg1 arg2 arg3 arg4) (fun _ => do
         pure 0)
     <|
@@ -26164,7 +26317,7 @@ mutual
 
 def k__dt_collapse_updater_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 166 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 168 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__dt_collapse_updater_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26192,7 +26345,7 @@ mutual
 
 def k__tuple_collapse_updater_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 167 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 169 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__tuple_collapse_updater_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26263,7 +26416,7 @@ mutual
 
 def k__eo_l_1___dt_updater_elim_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 168 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 170 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___dt_updater_elim_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26284,7 +26437,7 @@ def k__eo_l_1___dt_updater_elim_rhs : Nat → Id → Id → Id → K Id
 
 def k__dt_updater_elim_rhs : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 169 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 171 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__dt_updater_elim_rhs_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -26310,7 +26463,7 @@ mutual
 
 def k__eo_l_1___tuple_updater_elim_rhs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 170 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 172 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_l_1___tuple_updater_elim_rhs_1 σ arg1 arg2) (fun (n, t, a, s, ss) => do
         let kt24 ← (intern (.UOp UserOp.tuple))
         let kt28 ← (intern (.Apply s t))
@@ -26330,7 +26483,7 @@ def k__eo_l_1___tuple_updater_elim_rhs : Nat → Id → Id → K Id
 
 def k__tuple_updater_elim_rhs : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 171 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 173 [arg1, arg2] <| withStore fun σ =>
     kcase (m__tuple_updater_elim_rhs_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -42481,7 +42634,7 @@ mutual
 
 def k__get_ai_norm_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 172 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 174 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__get_ai_norm_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -42562,7 +42715,7 @@ mutual
 
 def k__get_a_norm_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 173 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 175 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__get_a_norm_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -42674,7 +42827,7 @@ mutual
 
 def k__run_evaluate : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 174 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 176 [arg1] <| withStore fun σ =>
     kcase (m__run_evaluate_1 σ arg1) (fun _ => do
         pure 0)
     <|
@@ -43240,7 +43393,7 @@ mutual
 
 def k__evaluate_list : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => cached 175 [arg1] <| withStore fun σ =>
+  | kfuel + 1, arg1 => cached 177 [arg1] <| withStore fun σ =>
     kcase (m__evaluate_list_1 σ arg1) (fun (t, ts) => do
         let kt10 ← (intern .__eo_List_cons)
         let kt14 ← (k__run_evaluate kfuel t)
@@ -43431,7 +43584,7 @@ mutual
 
 def k__eo_l_1___is_absorb_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 176 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 178 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__eo_l_1___is_absorb_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -43451,7 +43604,7 @@ def k__eo_l_1___is_absorb_rec : Nat → Id → Id → Id → K Id
 
 def k__is_absorb_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => cached 177 [arg1, arg2, arg3] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2, arg3 => cached 179 [arg1, arg2, arg3] <| withStore fun σ =>
     kcase (m__is_absorb_rec_1 σ arg1 arg2 arg3) (fun _ => do
         pure 0)
     <|
@@ -43602,7 +43755,7 @@ mutual
 
 def k__eo_is_closed_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => cached 179 [arg1, arg2] <| withStore fun σ =>
+  | kfuel + 1, arg1, arg2 => cached 181 [arg1, arg2] <| withStore fun σ =>
     kcase (m__eo_is_closed_rec_1 σ arg1 arg2) (fun _ => do
         pure 0)
     <|
@@ -43627,25 +43780,30 @@ def k__eo_is_closed_rec : Nat → Id → Id → K Id
         let kt58 ← (k__eo_list_concat kfuel kt54 vs arg2)
         k__eo_is_closed_rec kfuel x kt58)
     <|
-    kcase (m__eo_is_closed_rec_7 σ arg1 arg2) (fun (f, x) => do
-        let kt66 ← (k__eo_is_closed_rec kfuel f arg2)
-        let kt70 ← (k__eo_is_closed_rec kfuel x arg2)
-        k__eo_and kfuel kt66 kt70)
+    kcase (m__eo_is_closed_rec_7 σ arg1 arg2) (fun (vs, x) => do
+        let kt72 ← (intern .__eo_List_cons)
+        let kt76 ← (k__eo_list_concat kfuel kt72 vs arg2)
+        k__eo_is_closed_rec kfuel x kt76)
     <|
-    kcase (m__eo_is_closed_rec_8 σ arg1 arg2) (fun (u, x) => do
+    kcase (m__eo_is_closed_rec_8 σ arg1 arg2) (fun (f, x) => do
+        let kt84 ← (k__eo_is_closed_rec kfuel f arg2)
+        let kt88 ← (k__eo_is_closed_rec kfuel x arg2)
+        k__eo_and kfuel kt84 kt88)
+    <|
+    kcase (m__eo_is_closed_rec_9 σ arg1 arg2) (fun (u, x) => do
         k__eo_is_closed_rec kfuel x arg2)
     <|
-    kcase (m__eo_is_closed_rec_9 σ arg1 arg2) (fun (u, x, x2) => do
-        let kt80 ← (k__eo_is_closed_rec kfuel x arg2)
-        let kt84 ← (k__eo_is_closed_rec kfuel x2 arg2)
-        k__eo_and kfuel kt80 kt84)
+    kcase (m__eo_is_closed_rec_10 σ arg1 arg2) (fun (u, x, x2) => do
+        let kt98 ← (k__eo_is_closed_rec kfuel x arg2)
+        let kt102 ← (k__eo_is_closed_rec kfuel x2 arg2)
+        k__eo_and kfuel kt98 kt102)
     <|
-    kcase (m__eo_is_closed_rec_10 σ arg1 arg2) (fun (u, x, x2, x3) => do
-        let kt94 ← (k__eo_is_closed_rec kfuel x arg2)
-        let kt98 ← (k__eo_is_closed_rec kfuel x2 arg2)
-        let kt102 ← (k__eo_and kfuel kt94 kt98)
-        let kt106 ← (k__eo_is_closed_rec kfuel x3 arg2)
-        k__eo_and kfuel kt102 kt106)
+    kcase (m__eo_is_closed_rec_11 σ arg1 arg2) (fun (u, x, x2, x3) => do
+        let kt112 ← (k__eo_is_closed_rec kfuel x arg2)
+        let kt116 ← (k__eo_is_closed_rec kfuel x2 arg2)
+        let kt120 ← (k__eo_and kfuel kt112 kt116)
+        let kt124 ← (k__eo_is_closed_rec kfuel x3 arg2)
+        k__eo_and kfuel kt120 kt124)
     <|
     -- case
      do

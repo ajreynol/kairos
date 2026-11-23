@@ -1113,6 +1113,13 @@ def kr__eo_cmd_step_proven_alpha_equiv (fuel : Nat) (S : KState) : KArgList → 
   | (KArgList.cons a1 (KArgList.cons a2 (KArgList.cons a3 KArgList.nil))), (CIndexList.cons _ _) => pure 0
   | (KArgList.cons _ (KArgList.cons _ (KArgList.cons _ (KArgList.cons _ _)))), _ => pure 0
 
+def kr__eo_cmd_step_proven_beta_reduce (fuel : Nat) (S : KState) : KArgList → CIndexList → K Id
+  | KArgList.nil, _ => pure 0
+  | (KArgList.cons a1 KArgList.nil), CIndexList.nil => do
+    k__eo_prog_beta_reduce fuel a1
+  | (KArgList.cons a1 KArgList.nil), (CIndexList.cons _ _) => pure 0
+  | (KArgList.cons _ (KArgList.cons _ _)), _ => pure 0
+
 def kr__eo_cmd_step_proven_quant_var_reordering (fuel : Nat) (S : KState) : KArgList → CIndexList → K Id
   | KArgList.nil, _ => pure 0
   | (KArgList.cons a1 KArgList.nil), CIndexList.nil => do
@@ -6268,6 +6275,7 @@ def k__eo_cmd_step_proven (fuel : Nat) (S : KState) : CRule → KArgList → CIn
   | CRule.skolemize, arg3, arg4 => kr__eo_cmd_step_proven_skolemize fuel S arg3 arg4
   | CRule.skolem_intro, arg3, arg4 => kr__eo_cmd_step_proven_skolem_intro fuel S arg3 arg4
   | CRule.alpha_equiv, arg3, arg4 => kr__eo_cmd_step_proven_alpha_equiv fuel S arg3 arg4
+  | CRule.beta_reduce, arg3, arg4 => kr__eo_cmd_step_proven_beta_reduce fuel S arg3 arg4
   | CRule.quant_var_reordering, arg3, arg4 => kr__eo_cmd_step_proven_quant_var_reordering fuel S arg3 arg4
   | CRule.exists_elim, arg3, arg4 => kr__eo_cmd_step_proven_exists_elim fuel S arg3 arg4
   | CRule.quant_unused_vars, arg3, arg4 => kr__eo_cmd_step_proven_quant_unused_vars fuel S arg3 arg4

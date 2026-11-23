@@ -2137,6 +2137,21 @@ theorem kr__eo_cmd_step_proven_alpha_equiv_sim (fuel : Nat) {σ : Store} (hI : I
   · unfold __eo_cmd_step_proven; (try simp only [KArgList.dec]); exact Sim.stuck hI
   · unfold __eo_cmd_step_proven; (try simp only [KArgList.dec]); exact Sim.stuck hI
 
+theorem kr__eo_cmd_step_proven_beta_reduce_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ) {S : KState} (h1 : S.valid σ) {arg3 : KArgList} (h3 : arg3.valid σ) (arg4 : CIndexList) :
+    Sim sem σ (kr__eo_cmd_step_proven_beta_reduce fuel S arg3 arg4)
+      (__eo_cmd_step_proven (S.dec σ) CRule.beta_reduce (arg3.dec σ) arg4) := by
+  have hΓ := Ctx.cons (f := Fact.state S (S.dec σ)) ⟨h1, rfl⟩ (Ctx.stuck hI)
+  unfold kr__eo_cmd_step_proven_beta_reduce
+  split
+  · unfold __eo_cmd_step_proven; (try simp only [KArgList.dec]); exact Sim.stuck hI
+  · rename_i a1
+    obtain ⟨w_a1, -⟩ := h3
+    have hΓb := Ctx.arg w_a1 (hΓ)
+    unfold __eo_cmd_step_proven; (try simp only [KArgList.dec])
+    exact C__eo_prog_beta_reduce (allS__eo_prog_beta_reduce fuel) hI hΓb (.head _)
+  · unfold __eo_cmd_step_proven; (try simp only [KArgList.dec]); exact Sim.stuck hI
+  · unfold __eo_cmd_step_proven; (try simp only [KArgList.dec]); exact Sim.stuck hI
+
 theorem kr__eo_cmd_step_proven_quant_var_reordering_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ) {S : KState} (h1 : S.valid σ) {arg3 : KArgList} (h3 : arg3.valid σ) (arg4 : CIndexList) :
     Sim sem σ (kr__eo_cmd_step_proven_quant_var_reordering fuel S arg3 arg4)
       (__eo_cmd_step_proven (S.dec σ) CRule.quant_var_reordering (arg3.dec σ) arg4) := by
@@ -11086,6 +11101,7 @@ theorem k__eo_cmd_step_proven_sim (fuel : Nat) {σ : Store} (hI : Inv sem σ) {S
   case skolemize => exact kr__eo_cmd_step_proven_skolemize_sim fuel hI h1 h3 arg4
   case skolem_intro => exact kr__eo_cmd_step_proven_skolem_intro_sim fuel hI h1 h3 arg4
   case alpha_equiv => exact kr__eo_cmd_step_proven_alpha_equiv_sim fuel hI h1 h3 arg4
+  case beta_reduce => exact kr__eo_cmd_step_proven_beta_reduce_sim fuel hI h1 h3 arg4
   case quant_var_reordering => exact kr__eo_cmd_step_proven_quant_var_reordering_sim fuel hI h1 h3 arg4
   case exists_elim => exact kr__eo_cmd_step_proven_exists_elim_sim fuel hI h1 h3 arg4
   case quant_unused_vars => exact kr__eo_cmd_step_proven_quant_unused_vars_sim fuel hI h1 h3 arg4

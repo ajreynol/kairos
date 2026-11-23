@@ -7,12 +7,12 @@ namespace Kairos.Gen
 def declKinds : List (String × Nat) := [
   ("CHECKER_CMD", 4)
 , ("CHECKER_EMBED", 12)
-, ("CHECKER_RULE", 616)
+, ("CHECKER_RULE", 617)
 , ("EO_EMBED", 6)
-, ("EUNOIA", 215)
-, ("SMT", 148)
+, ("EUNOIA", 216)
+, ("SMT", 149)
 , ("SMT_BUILTIN", 22)
-, ("SMT_EMBED", 16)
+, ("SMT_EMBED", 18)
 , ("SMT_MAP", 2)
 , ("SMT_SEQ", 2)
 , ("SMT_TYPE", 15)
@@ -21,8 +21,8 @@ def declKinds : List (String × Nat) := [
 
 /-- Programs of the compiled signature, with their number of cases. -/
 def programs : List (String × Nat) := [
-  ("generated", 1111)
-, ("total", 1140)
+  ("generated", 1116)
+, ("total", 1145)
 ]
 
 end Kairos.Gen

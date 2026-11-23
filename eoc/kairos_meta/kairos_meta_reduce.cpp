@@ -786,6 +786,12 @@ bool KairosMetaReduce::checkBody(const Expr& e, Sort expect, Prog& p)
   }
   if (k == Kind::FUNCTION_TYPE && e.getNumChildren() == 2)
   {
+    // as lean-meta does, an evaluatable function type propagates stuckness
+    // as an application does
+    if (e.isEvaluatable())
+    {
+      p.callees.insert("$eo_mk_apply");
+    }
     return checkBody(e[0], Sort::TERM, p) && checkBody(e[1], Sort::TERM, p);
   }
   if (k == Kind::EVAL_IF_THEN_ELSE)
@@ -1441,6 +1447,23 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
                        + memProof(sc.gamma, b),
                    sc, out, final);
       }
+    }
+    else if (k == Kind::FUNCTION_TYPE && e.isEvaluatable())
+    {
+      // (-> A B) is (__eo_mk_apply (__eo_mk_apply FunType A) B) when it is
+      // evaluatable, as lean-meta prints it, so that stuckness propagates
+      const Prog& q = d_progs.at("$eo_mk_apply");
+      std::string a = compileTerm(e[0], sc, out, false);
+      std::string b = compileTerm(e[1], sc, out, false);
+      std::string ft = finish("intern .FunType", "intern_leaf " + sc.hI + " rfl", sc, out, false);
+      std::string g = finish("k" + q.lname + " " + fuelVar + " " + ft + " " + a,
+                             "C" + q.lname + " " + specOf(q) + " " + sc.hI + " " + sc.hG + " "
+                                 + memProof(sc.gamma, ft) + " " + memProof(sc.gamma, a),
+                             sc, out, false);
+      r = finish("k" + q.lname + " " + fuelVar + " " + g + " " + b,
+                 "C" + q.lname + " " + specOf(q) + " " + sc.hI + " " + sc.hG + " "
+                     + memProof(sc.gamma, g) + " " + memProof(sc.gamma, b),
+                 sc, out, final);
     }
     else if (k == Kind::FUNCTION_TYPE)
     {
