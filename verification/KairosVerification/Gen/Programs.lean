@@ -2450,32 +2450,6 @@ theorem m__eo_is_list_nil_22_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {ar
   have v1 := decode_leaf_inv (n := .__eo_List_nil) (d := σ.decode) hI rfl eq2
   simp [m__eo_is_list_nil_22, kguard, leaf_of_view v0, leaf_of_view v1] at h
 
-theorem m__eo_is_list_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_is_list_1 σ arg1 arg2 = some ()) :
-    σ.decode arg1 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_is_list_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h1 : arg1 < σ.size)
-    (h : m__eo_is_list_1 σ arg1 arg2 = none) :
-    σ.decode arg1 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h1 e; subst this
-  simp [m__eo_is_list_1, stuck_of_zero] at h
-
-theorem m__eo_is_list_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
-    (h1 : arg1 < σ.size)
-    (h2 : arg2 < σ.size)
-    (h : m__eo_is_list_2 σ arg1 arg2 = some ()) :
-    σ.decode arg2 = Term.Stuck := by
-  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
-
-theorem m__eo_is_list_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id} (h2 : arg2 < σ.size)
-    (h : m__eo_is_list_2 σ arg1 arg2 = none) :
-    σ.decode arg2 = Term.Stuck → False := by
-  intro e; have := decode_stuck_inv hI h2 e; subst this
-  simp [m__eo_is_list_2, stuck_of_zero] at h
-
 theorem m__eo_list_nth_rec_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {arg2 : Id}
     (h1 : arg1 < σ.size)
     (h2 : arg2 < σ.size)
@@ -77632,10 +77606,9 @@ theorem C__eo_cmp {n : Nat} (hf : S__eo_cmp n) {σ : Store} {Γ : List Fact} (hI
   (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
 
 theorem step__eo_cmp {kn : Nat} : S__eo_cmp (kn + 1) := by
-  intro σ arg1 arg2 hI _ _
+  intro σ arg1 arg2 hI h1 h2
   simp only [k__eo_cmp]
-  apply Sim.withStore
-  exact Sim.lift hI
+  exact Native.cmp_sim hI h1 h2
 
 theorem allS__eo_cmp : ∀ n, S__eo_cmp n
   | 0 => fun _ _ _ => by simp only [k__eo_cmp]; exact Ok.throw
@@ -79006,27 +78979,6 @@ theorem allS__eo_is_list_nil : ∀ n, S__eo_is_list_nil n
   | 0 => fun _ _ _ => by simp only [k__eo_is_list_nil]; exact Ok.throw
   | _ + 1 => step__eo_is_list_nil
 
-/-! ### 1 program: __eo_get_nil_rec -/
-
-abbrev S__eo_get_nil_rec (n : Nat) : Prop :=
-  ∀ {σ : Store} {arg1 : Id} {arg2 : Id}, Inv sem σ → arg1 < σ.size → arg2 < σ.size →
-    Sim sem σ (k__eo_get_nil_rec n arg1 arg2) (__eo_get_nil_rec (σ.decode arg1) (σ.decode arg2))
-
-theorem C__eo_get_nil_rec {n : Nat} (hf : S__eo_get_nil_rec n) {σ : Store} {Γ : List Fact} (hI : Inv sem σ) (hΓ : Ctx σ Γ) {arg1 : Id} {A1 : Term} {arg2 : Id} {A2 : Term}
-    (p1 : Fact.term arg1 A1 ∈ Γ)
-    (p2 : Fact.term arg2 A2 ∈ Γ) :
-    Sim sem σ (k__eo_get_nil_rec n arg1 arg2) (__eo_get_nil_rec A1 A2) :=
-  (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
-
-theorem step__eo_get_nil_rec {kn : Nat} : S__eo_get_nil_rec (kn + 1) := by
-  intro σ arg1 arg2 hI h1 h2
-  simp only [k__eo_get_nil_rec]
-  exact Native.getNil_sim (allS__eo_is_list_nil kn) hI h1 h2
-
-theorem allS__eo_get_nil_rec : ∀ n, S__eo_get_nil_rec n
-  | 0 => fun _ _ _ => by simp only [k__eo_get_nil_rec]; exact Ok.throw
-  | _ + 1 => step__eo_get_nil_rec
-
 /-! ### 1 program: __eo_is_list -/
 
 abbrev S__eo_is_list (n : Nat) : Prop :=
@@ -79041,27 +78993,8 @@ theorem C__eo_is_list {n : Nat} (hf : S__eo_is_list n) {σ : Store} {Γ : List F
 
 theorem step__eo_is_list {kn : Nat} : S__eo_is_list (kn + 1) := by
   intro σ arg1 arg2 hI h1 h2
-  have hΓ := Ctx.arg h2 (Ctx.arg h1 (Ctx.stuck hI))
   simp only [k__eo_is_list]
-  apply Sim.withStore
-  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
-  · have d1 := m__eo_is_list_1_some hI h1 h2 hm1
-    try dsimp only
-    rw [d1, __eo_is_list.eq_1]; kside
-    exact Sim.stuck hI
-  have kneg1 := m__eo_is_list_1_none hI h1 hm1
-  refine kcase_sim (fun _ hm2 => ?_) (fun hm2 => ?_)
-  · have d1 := m__eo_is_list_2_some hI h1 h2 hm2
-    try dsimp only
-    have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [d1, e1])
-    rw [d1, __eo_is_list.eq_2]; kside
-    exact Sim.stuck hI
-  have kneg2 := m__eo_is_list_2_none hI h2 hm2
-  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
-  have o2 : (σ.decode arg2) = Term.Stuck → False := fun e1 => kneg2 (by simp only [e1])
-  rw [__eo_is_list.eq_3]; kside
-  refine Sim.step hΓ (C__eo_get_nil_rec (allS__eo_get_nil_rec kn) hI hΓ (.tail _ (.head _)) (.head _)) fun kt0 σ1 hI2 hΓ3 => ?_
-  exact C__eo_is_ok (allS__eo_is_ok kn) hI2 hΓ3 (.head _)
+  exact Native.isList_sim (allS__eo_is_list_nil kn) hI h1 h2
 
 theorem allS__eo_is_list : ∀ n, S__eo_is_list n
   | 0 => fun _ _ _ => by simp only [k__eo_is_list]; exact Ok.throw
@@ -79079,10 +79012,10 @@ theorem C__eo_list_nth_rec {n : Nat} (hf : S__eo_list_nth_rec n) {σ : Store} {�
     Sim sem σ (k__eo_list_nth_rec n arg1 arg2) (__eo_list_nth_rec A1 A2) :=
   (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
 
-structure Spec79 (n : Nat) : Prop where
+structure Spec78 (n : Nat) : Prop where
   s__eo_list_nth_rec : S__eo_list_nth_rec n
 
-theorem step__eo_list_nth_rec {kn : Nat} (ih : Spec79 kn) : S__eo_list_nth_rec (kn + 1) := by
+theorem step__eo_list_nth_rec {kn : Nat} (ih : Spec78 kn) : S__eo_list_nth_rec (kn + 1) := by
   intro σ arg1 arg2 hI h1 h2
   have hΓ := Ctx.arg h2 (Ctx.arg h1 (Ctx.stuck hI))
   simp only [k__eo_list_nth_rec]
@@ -79119,17 +79052,17 @@ theorem step__eo_list_nth_rec {kn : Nat} (ih : Spec79 kn) : S__eo_list_nth_rec (
   rw [__eo_list_nth_rec.eq_4]; kside
   exact Sim.stuck hI
 
-theorem spec79 : ∀ n, Spec79 n
+theorem spec78 : ∀ n, Spec78 n
   | 0 => {
     s__eo_list_nth_rec := fun _ _ _ => by simp only [k__eo_list_nth_rec]; exact Ok.throw
     }
   | n + 1 =>
-    have ih := spec79 n
+    have ih := spec78 n
     {
     s__eo_list_nth_rec := step__eo_list_nth_rec ih
     }
 
-theorem allS__eo_list_nth_rec (n : Nat) : S__eo_list_nth_rec n := (spec79 n).s__eo_list_nth_rec
+theorem allS__eo_list_nth_rec (n : Nat) : S__eo_list_nth_rec n := (spec78 n).s__eo_list_nth_rec
 
 /-! ### 1 program: __eo_list_nth -/
 
@@ -82128,10 +82061,10 @@ theorem C__eo_list_len_rec {n : Nat} (hf : S__eo_list_len_rec n) {σ : Store} {�
     Sim sem σ (k__eo_list_len_rec n arg1) (__eo_list_len_rec A1) :=
   (hf hI (hΓ.valid p1)).congr (by rw [hΓ.dec p1])
 
-structure Spec164 (n : Nat) : Prop where
+structure Spec163 (n : Nat) : Prop where
   s__eo_list_len_rec : S__eo_list_len_rec n
 
-theorem step__eo_list_len_rec {kn : Nat} (ih : Spec164 kn) : S__eo_list_len_rec (kn + 1) := by
+theorem step__eo_list_len_rec {kn : Nat} (ih : Spec163 kn) : S__eo_list_len_rec (kn + 1) := by
   intro σ arg1 hI h1
   have hΓ := Ctx.arg h1 (Ctx.stuck hI)
   simp only [k__eo_list_len_rec]
@@ -82157,17 +82090,17 @@ theorem step__eo_list_len_rec {kn : Nat} (ih : Spec164 kn) : S__eo_list_len_rec 
   rw [__eo_list_len_rec.eq_3]; kside
   exact intern_leaf hI rfl
 
-theorem spec164 : ∀ n, Spec164 n
+theorem spec163 : ∀ n, Spec163 n
   | 0 => {
     s__eo_list_len_rec := fun _ _ => by simp only [k__eo_list_len_rec]; exact Ok.throw
     }
   | n + 1 =>
-    have ih := spec164 n
+    have ih := spec163 n
     {
     s__eo_list_len_rec := step__eo_list_len_rec ih
     }
 
-theorem allS__eo_list_len_rec (n : Nat) : S__eo_list_len_rec n := (spec164 n).s__eo_list_len_rec
+theorem allS__eo_list_len_rec (n : Nat) : S__eo_list_len_rec n := (spec163 n).s__eo_list_len_rec
 
 /-! ### 1 program: __eo_list_len -/
 
@@ -82460,10 +82393,10 @@ theorem C__eo_typeof {n : Nat} (hf : S__eo_typeof n) {σ : Store} {Γ : List Fac
     Sim sem σ (k__eo_typeof n arg1) (__eo_typeof A1) :=
   (hf hI (hΓ.valid p1)).congr (by rw [hΓ.dec p1])
 
-structure Spec171 (n : Nat) : Prop where
+structure Spec170 (n : Nat) : Prop where
   s__eo_typeof : S__eo_typeof n
 
-theorem step__eo_typeof {kn : Nat} (ih : Spec171 kn) : S__eo_typeof (kn + 1) := by
+theorem step__eo_typeof {kn : Nat} (ih : Spec170 kn) : S__eo_typeof (kn + 1) := by
   intro σ arg1 hI h1
   have hΓ := Ctx.arg h1 (Ctx.stuck hI)
   simp only [k__eo_typeof]
@@ -84768,17 +84701,17 @@ theorem step__eo_typeof {kn : Nat} (ih : Spec171 kn) : S__eo_typeof (kn + 1) := 
   rw [__eo_typeof.eq_209]; kside
   exact Sim.stuck hI
 
-theorem spec171 : ∀ n, Spec171 n
+theorem spec170 : ∀ n, Spec170 n
   | 0 => {
     s__eo_typeof := fun _ _ => by simp only [k__eo_typeof]; exact Ok.throw
     }
   | n + 1 =>
-    have ih := spec171 n
+    have ih := spec170 n
     {
     s__eo_typeof := step__eo_typeof ih
     }
 
-theorem allS__eo_typeof (n : Nat) : S__eo_typeof n := (spec171 n).s__eo_typeof
+theorem allS__eo_typeof (n : Nat) : S__eo_typeof n := (spec170 n).s__eo_typeof
 
 /-! ### 1 program: __eo_is_var -/
 
@@ -85002,6 +84935,27 @@ theorem step__eo_is_bool_type {kn : Nat} : S__eo_is_bool_type (kn + 1) := by
 theorem allS__eo_is_bool_type : ∀ n, S__eo_is_bool_type n
   | 0 => fun _ _ => by simp only [k__eo_is_bool_type]; exact Ok.throw
   | _ + 1 => step__eo_is_bool_type
+
+/-! ### 1 program: __eo_get_nil_rec -/
+
+abbrev S__eo_get_nil_rec (n : Nat) : Prop :=
+  ∀ {σ : Store} {arg1 : Id} {arg2 : Id}, Inv sem σ → arg1 < σ.size → arg2 < σ.size →
+    Sim sem σ (k__eo_get_nil_rec n arg1 arg2) (__eo_get_nil_rec (σ.decode arg1) (σ.decode arg2))
+
+theorem C__eo_get_nil_rec {n : Nat} (hf : S__eo_get_nil_rec n) {σ : Store} {Γ : List Fact} (hI : Inv sem σ) (hΓ : Ctx σ Γ) {arg1 : Id} {A1 : Term} {arg2 : Id} {A2 : Term}
+    (p1 : Fact.term arg1 A1 ∈ Γ)
+    (p2 : Fact.term arg2 A2 ∈ Γ) :
+    Sim sem σ (k__eo_get_nil_rec n arg1 arg2) (__eo_get_nil_rec A1 A2) :=
+  (hf hI (hΓ.valid p1) (hΓ.valid p2)).congr (by rw [hΓ.dec p1, hΓ.dec p2])
+
+theorem step__eo_get_nil_rec {kn : Nat} : S__eo_get_nil_rec (kn + 1) := by
+  intro σ arg1 arg2 hI h1 h2
+  simp only [k__eo_get_nil_rec]
+  exact Native.getNil_sim (allS__eo_is_list_nil kn) hI h1 h2
+
+theorem allS__eo_get_nil_rec : ∀ n, S__eo_get_nil_rec n
+  | 0 => fun _ _ _ => by simp only [k__eo_get_nil_rec]; exact Ok.throw
+  | _ + 1 => step__eo_get_nil_rec
 
 /-! ### 1 program: __eo_cons -/
 

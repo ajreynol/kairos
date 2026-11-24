@@ -582,4 +582,179 @@ theorem getNil_sim {isNil : Id → Id → K Id} {n : Nat}
   · simp only [hf0, ↓reduceIte]
     exact getNilR_spec hNil n hI hl hf hf0
 
+/-! ## `__eo_is_list` -/
+theorem bool_sim {σ : Store} (hI : Inv sem σ) {t : Term} (b : Bool) (h : t = .Boolean b) :
+    Sim sem σ (pure (if b then 1 else 2)) t := by
+  obtain ⟨_, _, hv, hb⟩ := bool_interned hI b
+  exact Sim.pure hI hv (by rw [decode_of_view hI hb, h]; rfl)
+
+theorem is_ok_stuck : __eo_is_ok .Stuck = .Boolean false := by
+  simp [__eo_is_ok, native_teq, native_not]
+
+theorem is_ok_of {t : Term} (h : t ≠ .Stuck) : __eo_is_ok t = .Boolean true := by
+  simp [__eo_is_ok, native_teq, native_not, h]
+
+theorem isListR_spec {isNil : Id → Id → K Id}
+    (hNil : ∀ {σ : Store} {a b : Id}, Inv sem σ → a < σ.size → b < σ.size →
+      Sim sem σ (isNil a b) (__eo_is_list_nil (σ.decode a) (σ.decode b))) {f : Id} :
+    ∀ (n : Nat) {σ : Store} {l : Id}, Inv sem σ → l < σ.size → f < σ.size → f ≠ 0 →
+      Sim sem σ (isListR isNil f n l) (__eo_is_ok (__eo_get_nil_rec (σ.decode f) (σ.decode l)))
+  | 0, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, hI, hl, hf, hf0 => by
+    have hF := ns hI hf hf0
+    unfold isListR
+    apply Ok.withStore'
+    have atNil : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Sim sem σ (isListR.isNilB isNil f l)
+          (__eo_is_ok (__eo_get_nil_rec (σ.decode f) (σ.decode l))) := by
+      intro hnc
+      unfold isListR.isNilB
+      by_cases hl0 : l = 0
+      · simp only [hl0, ↓reduceIte]
+        refine bool_sim hI false ?_
+        rw [decode_zero hI, __eo_get_nil_rec.eq_2 _ hF, is_ok_stuck]
+      simp only [hl0, ↓reduceIte]
+      have hL := ns hI hl hl0
+      rw [__eo_get_nil_rec.eq_4 _ _ hF hL (fun g x y h => hnc g x y h), requires_true]
+      apply Ok.bind
+      apply Ok.mono (hNil hI hf hl)
+      intro b σ1 ⟨hI1, hE1, hbv, hbd⟩
+      rw [← hbd]
+      apply Ok.mono (P := Post sem σ1 _) (Q := Post sem σ _) ?_ (fun _ _ h => h.weaken hE1)
+      by_cases hb1 : b = 1
+      · have hv : σ1.view b = .Boolean true := (view_bool_iff (b := true) hI1).mpr hb1
+        have : σ1.decode b = .Boolean true := by rw [decode_of_view hI1 hv]; rfl
+        rw [ite_eq_left this, ite_eq_left hb1]
+        exact bool_sim hI1 true (is_ok_of hL)
+      · have : ¬ σ1.decode b = .Boolean true := fun e =>
+          hb1 ((view_bool_iff (b := true) hI1).mp
+            (decode_leaf_inv hI1 (n := .Boolean true) rfl (d := fun _ => .Stuck) e))
+        rw [ite_eq_right this, ite_eq_right hb1]
+        exact bool_sim hI1 false is_ok_stuck
+    split
+    · rename_i gx y hv
+      split
+      · rename_i g x hgx
+        obtain ⟨_, hy, hg, _⟩ := cell_valid hI hl hv hgx
+        rw [cell_dec hI hv hgx, __eo_get_nil_rec.eq_3 _ _ _ _ hF]
+        by_cases hgf : g = f
+        · simp only [hgf, ↓reduceIte]
+          rw [requires_self hF]
+          exact isListR_spec hNil n hI hy hf hf0
+        · simp only [hgf, ↓reduceIte]
+          rw [requires_ne (fun e => hgf ((dec_eq_iff hI hf hg).mp e).symm)]
+          exact bool_sim hI false is_ok_stuck
+      · rename_i hgx
+        exact atNil (not_cell_of_head hI hv fun g x h => hgx g x h)
+    · rename_i hv
+      exact atNil (not_cell_of_view hI fun gx y h => hv gx y h)
+
+theorem isList_sim {isNil : Id → Id → K Id} {n : Nat}
+    (hNil : ∀ {σ : Store} {a b : Id}, Inv sem σ → a < σ.size → b < σ.size →
+      Sim sem σ (isNil a b) (__eo_is_list_nil (σ.decode a) (σ.decode b)))
+    {σ : Store} (hI : Inv sem σ) {f l : Id} (hf : f < σ.size) (hl : l < σ.size) :
+    Sim sem σ (isList isNil n f l) (__eo_is_list (σ.decode f) (σ.decode l)) := by
+  unfold isList
+  by_cases hf0 : f = 0
+  · simp only [hf0, true_or, ↓reduceIte]
+    rw [decode_zero hI, __eo_is_list.eq_1]
+    exact Sim.pure hI (size_pos hI) (decode_zero hI)
+  by_cases hl0 : l = 0
+  · simp only [hl0, or_true, ↓reduceIte]
+    rw [decode_zero hI, __eo_is_list.eq_2 _ (ns hI hf hf0)]
+    exact Sim.pure hI (size_pos hI) (decode_zero hI)
+  simp only [hf0, hl0, or_self, ↓reduceIte]
+  rw [__eo_is_list.eq_3 _ _ (ns hI hf hf0) (ns hI hl hl0)]
+  exact isListR_spec hNil n hI hl hf hf0
+
+/-! ## `__eo_cmp` -/
+theorem natCmp_refl (a : Nat) : natCmp a a = .eq := by simp [natCmp]
+theorem intCmp_refl (a : Int) : intCmp a a = .eq := by simp [intCmp]
+theorem boolCmp_refl (a : Bool) : boolCmp a a = .eq := by cases a <;> rfl
+theorem ratCmp_refl (a : native_Rat) : ratCmp a a = .eq := by
+  simp [ratCmp, intCmp_refl, natCmp_refl]
+theorem stringCmp_refl : ∀ a : native_String, stringCmp a a = .eq
+  | [] => rfl
+  | c :: s => by simp [stringCmp, natCmp_refl, stringCmp_refl s]
+
+mutual
+theorem termCmp_refl : ∀ t : Term, termCmp t t = .eq := by
+  intro t
+  cases t <;> simp only [termCmp, natCmp_refl, intCmp_refl, boolCmp_refl, ratCmp_refl,
+    stringCmp_refl, userOpCmp, userOp1Cmp, userOp2Cmp, userOp3Cmp, termCmp_refl,
+    datatypeDeclCmp_refl]
+theorem datatypeDeclCmp_refl : ∀ t : DatatypeDecl, datatypeDeclCmp t t = .eq := by
+  intro t
+  cases t <;> simp only [datatypeDeclCmp, natCmp_refl, stringCmp_refl, datatypeCmp_refl,
+    datatypeDeclCmp_refl]
+theorem datatypeCmp_refl : ∀ t : Datatype, datatypeCmp t t = .eq := by
+  intro t
+  cases t <;> simp only [datatypeCmp, natCmp_refl, datatypeConsCmp_refl, datatypeCmp_refl]
+theorem datatypeConsCmp_refl : ∀ t : DatatypeCons, datatypeConsCmp t t = .eq := by
+  intro t
+  cases t <;> simp only [datatypeConsCmp, natCmp_refl, termCmp_refl, datatypeConsCmp_refl]
+end
+
+theorem termCmp_of_ctor {s t : Term} (h : s.ctorIdx ≠ t.ctorIdx) :
+    termCmp s t = natCmp s.ctorIdx t.ctorIdx := by
+  cases s <;> first | rfl | (cases t <;> first | rfl | exact absurd rfl h)
+
+theorem ctorIdx_toTerm (d : Id → Term) (n : Node) : (n.toTerm d).ctorIdx = n.ctorIdx := by
+  cases n <;> rfl
+
+theorem child_lt {σ : Store} (hI : Inv sem σ) {a : Id} {n : Node} (hv : σ.view a = n)
+    (hn : n ≠ .Stuck) {j : Id} (hj : j ∈ n.children) : j < a := by
+  have ha : a < σ.size := Classical.byContradiction fun h => hn (hv ▸ view_out h)
+  exact lt_of_child hI ha (hv ▸ hj)
+
+theorem cmpId_spec {σ : Store} (hI : Inv sem σ) :
+    ∀ a b : Id, cmpId σ a b = termCmp (σ.decode a) (σ.decode b) := by
+  intro a
+  induction a using Nat.strongRecOn with
+  | ind a ih =>
+    intro b
+    rw [cmpId]
+    by_cases hab : a = b
+    · subst hab; simp only [↓reduceIte, termCmp_refl]
+    simp only [hab, ↓reduceIte]
+    split
+    · rename_i f x g y ha hb
+      have hf := child_lt hI ha (by simp) (j := f) (by simp [Node.children])
+      have hx := child_lt hI ha (by simp) (j := x) (by simp [Node.children])
+      rw [decode_of_view hI ha, decode_of_view hI hb]
+      simp only [hf, hx, and_self, ↓reduceDIte, Node.toTerm, termCmp, ih f hf, ih x hx]
+      cases termCmp (σ.decode f) (σ.decode g) <;> rfl
+    · rename_i i x j y ha hb
+      have hx := child_lt hI ha (by simp) (j := x) (by simp [Node.children])
+      rw [decode_of_view hI ha, decode_of_view hI hb]
+      simp only [hx, ↓reduceDIte, Node.toTerm, termCmp, ih x hx]
+      cases natCmp i j <;> rfl
+    · rename_i ha hb
+      rw [decode_of_view hI ha, decode_of_view hI hb]
+      simp only [Node.toTerm, termCmp]
+    · split
+      · rfl
+      · rename_i h
+        rw [decode_view' hI a, decode_view' hI b, termCmp_of_ctor] <;>
+          simp only [ctorIdx_toTerm]
+        exact h
+
+theorem cmp_sim {σ : Store} (hI : Inv sem σ) {a b : Id} (ha : a < σ.size) (hb : b < σ.size) :
+    Sim sem σ (cmp a b) (__eo_cmp (σ.decode a) (σ.decode b)) := by
+  unfold cmp
+  by_cases ha0 : a = 0
+  · simp only [ha0, true_or, ↓reduceIte]
+    rw [decode_zero hI, __eo_cmp.eq_1]
+    exact Sim.pure hI (size_pos hI) (decode_zero hI)
+  by_cases hb0 : b = 0
+  · simp only [hb0, or_true, ↓reduceIte]
+    rw [decode_zero hI, __eo_cmp.eq_2 _ (ns hI ha ha0)]
+    exact Sim.pure hI (size_pos hI) (decode_zero hI)
+  simp only [ha0, hb0, or_self, ↓reduceIte]
+  rw [__eo_cmp.eq_3 _ _ (ns hI ha ha0) (ns hI hb hb0)]
+  apply Ok.withStore'
+  refine (intern_sim hI (n := .Boolean _) (by simp [Node.children])).congr ?_
+  simp only [Node.toTerm, cmpId_spec hI, native_tcmp]
+  cases termCmp (σ.decode a) (σ.decode b) <;> rfl
+
 end Kairos.Native

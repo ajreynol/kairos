@@ -1,9 +1,9 @@
 /-
-Native versions of Eunoia's list operations, which `kairos-eoc` calls in
+Native versions of Eunoia's list operations and term comparison, which `kairos-eoc` calls in
 place of compiling Logos's definitions (`Kairos/Gen/Programs.lean` lists them).
 Their proofs are in `verification/KairosVerification/Runtime/Lists.lean`.
 
-Each follows Logos's recursion down the list, but works on ids: a cell is
+The list operations follow Logos's recursion down the list, but works on ids: a cell is
 `Apply (Apply f x) y`, its head `f x` is reused rather than interned again, and
 a walk that changes nothing answers `none`, so that the caller returns the list
 it was given (the same id: equal terms have equal ids). Elements are compared
@@ -144,5 +144,54 @@ def getNilR (isNil : Id → Id → K Id) (f : Id) : Nat → Id → K Id
 
 def getNil (isNil : Id → Id → K Id) (n : Nat) (f l : Id) : K Id :=
   if f = 0 then pure 0 else getNilR isNil f n l
+
+/-! ## `__eo_is_list`: is it a list of `f`'s? -/
+def isListR (isNil : Id → Id → K Id) (f : Id) : Nat → Id → K Id
+  | 0, _ => throw .fuel
+  | n + 1, l => withStore fun σ =>
+    match σ.view l with
+    | .Apply gx y =>
+      match σ.view gx with
+      | .Apply g _ => if g = f then isListR isNil f n y else pure 2
+      | _ => isNilB l
+    | _ => isNilB l
+where isNilB (l : Id) : K Id := do
+  if l = 0 then pure 2 else
+  let b ← isNil f l
+  pure (if b = 1 then 1 else 2)
+
+def isList (isNil : Id → Id → K Id) (n : Nat) (f l : Id) : K Id :=
+  if f = 0 ∨ l = 0 then pure 0 else isListR isNil f n l
+
+/-! ## `__eo_cmp`: Logos's order on terms -/
+/-- `termCmp` on ids. Equal ids are equal terms, different constructors are
+ordered by constructor, and applications by their parts; what remains (a few
+leaves) is left to `termCmp` itself. -/
+def cmpId (σ : Store) (a b : Id) : Ordering :=
+  if a = b then .eq else
+  match σ.view a, σ.view b with
+  | .Apply f x, .Apply g y =>
+    if _h : f < a ∧ x < a then
+      match cmpId σ f g with
+      | .eq => cmpId σ x y
+      | o => o
+    else .eq
+  | .UConst i x, .UConst j y =>
+    if _h : x < a then
+      match natCmp i j with
+      | .eq => cmpId σ x y
+      | o => o
+    else .eq
+  | .UOp o, .UOp o' => userOpCmp o o'
+  | m, n =>
+    if m.ctorIdx = n.ctorIdx then termCmp (σ.decode a) (σ.decode b)
+    else natCmp m.ctorIdx n.ctorIdx
+termination_by a
+decreasing_by all_goals first | exact _h.1 | exact _h.2 | exact _h
+
+def cmp (a b : Id) : K Id :=
+  if a = 0 ∨ b = 0 then pure 0 else withStore fun σ =>
+    let r := cmpId σ a b
+    intern (.Boolean (r == .lt))
 
 end Kairos.Native

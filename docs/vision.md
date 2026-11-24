@@ -190,7 +190,7 @@ caching off, Logos, Pathos, Ethos.
    CpcMini with generated lemmas. This is the direct counterpart of Pathos's
    pilot, where they proved four programs by hand.
 3. **All of CPC, executable.** *(in part: the whole checker is generated,
-   with 20 programs still lifted to Logos's own functions. Remaining: the
+   with 19 programs still lifted to Logos's own functions. Remaining: the
    parser, the CLI, and the first measurements against Logos and Pathos.)*
    Generate the whole checker, plus the parser and the CLI.
 4. **All of CPC, proven.** *(done for the checker: `kairos_refines_logos`

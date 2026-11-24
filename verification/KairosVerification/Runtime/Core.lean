@@ -16,10 +16,10 @@ import KairosVerification.Gen.Term
 namespace Kairos
 open Eo
 namespace Store
-@[simp] theorem decode_with_cache (σ : Store) (c : Std.HashMap (Nat × List Id) Id) :
+@[simp] theorem decode_with_cache (σ : Store) (c : Std.HashMap CKey Id) :
     ({ σ with cache := c } : Store).decode = σ.decode := rfl
 
-@[simp] theorem size_with_cache (σ : Store) (c : Std.HashMap (Nat × List Id) Id) :
+@[simp] theorem size_with_cache (σ : Store) (c : Std.HashMap CKey Id) :
     ({ σ with cache := c } : Store).size = σ.size := rfl
 
 end Store
@@ -35,20 +35,22 @@ inductive Reach (next : Array Id) : Id → Id → Prop
   | here {i : Id} : 0 < i → Reach next i i
   | older {s i : Id} : next[s]! < s → Reach next next[s]! i → Reach next s i
 
-/-- The chains hold the ids from 1 up to `m`, each in the bucket of its node. -/
+/-- The chains hold the ids from 3 up to `m`, each in the bucket of its node. -/
 structure Linked (nodes : Array Node) (heads next : Array Id) (m : Nat) : Prop where
   pos : 0 < heads.size
   lt : ∀ k : Nat, heads[k]! < m
-  reach : ∀ i, 0 < i → i < m → Reach next heads[bucket (nhash nodes[i]!) heads.size]! i
+  reach : ∀ i, 2 < i → i < m → Reach next heads[bucket (nhash nodes[i]!) heads.size]! i
 
 /-- The store invariant. -/
 structure Inv (sem : Sem) (σ : Store) : Prop where
   stuck0 : σ.nodes[0]? = some .Stuck
+  true1 : σ.nodes[1]? = some (.Boolean true)
+  false2 : σ.nodes[2]? = some (.Boolean false)
   wf : ∀ (i : Id) (n : Node), σ.nodes[i]? = some n → ∀ j ∈ n.children, j < i
   next_size : σ.next.size = σ.nodes.size
   linked : Linked σ.nodes σ.heads σ.next σ.nodes.size
   uniq : ∀ (n : Node) (i j : Id), σ.nodes[i]? = some n → σ.nodes[j]? = some n → i = j
-  cache : ∀ (p : Nat) (args : List Id) (r : Id), σ.cache[(p, args)]? = some r →
+  cache : ∀ (p : Nat) (args : List Id) (r : Id), σ.cache[ckey p args]? = some r →
     r < σ.size ∧ (∀ a ∈ args, a < σ.size) ∧
       sem p (args.map σ.decode) = some (σ.decode r)
 
@@ -149,12 +151,15 @@ end decode
 
 theorem Inv.init (sem : Sem) : Inv sem Store.init where
   stuck0 := rfl
+  true1 := rfl
+  false2 := rfl
   wf := by
     intro i n h j hj
-    simp only [Store.init] at h
-    rw [Array.getElem?_eq_some_iff] at h
-    obtain ⟨hi, rfl⟩ := h
-    simp [Node.children] at hj
+    match i, h with
+    | 0, h => cases h; simp [Store.init, Node.children] at hj
+    | 1, h => cases h; simp [Store.init, Node.children] at hj
+    | 2, h => cases h; simp [Store.init, Node.children] at hj
+    | i + 3, h => simp [Store.init] at h
   next_size := rfl
   linked := by
     refine ⟨by simp [Store.init], ?_, ?_⟩
@@ -162,14 +167,23 @@ theorem Inv.init (sem : Sem) : Inv sem Store.init where
       simp only [Store.init, getElem!_def, Array.getElem?_replicate]
       split
       · rename_i h; split at h <;> simp at h; simp [← h]
-      · exact Nat.one_pos
+      · simp
     · intro i h0 h1
       simp [Store.init] at h1; omega
   uniq := by
     intro n i j hi hj
-    have h1 := (Array.getElem?_eq_some_iff.mp hi).1
-    have h2 := (Array.getElem?_eq_some_iff.mp hj).1
-    simp [Store.init] at h1 h2; exact h1.trans h2.symm
+    match i, j, hi, hj with
+    | 0, 0, _, _ => rfl
+    | 1, 1, _, _ => rfl
+    | 2, 2, _, _ => rfl
+    | 0, 1, hi, hj => cases hi; simp [Store.init] at hj
+    | 0, 2, hi, hj => cases hi; simp [Store.init] at hj
+    | 1, 0, hi, hj => cases hi; simp [Store.init] at hj
+    | 1, 2, hi, hj => cases hi; simp [Store.init] at hj
+    | 2, 0, hi, hj => cases hi; simp [Store.init] at hj
+    | 2, 1, hi, hj => cases hi; simp [Store.init] at hj
+    | i + 3, _, hi, _ => simp [Store.init] at hi
+    | _, j + 3, _, hj => simp [Store.init] at hj
   cache := by simp [Store.init]
 
 end Kairos

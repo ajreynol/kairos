@@ -27,10 +27,7 @@ only sees the case at hand, however many cases follow. -/
 @[inline] def knative_teq (a b : Id) : Bool := decide (a = b)
 
 /-- Logos's `__eo_ite` on the id `c`, evaluating only the branch taken. -/
-@[inline] def k_ite (c : Id) (mt me : K Id) : K Id := withStore fun σ =>
-  match σ.view c with
-  | .Boolean true => mt
-  | .Boolean false => me
-  | _ => pure 0
+@[inline] def k_ite (c : Id) (mt me : K Id) : K Id := 
+  if c = 1 then mt else if c = 2 then me else pure 0
 
 end Kairos

@@ -46,9 +46,18 @@ theorem valid_of_app (hI : Inv sem σ) {x f y : Id} (hx : x < σ.size)
    valid_of_view hI hx hv (by simp [Node.children])⟩
 
 /-! ## Taking a matcher chain apart (the `_some` direction) -/
+/-- `leaf` is a test of the view, however it is made. -/
+theorem leaf_eq {α : Type} {x : Id} {n : Node} {k : Option α} :
+    σ.leaf x n k = if σ.view x = n then k else none := by
+  unfold leaf
+  split
+  · cases σ.view x <;> simp
+  · cases σ.view x <;> simp
+  · rfl
+
 theorem leaf_some {α : Type} {x : Id} {n : Node} {k : Option α} {r : α}
     (h : σ.leaf x n k = some r) : σ.view x = n ∧ k = some r := by
-  unfold leaf at h; split at h
+  rw [leaf_eq] at h; split at h
   · rename_i hb; exact ⟨hb, h⟩
   · simp at h
 
@@ -66,7 +75,7 @@ theorem stuck_some {α : Type} {x : Id} {k : Option α} {r : α}
 
 /-! ## Running a matcher chain on a known shape (the `_none` direction) -/
 theorem leaf_of_view {α : Type} {x : Id} {n : Node} {k : Option α}
-    (hv : σ.view x = n) : σ.leaf x n k = k := by simp [leaf, hv]
+    (hv : σ.view x = n) : σ.leaf x n k = k := by simp [leaf_eq, hv]
 
 theorem stuck_of_zero {α : Type} {k : Option α} : Store.stuck 0 k = k := by simp [Store.stuck]
 

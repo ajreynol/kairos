@@ -56,7 +56,6 @@ termination_by i
   match m with
   | .UOp o' => decide (o' = o)
   | _ => false
-
 def findApply (nodes : @& Array Node) (next : @& Array Id) (a b : @& Id) (i : Id) : Id :=
   find (isApply a b) nodes next i
 
@@ -78,7 +77,7 @@ termination_by nodes.size - i
 /-- Use four times as many buckets. -/
 @[noinline] def grow (σ : Store) : Store :=
   let ⟨nodes, heads, next, cache⟩ := σ
-  let (heads, next) := rehash nodes 1 (Array.replicate (heads.size * 4) 0) next
+  let (heads, next) := rehash nodes 3 (Array.replicate (heads.size * 4) 0) next
   ⟨nodes, heads, next, cache⟩
 
 /-- Add `n`, which is new, to bucket `k`. Taking the store apart lets its
@@ -93,6 +92,7 @@ arrays be updated in place. -/
 def internNode (n : Node) : K Id := fun σ =>
   match n with
   | .Stuck => .ok 0 σ
+  | .Boolean b => .ok (if b then 1 else 2) σ
   | _ =>
     let k := bucket (nhash n) σ.heads.size
     let i := findNode σ.nodes σ.next n σ.heads[k]!
@@ -114,16 +114,21 @@ def internUOp (o : UserOp) : K Id := fun σ =>
   match n with
   | .Apply a b => internApply a b
   | .UOp o => internUOp o
+  | .Boolean b => pure (if b then 1 else 2)
   | n => internNode n
 
 /-! ## The result cache -/
-/-- Run `body` for program `p` on `args`, unless the result is cached. -/
-def cached (p : Nat) (args : List Id) (body : K Id) : K Id := fun σ =>
-  match σ.cache[(p, args)]? with
+/-- `cached`, with the key built. -/
+def cachedK (k : CKey) (body : K Id) : K Id := fun σ =>
+  match σ.cache[k]? with
   | some r => .ok r σ
   | none =>
     match body σ with
-    | .ok r σ' => .ok r { σ' with cache := σ'.cache.insert (p, args) r }
+    | .ok r ⟨nodes, heads, next, cache⟩ => .ok r ⟨nodes, heads, next, cache.insert k r⟩
     | .error e σ' => .error e σ'
+
+/-- Run `body` for program `p` on `args`, unless the result is cached. -/
+@[inline] def cached (p : Nat) (args : List Id) (body : K Id) : K Id :=
+  cachedK (ckey p args) body
 
 end Kairos

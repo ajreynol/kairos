@@ -20,7 +20,14 @@ namespace Store
 hands its parts to the rest of the matcher. They inline to nested matches. -/
 
 @[inline] def leaf {α : Type} (σ : Store) (x : Id) (n : Node) (k : Option α) : Option α :=
-  if σ.view x = n then k else none
+  match n with
+  | .UOp o => match σ.view x with
+    | .UOp o' => if o' = o then k else none
+    | _ => none
+  | .Boolean b => match σ.view x with
+    | .Boolean b' => if b' = b then k else none
+    | _ => none
+  | n => if σ.view x = n then k else none
 
 /-- A native field a pattern fixes, e.g. the operator of an indexed operator. -/
 @[inline] def _root_.Kairos.kguard {α : Type} (c : Prop) [Decidable c] (k : Option α) : Option α :=

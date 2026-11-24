@@ -61,7 +61,8 @@ is up to date) and 1 otherwise. CI runs `--check` on every push (the
    stage mirrors, port them, and update `eoc/FORK_BASE`.
 4. `install/install-cpc.sh`, then `lake build`, then commit `Kairos/Gen/`.
 5. In `verification/`, `lake build`. If Ethos changed the definition of one of
-   Eunoia's list operations that Kairos has a native version of, this is
+   Eunoia's builtins that Kairos has a native version of (its list operations
+   or the term order, `termCmp`), this is
    where it shows: `KairosVerification/Runtime/Lists.lean` no longer proves
    against it. Port the change to `Kairos/Runtime/Lists.lean` and its proof,
    or drop the operation from the `natives` table of the stage so that it is

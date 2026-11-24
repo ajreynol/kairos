@@ -12,7 +12,7 @@ set_option maxRecDepth 100000
 namespace Kairos.Gen
 open Eo Kairos Store SmtEval
 
-/-! Generated 1116 of 1145 programs (20 lifted, 5 native); 4 over native values are Logos's own. Left out:
+/-! Generated 1116 of 1145 programs (19 lifted, 7 native); 4 over native values are Logos's own. Left out:
   __eo_Numeral: defined by a non-program definition
   __eo_Rational: defined by a non-program definition
   __eo_Binary: defined by a non-program definition
@@ -38,7 +38,6 @@ open Eo Kairos Store SmtEval
   __eo_prog_re_star_emp: defined by a non-program definition
 
 Lifted (Logos computes them on decoded arguments):
-  __eo_cmp: a term used as a native value
   __eo_datatype_constructors_rec: a native argument matched against a value
   __eo_datatype_cons_selectors_rec: a native argument matched against a value
   __eo_list_repeat_rec: a native argument matched against a value
@@ -60,7 +59,9 @@ Lifted (Logos computes them on decoded arguments):
   __eo_typeof_dt_sel_return: a native argument matched against a value
 
 Native (hand-written, Kairos/Runtime/Lists.lean, with their proofs):
+  __eo_cmp
   __eo_get_nil_rec
+  __eo_is_list
   __eo_list_erase_rec
   __eo_list_erase_all_rec
   __eo_list_setof_rec
@@ -470,12 +471,6 @@ def m__eo_is_list_nil_21 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
 
 def m__eo_is_list_nil_22 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
   σ.leaf arg1 .__eo_List_cons (σ.leaf arg2 .__eo_List_nil (some ()))
-
-def m__eo_is_list_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_is_list_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
 
 def m__eo_list_nth_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
   Store.stuck arg2 (some ())
@@ -10817,10 +10812,10 @@ def k__eo_gt : Nat → Id → Id → K Id
 
 /-! ### 1 program: __eo_cmp -/
 
-/-- Lifted: Logos computes it on decoded arguments. -/
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_cmp : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | _ + 1, arg1, arg2 => withStore fun σ => internTerm (__eo_cmp (σ.decode arg1) (σ.decode arg2))
+  | kfuel + 1, arg1, arg2 => Native.cmp arg1 arg2
 
 /-! ### 1 program: __eo_var -/
 
@@ -11386,28 +11381,12 @@ def k__eo_is_list_nil : Nat → Id → Id → K Id
      do
       intern (.Boolean false)
 
-/-! ### 1 program: __eo_get_nil_rec -/
-
-/-- Native: Kairos/Runtime/Lists.lean. -/
-def k__eo_get_nil_rec : Nat → Id → Id → K Id
-  | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => Native.getNil (k__eo_is_list_nil kfuel) kfuel arg1 arg2
-
 /-! ### 1 program: __eo_is_list -/
 
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_is_list : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_is_list_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_is_list_2 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    -- case
-     do
-      let kt0 ← (k__eo_get_nil_rec kfuel arg1 arg2)
-      k__eo_is_ok kfuel kt0
+  | kfuel + 1, arg1, arg2 => Native.isList (k__eo_is_list_nil kfuel) kfuel arg1 arg2
 
 /-! ### Recursive component 1 program: __eo_list_nth_rec -/
 
@@ -13846,6 +13825,13 @@ def k__eo_is_bool_type : Nat → Id → K Id
       let kt0 ← (k__eo_typeof kfuel arg1)
       let kt4 ← (intern .Bool)
       k__eo_eq kfuel kt0 kt4
+
+/-! ### 1 program: __eo_get_nil_rec -/
+
+/-- Native: Kairos/Runtime/Lists.lean. -/
+def k__eo_get_nil_rec : Nat → Id → Id → K Id
+  | 0, _, _ => throw .fuel
+  | kfuel + 1, arg1, arg2 => Native.getNil (k__eo_is_list_nil kfuel) kfuel arg1 arg2
 
 /-! ### 1 program: __eo_cons -/
 

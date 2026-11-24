@@ -40,16 +40,22 @@ theorem Sim.nite {c : Bool} {mt me : K Id} {T E : Term}
 theorem k_ite_sim (hI : Inv sem σ) (hΓ : Ctx σ Γ) {c : Id} {C T E : Term} {mt me : K Id}
     (hc : Fact.term c C ∈ Γ) (ht : Sim sem σ mt T) (he : Sim sem σ me E) :
     Sim sem σ (k_ite c mt me) (__eo_ite C T E) := by
-  apply Sim.withStore
   have hd := hΓ.dec hc
   rw [decode_view' hI c] at hd
   subst hd
   cases hv : σ.view c with
   | Boolean b =>
     cases b
-    · simpa [hv, Node.toTerm, __eo_ite, native_ite, native_teq] using he
-    · simpa [hv, Node.toTerm, __eo_ite, native_ite, native_teq] using ht
+    · have hc2 : c = 2 := (view_bool_iff hI).mp hv
+      simpa [k_ite, hc2, Node.toTerm, __eo_ite, native_ite, native_teq] using he
+    · have hc1 : c = 1 := (view_bool_iff hI).mp hv
+      simpa [k_ite, hc1, Node.toTerm, __eo_ite, native_ite, native_teq] using ht
   | _ =>
+    have h1 : c ≠ 1 := fun e => by
+      have := (view_bool_iff (b := true) hI).mpr e; rw [hv] at this; cases this
+    have h2 : c ≠ 2 := fun e => by
+      have := (view_bool_iff (b := false) hI).mpr e; rw [hv] at this; cases this
+    simp only [k_ite, h1, h2, ↓reduceIte]
     apply (Sim.stuck hI).congr
     simp [Node.toTerm, __eo_ite, native_ite, native_teq]
 

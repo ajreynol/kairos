@@ -3589,6 +3589,11 @@ void KairosMetaReduce::finalize()
        {2, "Native.getNil (k__eo_is_list_nil kfuel) kfuel arg1 arg2",
         "Native.getNil_sim (allS__eo_is_list_nil kn) hI h1 h2",
         {"__eo_is_list_nil"}}},
+      {"__eo_is_list",
+       {2, "Native.isList (k__eo_is_list_nil kfuel) kfuel arg1 arg2",
+        "Native.isList_sim (allS__eo_is_list_nil kn) hI h1 h2",
+        {"__eo_is_list_nil"}}},
+      {"__eo_cmp", {2, "Native.cmp arg1 arg2", "Native.cmp_sim hI h1 h2", {}}},
   };
   for (const std::string& n : d_names)
   {
