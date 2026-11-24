@@ -5,7 +5,7 @@ Logos's definitions (`__eo_list_erase_rec` and the others), so a change to
 those breaks this file, not the checker.
 -/
 import Kairos.Runtime.Lists
-import KairosVerification.Gen.Prims
+import KairosVerification.Gen.Intern
 
 namespace Kairos.Native
 open Eo Kairos Store SmtEval
@@ -756,5 +756,712 @@ theorem cmp_sim {σ : Store} (hI : Inv sem σ) {a b : Id} (ha : a < σ.size) (hb
   refine (intern_sim hI (n := .Boolean _) (by simp [Node.children])).congr ?_
   simp only [Node.toTerm, cmpId_spec hI, native_tcmp]
   cases termCmp (σ.decode a) (σ.decode b) <;> rfl
+
+/-! ## `__eo_list_concat_rec` -/
+theorem sim_zero {σ : Store} (hI : Inv sem σ) {t : Term} (h : t = .Stuck) :
+    Sim sem σ (pure 0) t :=
+  Sim.pure hI (size_pos hI) (by rw [decode_zero hI, h])
+
+theorem intern_app {σ σ1 : Store} (hI1 : Inv sem σ1) (hE : Extends σ σ1) {fx r : Id}
+    (hfx : fx < σ.size) (hr : r < σ1.size) {t : Term}
+    (ht : Term.Apply (σ.decode fx) (σ1.decode r) = t) :
+    Sim sem σ1 (intern (.Apply fx r)) t := by
+  refine (intern_sim hI1 (n := .Apply fx r)
+    (by simp [Node.children, Nat.lt_of_lt_of_le hfx hE.size_le, hr])).congr ?_
+  simp only [Node.toTerm]; rw [decode_extends hE fx hfx]; exact ht
+
+theorem cell_head {σ : Store} (hI : Inv sem σ) {fx f x : Id} (hfx : σ.view fx = .Apply f x) :
+    σ.decode fx = .Apply (σ.decode f) (σ.decode x) := by
+  rw [decode_of_view hI hfx]; rfl
+
+theorem app_ns {f x : Term} : Term.Apply f x = .Stuck → False := fun h => by cases h
+
+/-- The end of a list walk: `Stuck` if the list is, or `r`. -/
+theorem end_sim {σ : Store} (hI : Inv sem σ) {l r : Id} {t : Term} (hr : r < σ.size)
+    (h0 : l = 0 → t = .Stuck) (h1 : l ≠ 0 → σ.decode r = t) :
+    Sim sem σ (pure (if l = 0 then 0 else r)) t := by
+  by_cases hl : l = 0
+  · simp only [hl, ↓reduceIte]; exact sim_zero hI (h0 hl)
+  · simp only [hl, ↓reduceIte]; exact Sim.pure hI hr (h1 hl)
+
+theorem concatR_spec {z : Id} :
+    ∀ (n : Nat) {σ : Store} {l : Id}, Inv sem σ → l < σ.size → z < σ.size → z ≠ 0 →
+      Sim sem σ (concatR z n l) (__eo_list_concat_rec (σ.decode l) (σ.decode z))
+  | 0, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, hI, hl, hz, hz0 => by
+    have hZ := ns hI hz hz0
+    unfold concatR
+    apply Ok.withStore'
+    have fin : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Sim sem σ (pure (if l = 0 then 0 else z))
+          (__eo_list_concat_rec (σ.decode l) (σ.decode z)) := fun hnc =>
+      end_sim hI hz (fun h => by rw [h, decode_zero hI, __eo_list_concat_rec.eq_1]) fun h => by
+        have hL := ns hI hl h
+        symm; apply __eo_list_concat_rec.eq_4 <;> assumption
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨hfxv, hy, _, _⟩ := cell_valid hI hl hv hfx
+        rw [cell_dec hI hv hfx, __eo_list_concat_rec.eq_3 _ _ _ _ hZ]
+        apply Ok.bind
+        apply Ok.mono (concatR_spec n hI hy hz hz0)
+        intro r σ1 hp
+        rw [← hp.dec]
+        refine Ok.mono (P := Post sem σ1 _) ?_ (fun _ _ h => h.weaken hp.ext)
+        by_cases hr0 : r = 0
+        · simp only [hr0, ↓reduceIte]
+          exact sim_zero hp.inv (by rw [decode_zero hp.inv, __eo_mk_apply.eq_2 _ app_ns])
+        · simp only [hr0, ↓reduceIte]
+          rw [__eo_mk_apply.eq_3 _ _ app_ns (ns hp.inv hp.valid hr0)]
+          exact intern_app hp.inv hp.ext hfxv hp.valid (by rw [cell_head hI hfx])
+      · rename_i hfx
+        exact fin (not_cell_of_head hI hv fun f x h => hfx f x h)
+    · rename_i hv
+      exact fin (not_cell_of_view hI fun fx y h => hv fx y h)
+
+theorem concat_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l z : Id} (hl : l < σ.size)
+    (hz : z < σ.size) :
+    Sim sem σ (concat n l z) (__eo_list_concat_rec (σ.decode l) (σ.decode z)) := by
+  unfold concat
+  by_cases hz0 : z = 0
+  · simp only [hz0, ↓reduceIte]
+    refine sim_zero hI ?_
+    rw [decode_zero hI]
+    by_cases hl0 : l = 0
+    · rw [hl0, decode_zero hI, __eo_list_concat_rec.eq_1]
+    · rw [__eo_list_concat_rec.eq_2 _ (ns hI hl hl0)]
+  · simp only [hz0, ↓reduceIte]
+    exact concatR_spec n hI hl hz hz0
+
+/-! ## `__eo_list_rev_rec` -/
+theorem revR_spec :
+    ∀ (n : Nat) {σ : Store} {l acc : Id}, Inv sem σ → l < σ.size → acc < σ.size → acc ≠ 0 →
+      Sim sem σ (revR n l acc) (__eo_list_rev_rec (σ.decode l) (σ.decode acc))
+  | 0, _, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, acc, hI, hl, hz, hz0 => by
+    have hZ := ns hI hz hz0
+    unfold revR
+    apply Ok.withStore'
+    have fin : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Sim sem σ (pure (if l = 0 then 0 else acc))
+          (__eo_list_rev_rec (σ.decode l) (σ.decode acc)) := fun hnc =>
+      end_sim hI hz (fun h => by rw [h, decode_zero hI, __eo_list_rev_rec.eq_1]) fun h => by
+        have hL := ns hI hl h
+        symm; apply __eo_list_rev_rec.eq_4 <;> assumption
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨hfxv, hy, _, _⟩ := cell_valid hI hl hv hfx
+        rw [cell_dec hI hv hfx, __eo_list_rev_rec.eq_3 _ _ _ _ hZ]
+        apply Ok.bind
+        apply Ok.mono (intern_app hI (Extends.refl σ) hfxv hz rfl)
+        intro c σ1 hp
+        refine Ok.mono (P := Post sem σ1 _) ?_ (fun _ _ h => h.weaken hp.ext)
+        have hd := hp.dec
+        rw [cell_head hI hfx] at hd
+        rw [← hd, ← decode_extends hp.ext y hy]
+        refine revR_spec n hp.inv (Nat.lt_of_lt_of_le hy hp.ext.size_le) hp.valid ?_
+        intro h0
+        rw [h0, decode_zero hp.inv] at hd; cases hd
+      · rename_i hfx
+        exact fin (not_cell_of_head hI hv fun f x h => hfx f x h)
+    · rename_i hv
+      exact fin (not_cell_of_view hI fun fx y h => hv fx y h)
+
+theorem rev_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l z : Id} (hl : l < σ.size)
+    (hz : z < σ.size) :
+    Sim sem σ (rev n l z) (__eo_list_rev_rec (σ.decode l) (σ.decode z)) := by
+  unfold rev
+  by_cases hz0 : z = 0
+  · simp only [hz0, ↓reduceIte]
+    refine sim_zero hI ?_
+    rw [decode_zero hI]
+    by_cases hl0 : l = 0
+    · rw [hl0, decode_zero hI, __eo_list_rev_rec.eq_1]
+    · rw [__eo_list_rev_rec.eq_2 _ (ns hI hl hl0)]
+  · simp only [hz0, ↓reduceIte]
+    exact revR_spec n hI hl hz hz0
+
+/-! ## `__eo_get_elements_rec` -/
+theorem elementsR_spec {k e : Id} :
+    ∀ (n : Nat) {σ : Store} {l : Id}, Inv sem σ → l < σ.size → k < σ.size → e < σ.size →
+      σ.decode k = .__eo_List_cons → σ.decode e = .__eo_List_nil →
+      Sim sem σ (elementsR k e n l) (__eo_get_elements_rec (σ.decode l))
+  | 0, _, _, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, hI, hl, hk, he, dk, de => by
+    unfold elementsR
+    apply Ok.withStore'
+    have fin : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Sim sem σ (pure (if l = 0 then 0 else e))
+          (__eo_get_elements_rec (σ.decode l)) := fun hnc =>
+      end_sim hI he (fun h => by rw [h, decode_zero hI, __eo_get_elements_rec.eq_1]) fun h => by
+        have hL := ns hI hl h
+        rw [de]; symm; apply __eo_get_elements_rec.eq_3 <;> assumption
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨_, hy, _, hx⟩ := cell_valid hI hl hv hfx
+        rw [cell_dec hI hv hfx, __eo_get_elements_rec.eq_2]
+        apply Ok.bind
+        apply Ok.mono (elementsR_spec n hI hy hk he dk de)
+        intro r σ1 hp
+        rw [← hp.dec]
+        refine Ok.mono (P := Post sem σ1 _) ?_ (fun _ _ h => h.weaken hp.ext)
+        by_cases hr0 : r = 0
+        · simp only [hr0, ↓reduceIte]
+          exact sim_zero hp.inv (by rw [decode_zero hp.inv, __eo_mk_apply.eq_2 _ app_ns])
+        · simp only [hr0, ↓reduceIte]
+          rw [__eo_mk_apply.eq_3 _ _ app_ns (ns hp.inv hp.valid hr0)]
+          apply Ok.bind
+          apply Ok.mono (intern_app hp.inv hp.ext hk (Nat.lt_of_lt_of_le hx hp.ext.size_le) rfl)
+          intro c σ2 hq
+          refine Ok.mono (P := Post sem σ2 _) ?_ (fun _ _ h => h.weaken hq.ext)
+          refine intern_app hq.inv (Extends.refl σ2) hq.valid
+            (Nat.lt_of_lt_of_le hp.valid hq.ext.size_le) ?_
+          rw [hq.dec, decode_extends hq.ext r hp.valid, dk, decode_extends hp.ext x hx]
+      · rename_i hfx
+        exact fin (not_cell_of_head hI hv fun f x h => hfx f x h)
+    · rename_i hv
+      exact fin (not_cell_of_view hI fun fx y h => hv fx y h)
+
+theorem elements_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l : Id} (hl : l < σ.size) :
+    Sim sem σ (elements n l) (__eo_get_elements_rec (σ.decode l)) := by
+  unfold elements
+  apply Ok.bind
+  apply Ok.mono (intern_sim hI (n := .__eo_List_cons) (by simp [Node.children]))
+  intro k σ1 hp
+  apply Ok.bind
+  apply Ok.mono (intern_sim hp.inv (n := .__eo_List_nil) (by simp [Node.children]))
+  intro e σ2 hq
+  have hE := hp.ext.trans hq.ext
+  refine Ok.mono (P := Post sem σ2 _) ?_ (fun _ _ h => h.weaken hE)
+  rw [← decode_extends hE l hl]
+  refine elementsR_spec n hq.inv (Nat.lt_of_lt_of_le hl hE.size_le)
+    (Nat.lt_of_lt_of_le hp.valid hq.ext.size_le) hq.valid ?_ hq.dec
+  rw [decode_extends hq.ext k hp.valid]; exact hp.dec
+
+/-! ## `__eo_list_len_rec` -/
+theorem lenR_spec :
+    ∀ (n : Nat) {σ : Store} {l : Id} {i : Nat}, Inv sem σ → l < σ.size →
+      Ok (lenR n l i) σ (fun r? σ' => σ' = σ ∧ match r? with
+        | none => __eo_list_len_rec (σ.decode l) = .Stuck
+        | some k => __eo_list_len_rec (σ.decode l) = .Numeral ((k : Int) - (i : Int)))
+  | 0, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, i, hI, hl => by
+    unfold lenR
+    apply Ok.withStore'
+    have fin : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Ok (pure (if l = 0 then none else some i) : K (Option Nat)) σ (fun r? σ' => σ' = σ ∧ match r? with
+        | none => __eo_list_len_rec (σ.decode l) = .Stuck
+        | some k => __eo_list_len_rec (σ.decode l) = .Numeral ((k : Int) - (i : Int))) := fun hnc => by
+      refine Ok.pure ⟨rfl, ?_⟩
+      by_cases h : l = 0
+      · simp only [h, ↓reduceIte]
+        rw [decode_zero hI, __eo_list_len_rec.eq_1]
+      · simp only [h, ↓reduceIte]
+        have hL := ns hI hl h
+        rw [Int.sub_self]
+        apply __eo_list_len_rec.eq_3 <;> assumption
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨_, hy, _, _⟩ := cell_valid hI hl hv hfx
+        apply Ok.mono (lenR_spec n (i := i + 1) hI hy)
+        rintro r? σ' ⟨rfl, h⟩
+        refine ⟨rfl, ?_⟩
+        rw [cell_dec hI hv hfx, __eo_list_len_rec.eq_2]
+        cases r? with
+        | none => simp only at h ⊢; rw [h]; rfl
+        | some k =>
+          simp only at h ⊢
+          rw [h, __eo_add.eq_1]
+          have e : (1 : Int) + ((k : Int) - ((i + 1 : Nat) : Int)) = (k : Int) - (i : Int) := by omega
+          exact congrArg Term.Numeral e
+      · rename_i hfx
+        exact fin (not_cell_of_head hI hv fun f x h => hfx f x h)
+    · rename_i hv
+      exact fin (not_cell_of_view hI fun fx y h => hv fx y h)
+
+theorem intern_num {σ : Store} (hI : Inv sem σ) {i : Int} {t : Term} (h : t = .Numeral i) :
+    Sim sem σ (intern (.Numeral i)) t :=
+  (intern_sim hI (n := .Numeral i) (by simp [Node.children])).congr (by rw [h]; rfl)
+
+theorem len_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l : Id} (hl : l < σ.size) :
+    Sim sem σ (len n l) (__eo_list_len_rec (σ.decode l)) := by
+  unfold len
+  apply Ok.bind
+  apply Ok.mono (lenR_spec n (i := 0) hI hl)
+  rintro r? σ' ⟨rfl, h⟩
+  cases r? with
+  | none => exact sim_zero hI h
+  | some k => exact intern_num hI (by simpa using h)
+
+/-! ## `__eo_list_nth_rec` -/
+theorem nthR_spec :
+    ∀ (n : Nat) {σ : Store} {l : Id} {i : Int}, Inv sem σ → l < σ.size →
+      Sim sem σ (nthR n l i) (__eo_list_nth_rec (σ.decode l) (.Numeral i))
+  | 0, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, i, hI, hl => by
+    unfold nthR
+    apply Ok.withStore'
+    have hN : Term.Numeral i = .Stuck → False := fun h => by cases h
+    have fin : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Sim sem σ (pure 0) (__eo_list_nth_rec (σ.decode l) (.Numeral i)) := fun hnc =>
+      sim_zero hI (by
+        apply __eo_list_nth_rec.eq_4 <;>
+          first | assumption | (intros; first | exact hnc _ _ _ (by assumption) | contradiction))
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨_, hy, _, hx⟩ := cell_valid hI hl hv hfx
+        rw [cell_dec hI hv hfx]
+        by_cases hi : i = 0
+        · simp only [hi, ↓reduceIte]
+          rw [__eo_list_nth_rec.eq_2]
+          exact Sim.pure hI hx rfl
+        · simp only [hi, ↓reduceIte]
+          rw [__eo_list_nth_rec.eq_3 _ _ _ _ hN (fun h => by cases h; exact hi rfl),
+            __eo_add.eq_1]
+          exact nthR_spec n hI hy
+      · rename_i hfx
+        exact fin (not_cell_of_head hI hv fun f x h => hfx f x h)
+    · rename_i hv
+      exact fin (not_cell_of_view hI fun fx y h => hv fx y h)
+
+theorem nth_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l i : Id} (hl : l < σ.size) :
+    Sim sem σ (nth n l i) (__eo_list_nth_rec (σ.decode l) (σ.decode i)) := by
+  unfold nth
+  apply Ok.withStore'
+  split
+  · rename_i j hj
+    rw [decode_of_view hI hj]
+    exact nthR_spec n hI hl
+  · exact Sim.lift hI
+
+/-! ## `__eo_list_find_rec` -/
+theorem findR_spec {z : Id} :
+    ∀ (n : Nat) {σ : Store} {l : Id} {i : Int}, Inv sem σ → l < σ.size → z < σ.size → z ≠ 0 →
+      Ok (findR z n l i) σ (fun r? σ' => σ' = σ ∧ match r? with
+        | none => __eo_list_find_rec (σ.decode l) (σ.decode z) (.Numeral i) = .Stuck
+        | some k => __eo_list_find_rec (σ.decode l) (σ.decode z) (.Numeral i) = .Numeral k)
+  | 0, _, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, i, hI, hl, hz, hz0 => by
+    have hZ := ns hI hz hz0
+    have hN : Term.Numeral i = .Stuck → False := fun h => by cases h
+    unfold findR
+    apply Ok.withStore'
+    have fin : (∀ F X Y, σ.decode l = .Apply (.Apply F X) Y → False) →
+        Ok (pure (if l = 0 then none else some (-1)) : K (Option Int)) σ (fun r? σ' => σ' = σ ∧ match r? with
+        | none => __eo_list_find_rec (σ.decode l) (σ.decode z) (.Numeral i) = .Stuck
+        | some k => __eo_list_find_rec (σ.decode l) (σ.decode z) (.Numeral i) = .Numeral k) := fun hnc => by
+      refine Ok.pure ⟨rfl, ?_⟩
+      by_cases h : l = 0
+      · simp only [h, ↓reduceIte]
+        rw [decode_zero hI, __eo_list_find_rec.eq_1]
+      · simp only [h, ↓reduceIte]
+        have hL := ns hI hl h
+        apply __eo_list_find_rec.eq_5 <;> assumption
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨_, hy, _, hx⟩ := cell_valid hI hl hv hfx
+        rw [cell_dec hI hv hfx, __eo_list_find_rec.eq_4 _ _ _ _ _ hZ hN]
+        by_cases hx0 : x = 0
+        · simp only [hx0, ↓reduceIte]
+          refine Ok.pure ⟨rfl, ?_⟩
+          simp only
+          rw [decode_zero hI, __eo_eq.eq_1, ite_stuck']
+        simp only [hx0, ↓reduceIte]
+        rw [eo_eq_ids hI hx hz hx0 hz0]
+        by_cases hxz : x = z
+        · simp only [hxz, ↓reduceIte, decide_true, ite_true']
+          exact Ok.pure ⟨rfl, rfl⟩
+        · simp only [hxz, ↓reduceIte, decide_false, ite_false', __eo_add.eq_1]
+          exact findR_spec n hI hy hz hz0
+      · rename_i hfx
+        exact fin (not_cell_of_head hI hv fun f x h => hfx f x h)
+    · rename_i hv
+      exact fin (not_cell_of_view hI fun fx y h => hv fx y h)
+
+theorem findIdx_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l z i : Id} (hl : l < σ.size)
+    (hz : z < σ.size) :
+    Sim sem σ (findIdx n l z i) (__eo_list_find_rec (σ.decode l) (σ.decode z) (σ.decode i)) := by
+  unfold findIdx
+  apply Ok.withStore'
+  split
+  · rename_i j hj
+    rw [decode_of_view hI hj]
+    by_cases hz0 : z = 0
+    · simp only [hz0, ↓reduceIte]
+      refine sim_zero hI ?_
+      rw [decode_zero hI]
+      by_cases hl0 : l = 0
+      · rw [hl0, decode_zero hI, __eo_list_find_rec.eq_1]
+      · rw [__eo_list_find_rec.eq_2 _ _ (ns hI hl hl0)]
+    · simp only [hz0, ↓reduceIte]
+      apply Ok.bind
+      apply Ok.mono (findR_spec n (i := j) hI hl hz hz0)
+      rintro r? σ' ⟨rfl, h⟩
+      cases r? with
+      | none => exact sim_zero hI h
+      | some k => exact intern_num hI h
+  · exact Sim.lift hI
+
+/-! ## `__eo_list_minclude_rec` -/
+theorem not_bool (b : Bool) : __eo_not (.Boolean b) = .Boolean (!b) := by
+  rw [__eo_not.eq_1]; rfl
+theorem not_stuck : __eo_not .Stuck = .Stuck := by simp [__eo_not]
+
+theorem mincludeR_spec :
+    ∀ (n : Nat) {σ : Store} {y z : Id}, Inv sem σ → y < σ.size → z < σ.size → y ≠ 0 →
+      Sim sem σ (mincludeR n y z)
+        (__eo_list_minclude_rec (σ.decode y) (σ.decode z) (.Boolean true))
+  | 0, _, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, y, z, hI, hy, hz, hy0 => by
+    have hY := ns hI hy hy0
+    unfold mincludeR
+    apply Ok.withStore'
+    have hT : Term.Boolean true = .Stuck → False := fun h => by cases h
+    have fin : (∀ X Z, σ.decode z = .Apply (.Apply .__eo_List_cons X) Z → False) →
+        (σ.decode z = .__eo_List_nil → False) →
+        Sim sem σ (pure 0) (__eo_list_minclude_rec (σ.decode y) (σ.decode z) (.Boolean true)) := by
+      intro h1 h2
+      refine sim_zero hI ?_
+      by_cases hz0 : z = 0
+      · rw [hz0, decode_zero hI, __eo_list_minclude_rec.eq_2 _ _ hY]
+      · have hZ := ns hI hz hz0
+        apply __eo_list_minclude_rec.eq_6 <;>
+          first
+          | assumption
+          | (intros; first
+              | contradiction
+              | exact h1 _ _ (by assumption)
+              | exact h2 (by assumption))
+    split
+    · rename_i cx z' hv
+      have hnil : σ.decode z = .__eo_List_nil → False := fun h => by
+        rw [decode_of_view hI hv] at h; cases h
+      split
+      · rename_i c x hcx
+        split
+        · rename_i hc
+          obtain ⟨_, hz', _, hx⟩ := cell_valid hI hz hv hcx
+          have dc : σ.decode c = .__eo_List_cons := by rw [decode_of_view hI hc]; rfl
+          rw [cell_dec hI hv hcx, dc, __eo_list_minclude_rec.eq_4 _ _ _ hY]
+          apply Ok.bind
+          apply Ok.mono (erase_sim (n := n) hI hy hx)
+          intro v σ1 hp
+          refine Ok.mono (P := Post sem σ1 _) ?_ (fun _ _ h => h.weaken hp.ext)
+          rw [← hp.dec]
+          by_cases hv0 : v = 0
+          · simp only [hv0, true_or, ↓reduceIte]
+            exact sim_zero hp.inv (by rw [decode_zero hp.inv, __eo_list_minclude_rec.eq_1])
+          have hV := ns hp.inv hp.valid hv0
+          by_cases hz0 : z' = 0
+          · simp only [hz0, or_true, ↓reduceIte]
+            exact sim_zero hp.inv (by rw [decode_zero hI, __eo_list_minclude_rec.eq_2 _ _ hV])
+          simp only [hv0, hz0, or_self, ↓reduceIte]
+          have hz1 := Nat.lt_of_lt_of_le hz' hp.ext.size_le
+          have hy1 := Nat.lt_of_lt_of_le hy hp.ext.size_le
+          rw [← decode_extends hp.ext y hy, ← decode_extends hp.ext z' hz',
+            eo_eq_ids hp.inv hp.valid hy1 hv0 hy0, not_bool]
+          by_cases hvy : v = y
+          · simp only [hvy, ↓reduceIte, decide_true, Bool.not_true]
+            refine bool_sim hp.inv false ?_
+            rw [hvy] at hV
+            exact __eo_list_minclude_rec.eq_3 _ _ hV (ns hp.inv hz1 hz0)
+          · simp only [hvy, ↓reduceIte, decide_false, Bool.not_false]
+            exact mincludeR_spec n hp.inv hp.valid hz1 hv0
+        · rename_i hc
+          refine fin (fun X Z h => ?_) hnil
+          rw [cell_dec hI hv hcx] at h
+          simp only [Term.Apply.injEq] at h
+          exact hc (decode_leaf_inv hI (n := .__eo_List_cons) rfl (d := fun _ => .Stuck) h.1.1)
+      · rename_i hcx
+        exact fin (fun X Z h => not_cell_of_head hI hv (fun f x h => hcx f x h) _ _ _ h) hnil
+    · rename_i hv
+      have dz : σ.decode z = .__eo_List_nil := by rw [decode_of_view hI hv]; rfl
+      rw [dz, __eo_list_minclude_rec.eq_5 _ hY]
+      exact bool_sim hI true rfl
+    · rename_i hv1 hv2
+      refine fin (fun X Z h => not_cell_of_view hI (fun f x h => hv1 f x h) _ _ _ h) (fun h => ?_)
+      exact hv2 (decode_leaf_inv hI (n := .__eo_List_nil) rfl (d := fun _ => .Stuck) h)
+
+theorem minclude_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {y z b : Id} (hy : y < σ.size)
+    (hz : z < σ.size) :
+    Sim sem σ (minclude n y z b)
+      (__eo_list_minclude_rec (σ.decode y) (σ.decode z) (σ.decode b)) := by
+  unfold minclude
+  by_cases hy0 : y = 0
+  · simp only [hy0, true_or, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_list_minclude_rec.eq_1])
+  have hY := ns hI hy hy0
+  by_cases hz0 : z = 0
+  · simp only [hz0, or_true, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_list_minclude_rec.eq_2 _ _ hY])
+  have hZ := ns hI hz hz0
+  simp only [hy0, hz0, or_self, ↓reduceIte]
+  by_cases hb1 : b = 1
+  · simp only [hb1, ↓reduceIte]
+    have : σ.decode 1 = .Boolean true := by
+      exact decode_of_view hI ((view_bool_iff (b := true) hI).mpr rfl)
+    rw [this]
+    exact mincludeR_spec n hI hy hz hy0
+  by_cases hb2 : b = 2
+  · simp only [hb2, ↓reduceIte]
+    have : σ.decode 2 = .Boolean false := by
+      exact decode_of_view hI ((view_bool_iff (b := false) hI).mpr rfl)
+    rw [this]
+    exact bool_sim hI false (__eo_list_minclude_rec.eq_3 _ _ hY hZ)
+  simp only [hb1, hb2, ↓reduceIte]
+  refine sim_zero hI ?_
+  have h1 : σ.decode b = .Boolean true → False := fun h => hb1
+    ((view_bool_iff (b := true) hI).mp
+      (decode_leaf_inv hI (n := .Boolean true) rfl (d := fun _ => .Stuck) h))
+  have h2 : σ.decode b = .Boolean false → False := fun h => hb2
+    ((view_bool_iff (b := false) hI).mp
+      (decode_leaf_inv hI (n := .Boolean false) rfl (d := fun _ => .Stuck) h))
+  apply __eo_list_minclude_rec.eq_6 <;>
+    first
+    | assumption
+    | (intros; first | exact h1 (by assumption) | exact h2 (by assumption))
+
+/-! ## `__eo_list_inter_rec` -/
+theorem interR_spec :
+    ∀ (n : Nat) {σ : Store} {l b : Id}, Inv sem σ → l < σ.size → b < σ.size →
+      Ok (interR n l b) σ (OPost sem σ l (__eo_list_inter_rec (σ.decode l) (σ.decode b)))
+  | 0, _, _, _, _, _, _ => Ok.throw
+  | n + 1, σ, l, b, hI, hl, hb => by
+    unfold interR
+    apply Ok.withStore'
+    by_cases hb0 : b = 0
+    · simp only [hb0, ↓reduceIte]
+      subst hb0
+      rw [decode_zero hI]
+      by_cases hl0 : l = 0
+      · subst hl0; rw [decode_zero hI, __eo_list_inter_rec.eq_1]
+        exact Ok.pure (OPost.some_zero hI)
+      · rw [__eo_list_inter_rec.eq_2 _ (ns hI hl hl0)]
+        exact Ok.pure (OPost.some_zero hI)
+    simp only [hb0, ↓reduceIte]
+    have hB := ns hI hb hb0
+    split
+    · rename_i fx y hv
+      split
+      · rename_i f x hfx
+        obtain ⟨hfxv, hy, hf, hx⟩ := cell_valid hI hl hv hfx
+        rw [cell_dec hI hv hfx, __eo_list_inter_rec.eq_3 _ _ _ _ hB]
+        by_cases hfx0 : f = 0 ∨ x = 0
+        · simp only [hfx0, ↓reduceIte]
+          by_cases hf0 : f = 0
+          · subst hf0; rw [decode_zero hI, __eo_prepend_if.eq_1]
+            exact Ok.pure (OPost.some_zero hI)
+          · have hx0 : x = 0 := hfx0.resolve_left hf0
+            subst hx0; rw [decode_zero hI, __eo_prepend_if.eq_2 _ _ _ (ns hI hf hf0)]
+            exact Ok.pure (OPost.some_zero hI)
+        · simp only [hfx0, ↓reduceIte]
+          have hf0 : f ≠ 0 := fun e => hfx0 (.inl e)
+          have hx0 : x ≠ 0 := fun e => hfx0 (.inr e)
+          have hF := ns hI hf hf0
+          have hX := ns hI hx hx0
+          apply Ok.bind
+          apply Ok.mono (erase_sim (n := n) hI hb hx)
+          intro v σ1 ⟨hI1, hE1, hvv, hvd⟩
+          rw [← hvd]
+          by_cases hv0 : v = 0
+          · simp only [hv0, ↓reduceIte]
+            subst hv0
+            rw [decode_zero hI1, __eo_eq.eq_1, not_stuck]
+            have : __eo_list_inter_rec (σ.decode y) .Stuck = .Stuck := by
+              by_cases hy0 : y = 0
+              · subst hy0; rw [decode_zero hI, __eo_list_inter_rec.eq_1]
+              · rw [__eo_list_inter_rec.eq_2 _ (ns hI hy hy0)]
+            rw [this, __eo_prepend_if.eq_3 _ _ _ hF hX]
+            exact Ok.pure ⟨hI1, hE1, size_pos hI1, decode_zero hI1⟩
+          · simp only [hv0, ↓reduceIte]
+            have hy1 := Nat.lt_of_lt_of_le hy hE1.size_le
+            have hb1 := Nat.lt_of_lt_of_le hb hE1.size_le
+            apply Ok.bind
+            apply Ok.mono (interR_spec n hI1 hy1 hvv)
+            intro r? σ2 hp
+            obtain ⟨hI2, hE2, hresv, hresd⟩ := hp.getD hy1
+            rw [decode_extends hE1 y hy] at hresd
+            have hE12 := hE1.trans hE2
+            rw [← decode_extends hE1 b hb, eo_eq_ids hI1 hvv hb1 hv0 hb0, not_bool]
+            by_cases hres0 : r?.getD y = 0
+            · simp only [hres0, ↓reduceIte]
+              rw [hres0, decode_zero hI2] at hresd
+              rw [← hresd, __eo_prepend_if.eq_3 _ _ _ hF hX]
+              exact Ok.pure ⟨hI2, hE12, size_pos hI2, decode_zero hI2⟩
+            · simp only [hres0, ↓reduceIte]
+              have hR := ns hI2 hresv hres0
+              by_cases hvb : v = b
+              · simp only [hvb, ↓reduceIte, decide_true, Bool.not_true]
+                rw [hvb] at hresd
+                rw [← hresd, __eo_prepend_if.eq_5 _ _ _ hF hX hR]
+                exact Ok.pure ⟨hI2, hE12, hresv, rfl⟩
+              · simp only [hvb, ↓reduceIte, decide_false, Bool.not_false]
+                rw [← hresd, __eo_prepend_if.eq_4 _ _ _ hF hX hR]
+                cases r? with
+                | none =>
+                  refine Ok.pure ⟨hI2, hE12, ?_, ne_zero_of_app hI hv⟩
+                  simp only [Option.getD_none] at hresd ⊢
+                  rw [cell_dec hI hv hfx, decode_extends hE12 y hy]
+                | some r =>
+                  simp only [Option.getD_some] at hresv ⊢
+                  refine intern_cell hI2 hE12 hfxv hresv ?_
+                  rw [decode_of_view hI hfx]; rfl
+      · rename_i hfx
+        have hl0 := ne_zero_of_app hI hv
+        simp only [hl0, ↓reduceIte]
+        refine Ok.pure (OPost.none_of hI ?_ hl0)
+        rw [__eo_list_inter_rec.eq_4 _ _ (ns hI hl hl0)
+          (not_cell_of_head hI hv fun f x h => hfx f x h) hB]
+    · rename_i hv
+      by_cases hl0 : l = 0
+      · simp only [hl0, ↓reduceIte]
+        subst hl0
+        rw [decode_zero hI, __eo_list_inter_rec.eq_1]
+        exact Ok.pure (OPost.some_zero hI)
+      · simp only [hl0, ↓reduceIte]
+        refine Ok.pure (OPost.none_of hI ?_ hl0)
+        rw [__eo_list_inter_rec.eq_4 _ _ (ns hI hl hl0)
+          (not_cell_of_view hI fun fx y h => hv fx y h) hB]
+
+theorem inter_sim {n : Nat} {σ : Store} (hI : Inv sem σ) {l b : Id} (hl : l < σ.size)
+    (hb : b < σ.size) :
+    Sim sem σ (inter n l b) (__eo_list_inter_rec (σ.decode l) (σ.decode b)) := by
+  unfold inter
+  apply Ok.bind
+  apply Ok.mono (interR_spec n hI hl hb)
+  intro r? σ1 hp
+  have := hp.sim hl
+  cases r? <;> exact Ok.pure this
+
+/-! ## `__eo_list_repeat_rec` -/
+theorem repeatR_spec {fa e : Id} {F A E : Term} (hF : F = .Stuck → False)
+    (hA : A = .Stuck → False) (hE : __eo_nil F (__eo_typeof A) = E) :
+    ∀ (i : Nat) {σ : Store}, Inv sem σ → fa < σ.size → e < σ.size →
+      σ.decode fa = .Apply F A → σ.decode e = E →
+      Sim sem σ (repeatR fa e i) (__eo_list_repeat_rec F A i)
+  | 0, σ, hI, hfa, he, dfa, de => by
+    have : __eo_list_repeat_rec F A 0 = E := by
+      rw [← hE]
+      apply __eo_list_repeat_rec.eq_4 <;>
+        first | assumption | (intro n h; cases h)
+    rw [this]
+    exact Sim.pure hI he de
+  | i + 1, σ, hI, hfa, he, dfa, de => by
+    have : __eo_list_repeat_rec F A (i + 1)
+        = __eo_mk_apply (.Apply F A) (__eo_list_repeat_rec F A i) :=
+      __eo_list_repeat_rec.eq_3 _ _ _ hF hA
+    rw [this]
+    unfold repeatR
+    apply Ok.bind
+    apply Ok.mono (repeatR_spec hF hA hE i hI hfa he dfa de)
+    intro r σ1 hp
+    rw [← hp.dec]
+    refine Ok.mono (P := Post sem σ1 _) ?_ (fun _ _ h => h.weaken hp.ext)
+    by_cases hr0 : r = 0
+    · simp only [hr0, ↓reduceIte]
+      exact sim_zero hp.inv (by rw [decode_zero hp.inv, __eo_mk_apply.eq_2 _ app_ns])
+    · simp only [hr0, ↓reduceIte]
+      rw [__eo_mk_apply.eq_3 _ _ app_ns (ns hp.inv hp.valid hr0)]
+      exact intern_app hp.inv hp.ext hfa hp.valid (by rw [dfa])
+
+theorem rep_sim {typeOf : Id → K Id} {nilOf : Id → Id → K Id}
+    (hT : ∀ {σ : Store} {a : Id}, Inv sem σ → a < σ.size →
+      Sim sem σ (typeOf a) (__eo_typeof (σ.decode a)))
+    (hN : ∀ {σ : Store} {a b : Id}, Inv sem σ → a < σ.size → b < σ.size →
+      Sim sem σ (nilOf a b) (__eo_nil (σ.decode a) (σ.decode b)))
+    {σ : Store} (hI : Inv sem σ) {f a : Id} {i : Nat} (hf : f < σ.size) (ha : a < σ.size) :
+    Sim sem σ (rep typeOf nilOf f a i) (__eo_list_repeat_rec (σ.decode f) (σ.decode a) i) := by
+  unfold rep
+  by_cases hf0 : f = 0
+  · simp only [hf0, true_or, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_list_repeat_rec.eq_1])
+  have hF := ns hI hf hf0
+  by_cases ha0 : a = 0
+  · simp only [ha0, or_true, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_list_repeat_rec.eq_2 _ _ hF])
+  have hA := ns hI ha ha0
+  simp only [hf0, ha0, or_self, ↓reduceIte]
+  apply Ok.bind
+  apply Ok.mono (hT hI ha)
+  intro t σ1 hp
+  apply Ok.bind
+  apply Ok.mono (hN hp.inv (Nat.lt_of_lt_of_le hf hp.ext.size_le) hp.valid)
+  intro e σ2 hq
+  have h12 := hp.ext.trans hq.ext
+  apply Ok.bind
+  apply Ok.mono (intern_app hq.inv h12 hf (Nat.lt_of_lt_of_le ha h12.size_le) rfl)
+  intro fa σ3 hr
+  have h13 := h12.trans hr.ext
+  refine Ok.mono (P := Post sem σ3 _) ?_ (fun _ _ h => h.weaken h13)
+  refine repeatR_spec hF hA rfl i hr.inv hr.valid
+    (Nat.lt_of_lt_of_le hq.valid hr.ext.size_le) ?_ ?_
+  · rw [hr.dec, decode_extends h12 a ha]
+  · rw [decode_extends hr.ext e hq.valid, hq.dec, hp.dec, decode_extends hp.ext f hf]
+
+/-! ## Small builtins -/
+theorem mkApply_sim {σ : Store} (hI : Inv sem σ) {f x : Id} (hf : f < σ.size) (hx : x < σ.size) :
+    Sim sem σ (mkApply f x) (__eo_mk_apply (σ.decode f) (σ.decode x)) := by
+  unfold mkApply
+  by_cases hf0 : f = 0
+  · simp only [hf0, true_or, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_mk_apply.eq_1])
+  have hF := ns hI hf hf0
+  by_cases hx0 : x = 0
+  · simp only [hx0, or_true, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_mk_apply.eq_2 _ hF])
+  simp only [hf0, hx0, or_self, ↓reduceIte]
+  rw [__eo_mk_apply.eq_3 _ _ hF (ns hI hx hx0)]
+  exact intern_app hI (Extends.refl σ) hf hx rfl
+
+theorem eq_sim {σ : Store} (hI : Inv sem σ) {a b : Id} (ha : a < σ.size) (hb : b < σ.size) :
+    Sim sem σ (eq a b) (__eo_eq (σ.decode a) (σ.decode b)) := by
+  unfold eq
+  by_cases ha0 : a = 0
+  · simp only [ha0, true_or, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_eq.eq_1])
+  by_cases hb0 : b = 0
+  · simp only [hb0, or_true, ↓reduceIte]
+    exact sim_zero hI (by rw [decode_zero hI, __eo_eq.eq_2 _ (ns hI ha ha0)])
+  simp only [ha0, hb0, or_self, ↓reduceIte]
+  rw [eo_eq_ids hI ha hb ha0 hb0]
+  by_cases h : b = a
+  · simp only [h, ↓reduceIte, decide_true]; exact bool_sim hI true rfl
+  · simp only [h, Ne.symm h, ↓reduceIte, decide_false]; exact bool_sim hI false rfl
+
+theorem requires_sim {σ : Store} (hI : Inv sem σ) {a b c : Id} (ha : a < σ.size)
+    (hb : b < σ.size) (hc : c < σ.size) :
+    Sim sem σ (requires a b c) (__eo_requires (σ.decode a) (σ.decode b) (σ.decode c)) := by
+  unfold requires
+  by_cases hab : a = b
+  · subst hab
+    by_cases ha0 : a = 0
+    · simp only [ha0, ne_eq, not_true_eq_false, and_false, ↓reduceIte]
+      refine sim_zero hI ?_
+      simp [decode_zero hI, __eo_requires, native_ite, native_teq, native_not]
+    · simp only [ha0, ne_eq, not_false_eq_true, and_self, ↓reduceIte]
+      rw [requires_self (ns hI ha ha0)]
+      exact Sim.pure hI hc rfl
+  · simp only [hab, false_and, ↓reduceIte]
+    exact sim_zero hI (requires_ne fun e => hab ((dec_eq_iff hI ha hb).mp e))
+
+theorem isOk_sim {σ : Store} (hI : Inv sem σ) {a : Id} (ha : a < σ.size) :
+    Sim sem σ (isOk a) (__eo_is_ok (σ.decode a)) := by
+  unfold isOk
+  by_cases ha0 : a = 0
+  · simp only [ha0, ↓reduceIte]
+    exact bool_sim hI false (by rw [decode_zero hI, is_ok_stuck])
+  · simp only [ha0, ↓reduceIte]
+    exact bool_sim hI true (is_ok_of (ns hI ha ha0))
 
 end Kairos.Native

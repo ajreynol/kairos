@@ -104,6 +104,7 @@ class KairosMetaReduce : public MetaReducePlugin
     std::string nativeCode;
     std::string nativeProof;
     std::vector<std::string> nativeCallees;
+    bool nativeInline = false;
     /** The rule dispatch: emitted to Kairos/Gen/Dispatch.lean. */
     bool dispatch = false;
     /** Its strongly connected component of the call graph, and whether that

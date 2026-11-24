@@ -31,9 +31,9 @@ not trusted. `verification/KairosVerification/Statement.lean` checks in the
 build that the central statement depends on no definition of the verification
 project.
 
-`kairos-eoc` generates the term programs (1116 of 1145; 19 of them lifted,
-i.e. computed by Logos on decoded arguments, and 7 native, i.e. Eunoia
-operations hand-written in `Kairos/Runtime/Lists.lean` with their proofs; the
+`kairos-eoc` generates the term programs (1116 of 1145; 18 of them lifted,
+i.e. computed by Logos on decoded arguments, and 20 native, i.e. Eunoia
+builtins hand-written in `Kairos/Runtime/Lists.lean` with their proofs; the
 generated file lists both), the rule dispatch, and all their proofs. The checker's template part is
 mirrored by hand (`Kairos/Checker/`).
 

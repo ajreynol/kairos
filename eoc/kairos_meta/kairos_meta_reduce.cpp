@@ -1035,7 +1035,7 @@ std::string KairosMetaReduce::emitProgram(Prog& p,
   if (p.native)
   {
     codeOut << "/-- Native: Kairos/Runtime/Lists.lean. -/\n";
-    codeOut << "def " << kf << " : Nat";
+    codeOut << (p.nativeInline ? "@[inline] def " : "def ") << kf << " : Nat";
     for (size_t i = 0; i < nargs; i++)
     {
       codeOut << " → " << p.args[i].kType;
@@ -3564,7 +3564,7 @@ void KairosMetaReduce::finalize()
       p.lifted = true;
     }
   }
-  // Eunoia's list operations that Kairos has native versions of, with their
+  // Eunoia's builtins that Kairos has native versions of, with their
   // proofs (Kairos/Runtime/Lists.lean, and its proofs in verification/): the
   // program's code and the term proving its step, given `kfuel`/`kn`, the
   // argument ids `arg1`... and their validity `h1`...; and the generated
@@ -3576,6 +3576,10 @@ void KairosMetaReduce::finalize()
     std::string code;
     std::string proof;
     std::vector<std::string> callees;
+    /** The last argument is a native natural number; the others are terms. */
+    bool lastNat = false;
+    /** Small enough to inline at every call. */
+    bool inlined = false;
   };
   const std::map<std::string, NativeImpl> natives = {
       {"__eo_list_erase_rec",
@@ -3594,6 +3598,29 @@ void KairosMetaReduce::finalize()
         "Native.isList_sim (allS__eo_is_list_nil kn) hI h1 h2",
         {"__eo_is_list_nil"}}},
       {"__eo_cmp", {2, "Native.cmp arg1 arg2", "Native.cmp_sim hI h1 h2", {}}},
+      {"__eo_list_concat_rec",
+       {2, "Native.concat kfuel arg1 arg2", "Native.concat_sim hI h1 h2", {}}},
+      {"__eo_list_rev_rec", {2, "Native.rev kfuel arg1 arg2", "Native.rev_sim hI h1 h2", {}}},
+      {"__eo_get_elements_rec",
+       {1, "Native.elements kfuel arg1", "Native.elements_sim hI h1", {}}},
+      {"__eo_list_len_rec", {1, "Native.len kfuel arg1", "Native.len_sim hI h1", {}}},
+      {"__eo_list_nth_rec", {2, "Native.nth kfuel arg1 arg2", "Native.nth_sim hI h1", {}}},
+      {"__eo_list_find_rec",
+       {3, "Native.findIdx kfuel arg1 arg2 arg3", "Native.findIdx_sim hI h1 h2", {}}},
+      {"__eo_list_minclude_rec",
+       {3, "Native.minclude kfuel arg1 arg2 arg3", "Native.minclude_sim hI h1 h2", {}}},
+      {"__eo_list_inter_rec",
+       {2, "Native.inter kfuel arg1 arg2", "Native.inter_sim hI h1 h2", {}}},
+      {"__eo_list_repeat_rec",
+       {3, "Native.rep (k__eo_typeof kfuel) (k__eo_nil kfuel) arg1 arg2 arg3",
+        "Native.rep_sim (allS__eo_typeof kn) (allS__eo_nil kn) hI h1 h2",
+        {"__eo_typeof", "__eo_nil"}, true}},
+      {"__eo_mk_apply",
+       {2, "Native.mkApply arg1 arg2", "Native.mkApply_sim hI h1 h2", {}, false, true}},
+      {"__eo_eq", {2, "Native.eq arg1 arg2", "Native.eq_sim hI h1 h2", {}, false, true}},
+      {"__eo_requires",
+       {3, "Native.requires arg1 arg2 arg3", "Native.requires_sim hI h1 h2 h3", {}, false, true}},
+      {"__eo_is_ok", {1, "Native.isOk arg1", "Native.isOk_sim hI h1", {}, false, true}},
   };
   for (const std::string& n : d_names)
   {
@@ -3605,9 +3632,10 @@ void KairosMetaReduce::finalize()
       continue;
     }
     bool allTerms = true;
-    for (const ArgInfo& a : p.args)
+    for (size_t i = 0; i < p.args.size(); i++)
     {
-      allTerms &= (a.sort == Sort::TERM);
+      bool nat = it->second.lastNat && i + 1 == p.args.size();
+      allTerms &= nat ? p.args[i].kType == "native_Nat" : p.args[i].sort == Sort::TERM;
     }
     std::vector<std::string> callees;
     for (const std::string& c : it->second.callees)
@@ -3631,6 +3659,7 @@ void KairosMetaReduce::finalize()
     p.nativeCode = it->second.code;
     p.nativeProof = it->second.proof;
     p.nativeCallees = callees;
+    p.nativeInline = it->second.inlined;
   }
   // a program calling an unsupported one is lifted, or unsupported
   bool changed = true;

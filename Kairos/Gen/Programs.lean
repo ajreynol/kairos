@@ -12,7 +12,7 @@ set_option maxRecDepth 100000
 namespace Kairos.Gen
 open Eo Kairos Store SmtEval
 
-/-! Generated 1116 of 1145 programs (19 lifted, 7 native); 4 over native values are Logos's own. Left out:
+/-! Generated 1116 of 1145 programs (18 lifted, 20 native); 4 over native values are Logos's own. Left out:
   __eo_Numeral: defined by a non-program definition
   __eo_Rational: defined by a non-program definition
   __eo_Binary: defined by a non-program definition
@@ -40,7 +40,6 @@ open Eo Kairos Store SmtEval
 Lifted (Logos computes them on decoded arguments):
   __eo_datatype_constructors_rec: a native argument matched against a value
   __eo_datatype_cons_selectors_rec: a native argument matched against a value
-  __eo_list_repeat_rec: a native argument matched against a value
   __get_lambda_type: pattern kind VARIABLE
   __get_var_type: pattern kind VARIABLE
   __is_closed_rec: pattern kind VARIABLE
@@ -59,13 +58,26 @@ Lifted (Logos computes them on decoded arguments):
   __eo_typeof_dt_sel_return: a native argument matched against a value
 
 Native (hand-written, Kairos/Runtime/Lists.lean, with their proofs):
+  __eo_mk_apply
+  __eo_is_ok
+  __eo_requires
+  __eo_eq
   __eo_cmp
   __eo_get_nil_rec
   __eo_is_list
+  __eo_get_elements_rec
+  __eo_list_len_rec
+  __eo_list_concat_rec
+  __eo_list_nth_rec
+  __eo_list_find_rec
+  __eo_list_rev_rec
   __eo_list_erase_rec
   __eo_list_erase_all_rec
   __eo_list_setof_rec
+  __eo_list_minclude_rec
   __eo_list_diff_rec
+  __eo_list_inter_rec
+  __eo_list_repeat_rec
 -/
 
 /-! ## Matchers -/
@@ -84,12 +96,6 @@ def m__eo_prepend_if_4 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) (arg4 : 
 
 def m__eo_prepend_if_5 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) (arg4 : Id) : Option Unit :=
   σ.leaf arg1 (.Boolean false) (some ())
-
-def m__eo_mk_apply_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_mk_apply_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
 
 def m__eo_not_1 (σ : Store) (arg1 : Id) : Option native_Bool :=
   σ.m_Boolean arg1 fun b => some b
@@ -228,12 +234,6 @@ def m__eo_to_str_1 (σ : Store) (arg1 : Id) : Option native_Int :=
 
 def m__eo_to_str_2 (σ : Store) (arg1 : Id) : Option native_String :=
   σ.m_String arg1 fun s1 => some s1
-
-def m__eo_eq_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_eq_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
 
 def m__eo_is_bool_internal_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
@@ -471,15 +471,6 @@ def m__eo_is_list_nil_21 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
 
 def m__eo_is_list_nil_22 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
   σ.leaf arg1 .__eo_List_cons (σ.leaf arg2 .__eo_List_nil (some ()))
-
-def m__eo_list_nth_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
-
-def m__eo_list_nth_rec_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => σ.leaf arg2 (.Numeral 0) (some (f, x, y))
-
-def m__eo_list_nth_rec_3 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp9 y => σ.m_Apply kp9 fun f x => some (f, x, y)
 
 def m__get_nth_var_type_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
   Store.stuck arg2 (some ())
@@ -801,12 +792,6 @@ def m__eo_typeof_to_int_1 (σ : Store) (arg1 : Id) : Option Unit :=
 
 def m__eo_typeof_to_real_1 (σ : Store) (arg1 : Id) : Option Unit :=
   σ.leaf arg1 (.UOp UserOp.Int) (some ())
-
-def m__eo_list_len_rec_1 (σ : Store) (arg1 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_list_len_rec_2 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => some (f, x, y)
 
 def m__eo_typeof_tuple_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
@@ -1488,66 +1473,6 @@ def m__eo_dt_selectors_2 (σ : Store) (arg1 : Id) : Option (native_String × Dat
 
 def m__eo_is_bool_type_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
-
-def m__eo_get_elements_rec_1 (σ : Store) (arg1 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_get_elements_rec_2 (σ : Store) (arg1 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => some (f, x, y)
-
-def m__eo_list_concat_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_list_concat_rec_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
-
-def m__eo_list_concat_rec_3 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => some (f, x, y)
-
-def m__eo_list_find_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_list_find_rec_2 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
-
-def m__eo_list_find_rec_3 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  Store.stuck arg3 (some ())
-
-def m__eo_list_find_rec_4 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => some (f, x, y)
-
-def m__eo_list_rev_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_list_rev_rec_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
-
-def m__eo_list_rev_rec_3 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => some (f, x, y)
-
-def m__eo_list_minclude_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_list_minclude_rec_2 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
-
-def m__eo_list_minclude_rec_3 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  σ.leaf arg3 (.Boolean false) (some ())
-
-def m__eo_list_minclude_rec_4 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option (Id × Id) :=
-  σ.m_Apply arg2 fun kp0 z => σ.m_Apply kp0 fun kp4 x => σ.leaf kp4 .__eo_List_cons (σ.leaf arg3 (.Boolean true) (some (x, z)))
-
-def m__eo_list_minclude_rec_5 (σ : Store) (arg1 : Id) (arg2 : Id) (arg3 : Id) : Option Unit :=
-  σ.leaf arg2 .__eo_List_nil (σ.leaf arg3 (.Boolean true) (some ()))
-
-def m__eo_list_inter_rec_1 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg1 (some ())
-
-def m__eo_list_inter_rec_2 (σ : Store) (arg1 : Id) (arg2 : Id) : Option Unit :=
-  Store.stuck arg2 (some ())
-
-def m__eo_list_inter_rec_3 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (Id × Id × Id) :=
-  σ.m_Apply arg1 fun kp0 y => σ.m_Apply kp0 fun f x => some (f, x, y)
 
 def m__eo_list_singleton_elim_2_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
@@ -10198,7 +10123,7 @@ def m__eo_is_closed_rec_11 (σ : Store) (arg1 : Id) (arg2 : Id) : Option (UserOp
 def m__eo_is_closed_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
 
-/-! ## Programs, by component of the call graph (145 recursive) -/
+/-! ## Programs, by component of the call graph (137 recursive) -/
 
 /-! ### 1 program: __eo_prepend_if -/
 
@@ -10238,18 +10163,10 @@ def k__eo_mk_fun_type : Nat → Id → Id → K Id
 
 /-! ### 1 program: __eo_mk_apply -/
 
-def k__eo_mk_apply : Nat → Id → Id → K Id
+/-- Native: Kairos/Runtime/Lists.lean. -/
+@[inline] def k__eo_mk_apply : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_mk_apply_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_mk_apply_2 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    -- case
-     do
-      intern (.Apply arg1 arg2)
+  | kfuel + 1, arg1, arg2 => Native.mkApply arg1 arg2
 
 /-! ### 1 program: __eo_binary_mod_w -/
 
@@ -10271,21 +10188,17 @@ def k__eo_mk_binary : Nat → native_Int → native_Int → K Id
 
 /-! ### 1 program: __eo_is_ok -/
 
-def k__eo_is_ok : Nat → Id → K Id
+/-- Native: Kairos/Runtime/Lists.lean. -/
+@[inline] def k__eo_is_ok : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => withStore fun σ =>
-    -- case
-     do
-      intern (.Boolean (native_not (knative_teq arg1 0)))
+  | kfuel + 1, arg1 => Native.isOk arg1
 
 /-! ### 1 program: __eo_requires -/
 
-def k__eo_requires : Nat → Id → Id → Id → K Id
+/-- Native: Kairos/Runtime/Lists.lean. -/
+@[inline] def k__eo_requires : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => withStore fun σ =>
-    -- case
-     do
-      if (knative_teq arg1 arg2) then (do if (native_not (knative_teq arg1 0)) then (do pure arg3) else (do pure 0)) else (do pure 0)
+  | kfuel + 1, arg1, arg2, arg3 => Native.requires arg1 arg2 arg3
 
 /-! ### 1 program: __eo_not -/
 
@@ -10637,18 +10550,10 @@ def k__eo_to_str : Nat → Id → K Id
 
 /-! ### 1 program: __eo_eq -/
 
-def k__eo_eq : Nat → Id → Id → K Id
+/-- Native: Kairos/Runtime/Lists.lean. -/
+@[inline] def k__eo_eq : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_eq_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_eq_2 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    -- case
-     do
-      intern (.Boolean (knative_teq arg2 arg1))
+  | kfuel + 1, arg1, arg2 => Native.eq arg1 arg2
 
 /-! ### 1 program: __eo_is_eq -/
 
@@ -11388,29 +11293,12 @@ def k__eo_is_list : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
   | kfuel + 1, arg1, arg2 => Native.isList (k__eo_is_list_nil kfuel) kfuel arg1 arg2
 
-/-! ### Recursive component 1 program: __eo_list_nth_rec -/
+/-! ### 1 program: __eo_list_nth_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_nth_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_list_nth_rec_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_nth_rec_2 σ arg1 arg2) (fun (f, x, y) => do
-        pure x)
-    <|
-    kcase (m__eo_list_nth_rec_3 σ arg1 arg2) (fun (f, x, y) => do
-        let kt18 ← (intern (.Numeral (-1 : native_Int)))
-        let kt22 ← (k__eo_add kfuel arg2 kt18)
-        k__eo_list_nth_rec kfuel y kt22)
-    <|
-    -- default
-     do
-      pure 0
-
-end
+  | kfuel + 1, arg1, arg2 => Native.nth kfuel arg1 arg2
 
 /-! ### 1 program: __eo_list_nth -/
 
@@ -12620,26 +12508,12 @@ def k__eo_typeof_to_real : Nat → Id → K Id
      do
       pure 0
 
-/-! ### Recursive component 1 program: __eo_list_len_rec -/
+/-! ### 1 program: __eo_list_len_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_len_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => withStore fun σ =>
-    kcase (m__eo_list_len_rec_1 σ arg1) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_len_rec_2 σ arg1) (fun (f, x, y) => do
-        let kt9 ← (intern (.Numeral 1))
-        let kt13 ← (k__eo_list_len_rec kfuel y)
-        k__eo_add kfuel kt9 kt13)
-    <|
-    -- case
-     do
-      intern (.Numeral 0)
-
-end
+  | kfuel + 1, arg1 => Native.len kfuel arg1
 
 /-! ### 1 program: __eo_list_len -/
 
@@ -13846,27 +13720,12 @@ def k__eo_cons : Nat → Id → Id → Id → K Id
       let kt12 ← (intern (.Apply kt8 arg3))
       k__eo_requires kfuel kt0 kt4 kt12
 
-/-! ### Recursive component 1 program: __eo_get_elements_rec -/
+/-! ### 1 program: __eo_get_elements_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_get_elements_rec : Nat → Id → K Id
   | 0, _ => throw .fuel
-  | kfuel + 1, arg1 => withStore fun σ =>
-    kcase (m__eo_get_elements_rec_1 σ arg1) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_get_elements_rec_2 σ arg1) (fun (f, x, y) => do
-        let kt9 ← (intern .__eo_List_cons)
-        let kt13 ← (intern (.Apply kt9 x))
-        let kt17 ← (k__eo_get_elements_rec kfuel y)
-        k__eo_mk_apply kfuel kt13 kt17)
-    <|
-    -- case
-     do
-      intern .__eo_List_nil
-
-end
+  | kfuel + 1, arg1 => Native.elements kfuel arg1
 
 /-! ### 1 program: __eo_get_elements -/
 
@@ -13880,29 +13739,12 @@ def k__eo_get_elements : Nat → Id → Id → K Id
       let kt8 ← (k__eo_get_elements_rec kfuel arg2)
       k__eo_requires kfuel kt0 kt4 kt8
 
-/-! ### Recursive component 1 program: __eo_list_concat_rec -/
+/-! ### 1 program: __eo_list_concat_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_concat_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_list_concat_rec_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_concat_rec_2 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_concat_rec_3 σ arg1 arg2) (fun (f, x, y) => do
-        let kt9 ← (intern (.Apply f x))
-        let kt13 ← (k__eo_list_concat_rec kfuel y arg2)
-        k__eo_mk_apply kfuel kt9 kt13)
-    <|
-    -- case
-     do
-      pure arg2
-
-end
+  | kfuel + 1, arg1, arg2 => Native.concat kfuel arg1 arg2
 
 /-! ### 1 program: __eo_list_concat -/
 
@@ -13918,31 +13760,12 @@ def k__eo_list_concat : Nat → Id → Id → Id → K Id
       let kt16 ← (k__eo_requires kfuel kt8 kt4 kt12)
       k__eo_requires kfuel kt0 kt4 kt16
 
-/-! ### Recursive component 1 program: __eo_list_find_rec -/
+/-! ### 1 program: __eo_list_find_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_find_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => withStore fun σ =>
-    kcase (m__eo_list_find_rec_1 σ arg1 arg2 arg3) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_find_rec_2 σ arg1 arg2 arg3) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_find_rec_3 σ arg1 arg2 arg3) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_find_rec_4 σ arg1 arg2 arg3) (fun (f, x, y) => do
-        let kt9 ← (k__eo_eq kfuel x arg2)
-        k_ite kt9 (do pure arg3) (do let kt13 ← (intern (.Numeral 1)); let kt17 ← (k__eo_add kfuel arg3 kt13); k__eo_list_find_rec kfuel y arg2 kt17))
-    <|
-    -- case
-     do
-      intern (.Numeral (-1 : native_Int))
-
-end
+  | kfuel + 1, arg1, arg2, arg3 => Native.findIdx kfuel arg1 arg2 arg3
 
 /-! ### 1 program: __eo_list_find -/
 
@@ -13957,29 +13780,12 @@ def k__eo_list_find : Nat → Id → Id → Id → K Id
       let kt12 ← (k__eo_list_find_rec kfuel arg2 arg3 kt8)
       k__eo_requires kfuel kt0 kt4 kt12
 
-/-! ### Recursive component 1 program: __eo_list_rev_rec -/
+/-! ### 1 program: __eo_list_rev_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_rev_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_list_rev_rec_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_rev_rec_2 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_rev_rec_3 σ arg1 arg2) (fun (f, x, y) => do
-        let kt9 ← (intern (.Apply f x))
-        let kt13 ← (intern (.Apply kt9 arg2))
-        k__eo_list_rev_rec kfuel y kt13)
-    <|
-    -- case
-     do
-      pure arg2
-
-end
+  | kfuel + 1, arg1, arg2 => Native.rev kfuel arg1 arg2
 
 /-! ### 1 program: __eo_list_rev -/
 
@@ -14051,36 +13857,12 @@ def k__eo_list_setof : Nat → Id → Id → K Id
       let kt8 ← (k__eo_list_setof_rec kfuel arg2)
       k__eo_requires kfuel kt0 kt4 kt8
 
-/-! ### Recursive component 1 program: __eo_list_minclude_rec -/
+/-! ### 1 program: __eo_list_minclude_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_minclude_rec : Nat → Id → Id → Id → K Id
   | 0, _, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2, arg3 => withStore fun σ =>
-    kcase (m__eo_list_minclude_rec_1 σ arg1 arg2 arg3) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_minclude_rec_2 σ arg1 arg2 arg3) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_minclude_rec_3 σ arg1 arg2 arg3) (fun _ => do
-        intern (.Boolean false))
-    <|
-    kcase (m__eo_list_minclude_rec_4 σ arg1 arg2 arg3) (fun (x, z) => do
-        let kt10 ← (k__eo_list_erase_rec kfuel arg1 x)
-        let kt14 ← (k__eo_eq kfuel kt10 arg1)
-        let kt18 ← (k__eo_not kfuel kt14)
-        k__eo_list_minclude_rec kfuel kt10 z kt18)
-    <|
-    kcase (m__eo_list_minclude_rec_5 σ arg1 arg2 arg3) (fun _ => do
-        intern (.Boolean true))
-    <|
-    -- default
-     do
-      pure 0
-
-end
+  | kfuel + 1, arg1, arg2, arg3 => Native.minclude kfuel arg1 arg2 arg3
 
 /-! ### 1 program: __eo_list_minclude -/
 
@@ -14137,31 +13919,12 @@ def k__eo_list_diff : Nat → Id → Id → Id → K Id
       let kt16 ← (k__eo_requires kfuel kt8 kt4 kt12)
       k__eo_requires kfuel kt0 kt4 kt16
 
-/-! ### Recursive component 1 program: __eo_list_inter_rec -/
+/-! ### 1 program: __eo_list_inter_rec -/
 
-mutual
-
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_inter_rec : Nat → Id → Id → K Id
   | 0, _, _ => throw .fuel
-  | kfuel + 1, arg1, arg2 => withStore fun σ =>
-    kcase (m__eo_list_inter_rec_1 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_inter_rec_2 σ arg1 arg2) (fun _ => do
-        pure 0)
-    <|
-    kcase (m__eo_list_inter_rec_3 σ arg1 arg2) (fun (f, x, y) => do
-        let kt9 ← (k__eo_list_erase_rec kfuel arg2 x)
-        let kt13 ← (k__eo_eq kfuel kt9 arg2)
-        let kt17 ← (k__eo_not kfuel kt13)
-        let kt21 ← (k__eo_list_inter_rec kfuel y kt9)
-        k__eo_prepend_if kfuel kt17 f x kt21)
-    <|
-    -- case
-     do
-      pure arg1
-
-end
+  | kfuel + 1, arg1, arg2 => Native.inter kfuel arg1 arg2
 
 /-! ### 1 program: __eo_list_inter -/
 
@@ -14453,10 +14216,10 @@ def k__eo_list_singleton_intro : Nat → Id → Id → K Id
 
 /-! ### 1 program: __eo_list_repeat_rec -/
 
-/-- Lifted: Logos computes it on decoded arguments. -/
+/-- Native: Kairos/Runtime/Lists.lean. -/
 def k__eo_list_repeat_rec : Nat → Id → Id → native_Nat → K Id
   | 0, _, _, _ => throw .fuel
-  | _ + 1, arg1, arg2, arg3 => withStore fun σ => internTerm (__eo_list_repeat_rec (σ.decode arg1) (σ.decode arg2) arg3)
+  | kfuel + 1, arg1, arg2, arg3 => Native.rep (k__eo_typeof kfuel) (k__eo_nil kfuel) arg1 arg2 arg3
 
 /-! ### 1 program: __eo_list_repeat -/
 
