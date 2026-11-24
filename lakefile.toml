@@ -14,7 +14,8 @@ rev = "bdcbd95f615627b26b6ebabc0f584e5230b0bf1f"
 
 [[lean_lib]]
 name = "Kairos"
-# The checker: code only. Its proofs are in verification/.
+# The checker. Its proofs are in verification/, except those of the interning
+# table, which the definition of interning by address needs (Kairos/Runtime/Table.lean).
 moreLeanArgs = ["-DwarningAsError=true", "-DmaxRecDepth=100000"]
 
 

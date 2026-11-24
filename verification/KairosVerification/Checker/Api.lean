@@ -79,7 +79,7 @@ theorem kairos_refines_logos (F : CArgList) (C : CCmdList) :
     kairos_checker_is_refutation F C = true → __eo_checker_is_refutation F C = true := by
   intro hb
   have h := kairos_check_sim defaultFuel F C
-  unfold kairos_checker_is_refutation at hb
+  rw [kairos_checker_is_refutation_eq] at hb
   unfold SimR Ok at h
   cases hr : kairos_check defaultFuel F C Store.init with
   | ok b σ' =>

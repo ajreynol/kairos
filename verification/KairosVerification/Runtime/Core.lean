@@ -10,7 +10,7 @@ invariant.
 * `Inv` is the store invariant: id 0 is `Stuck`, children precede parents, and
   the interning table is exact (so equal ids ⇔ equal terms).
 -/
-import Kairos.Runtime.Monad
+import Kairos.Runtime.Table
 import KairosVerification.Gen.Term
 
 namespace Kairos
@@ -30,26 +30,9 @@ open Store
 arguments. Generated per signature from Logos's definitions. -/
 abbrev Sem := Nat → List Term → Option Term
 
-/-- `i` is on the chain from `s`, which goes to smaller ids and ends at 0. -/
-inductive Reach (next : Array Id) : Id → Id → Prop
-  | here {i : Id} : 0 < i → Reach next i i
-  | older {s i : Id} : next[s]! < s → Reach next next[s]! i → Reach next s i
-
-/-- The chains hold the ids from 3 up to `m`, each in the bucket of its node. -/
-structure Linked (nodes : Array Node) (heads next : Array Id) (m : Nat) : Prop where
-  pos : 0 < heads.size
-  lt : ∀ k : Nat, heads[k]! < m
-  reach : ∀ i, 2 < i → i < m → Reach next heads[bucket (nhash nodes[i]!) heads.size]! i
-
 /-- The store invariant. -/
-structure Inv (sem : Sem) (σ : Store) : Prop where
-  stuck0 : σ.nodes[0]? = some .Stuck
-  true1 : σ.nodes[1]? = some (.Boolean true)
-  false2 : σ.nodes[2]? = some (.Boolean false)
+structure Inv (sem : Sem) (σ : Store) : Prop extends TInv σ where
   wf : ∀ (i : Id) (n : Node), σ.nodes[i]? = some n → ∀ j ∈ n.children, j < i
-  next_size : σ.next.size = σ.nodes.size
-  linked : Linked σ.nodes σ.heads σ.next σ.nodes.size
-  uniq : ∀ (n : Node) (i j : Id), σ.nodes[i]? = some n → σ.nodes[j]? = some n → i = j
   cache : ∀ (p : Nat) (args : List Id) (r : Id), σ.cache[ckey p args]? = some r →
     r < σ.size ∧ (∀ a ∈ args, a < σ.size) ∧
       sem p (args.map σ.decode) = some (σ.decode r)
@@ -150,9 +133,7 @@ theorem decode_eq_stuck_iff (hI : Inv sem σ) {i : Id} (hi : i < σ.size) :
 end decode
 
 theorem Inv.init (sem : Sem) : Inv sem Store.init where
-  stuck0 := rfl
-  true1 := rfl
-  false2 := rfl
+  toTInv := TInv.init
   wf := by
     intro i n h j hj
     match i, h with
@@ -160,30 +141,6 @@ theorem Inv.init (sem : Sem) : Inv sem Store.init where
     | 1, h => cases h; simp [Store.init, Node.children] at hj
     | 2, h => cases h; simp [Store.init, Node.children] at hj
     | i + 3, h => simp [Store.init] at h
-  next_size := rfl
-  linked := by
-    refine ⟨by simp [Store.init], ?_, ?_⟩
-    · intro k
-      simp only [Store.init, getElem!_def, Array.getElem?_replicate]
-      split
-      · rename_i h; split at h <;> simp at h; simp [← h]
-      · simp
-    · intro i h0 h1
-      simp [Store.init] at h1; omega
-  uniq := by
-    intro n i j hi hj
-    match i, j, hi, hj with
-    | 0, 0, _, _ => rfl
-    | 1, 1, _, _ => rfl
-    | 2, 2, _, _ => rfl
-    | 0, 1, hi, hj => cases hi; simp [Store.init] at hj
-    | 0, 2, hi, hj => cases hi; simp [Store.init] at hj
-    | 1, 0, hi, hj => cases hi; simp [Store.init] at hj
-    | 1, 2, hi, hj => cases hi; simp [Store.init] at hj
-    | 2, 0, hi, hj => cases hi; simp [Store.init] at hj
-    | 2, 1, hi, hj => cases hi; simp [Store.init] at hj
-    | i + 3, _, hi, _ => simp [Store.init] at hi
-    | _, j + 3, _, hj => simp [Store.init] at hj
   cache := by simp [Store.init]
 
 end Kairos
