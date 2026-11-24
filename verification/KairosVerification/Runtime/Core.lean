@@ -10,7 +10,7 @@ invariant.
 * `Inv` is the store invariant: id 0 is `Stuck`, children precede parents, and
   the interning table is exact (so equal ids ⇔ equal terms).
 -/
-import Kairos.Runtime.Core
+import Kairos.Runtime.Monad
 import KairosVerification.Gen.Term
 
 namespace Kairos
@@ -30,11 +30,24 @@ open Store
 arguments. Generated per signature from Logos's definitions. -/
 abbrev Sem := Nat → List Term → Option Term
 
+/-- `i` is on the chain from `s`, which goes to smaller ids and ends at 0. -/
+inductive Reach (next : Array Id) : Id → Id → Prop
+  | here {i : Id} : 0 < i → Reach next i i
+  | older {s i : Id} : next[s]! < s → Reach next next[s]! i → Reach next s i
+
+/-- The chains hold the ids from 1 up to `m`, each in the bucket of its node. -/
+structure Linked (nodes : Array Node) (heads next : Array Id) (m : Nat) : Prop where
+  pos : 0 < heads.size
+  lt : ∀ k : Nat, heads[k]! < m
+  reach : ∀ i, 0 < i → i < m → Reach next heads[bucket (nhash nodes[i]!) heads.size]! i
+
 /-- The store invariant. -/
 structure Inv (sem : Sem) (σ : Store) : Prop where
   stuck0 : σ.nodes[0]? = some .Stuck
   wf : ∀ (i : Id) (n : Node), σ.nodes[i]? = some n → ∀ j ∈ n.children, j < i
-  table : ∀ (n : Node) (i : Id), σ.table[n]? = some i ↔ σ.nodes[i]? = some n
+  next_size : σ.next.size = σ.nodes.size
+  linked : Linked σ.nodes σ.heads σ.next σ.nodes.size
+  uniq : ∀ (n : Node) (i j : Id), σ.nodes[i]? = some n → σ.nodes[j]? = some n → i = j
   cache : ∀ (p : Nat) (args : List Id) (r : Id), σ.cache[(p, args)]? = some r →
     r < σ.size ∧ (∀ a ∈ args, a < σ.size) ∧
       sem p (args.map σ.decode) = some (σ.decode r)
@@ -114,8 +127,7 @@ theorem decode_inj (hI : Inv sem σ) :
       simp [view, Array.getElem?_eq_getElem hi]
     have hgj : σ.nodes[j]? = some (σ.view i) := by
       rw [hn]; simp [view, Array.getElem?_eq_getElem hj]
-    have := ((hI.table _ i).mpr hgi).symm.trans ((hI.table _ j).mpr hgj)
-    exact Option.some.inj this
+    exact hI.uniq _ i j hgi hgj
 
 theorem decode_eq_iff (hI : Inv sem σ) {i j : Id} (hi : i < σ.size) (hj : j < σ.size) :
     σ.decode i = σ.decode j ↔ i = j :=
@@ -143,19 +155,21 @@ theorem Inv.init (sem : Sem) : Inv sem Store.init where
     rw [Array.getElem?_eq_some_iff] at h
     obtain ⟨hi, rfl⟩ := h
     simp [Node.children] at hj
-  table := by
-    intro n i
-    simp only [Store.init, Std.HashMap.getElem?_insert, Std.HashMap.getElem?_empty]
-    constructor
-    · intro h
-      split at h
-      · rename_i hn
-        simp at h hn; subst h; subst hn; rfl
-      · simp at h
-    · intro h
-      rw [Array.getElem?_eq_some_iff] at h
-      obtain ⟨hi, rfl⟩ := h
-      simp at hi; subst hi; simp
+  next_size := rfl
+  linked := by
+    refine ⟨by simp [Store.init], ?_, ?_⟩
+    · intro k
+      simp only [Store.init, getElem!_def, Array.getElem?_replicate]
+      split
+      · rename_i h; split at h <;> simp at h; simp [← h]
+      · exact Nat.one_pos
+    · intro i h0 h1
+      simp [Store.init] at h1; omega
+  uniq := by
+    intro n i j hi hj
+    have h1 := (Array.getElem?_eq_some_iff.mp hi).1
+    have h2 := (Array.getElem?_eq_some_iff.mp hj).1
+    simp [Store.init] at h1 h2; exact h1.trans h2.symm
   cache := by simp [Store.init]
 
 end Kairos

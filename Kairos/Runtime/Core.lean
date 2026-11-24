@@ -22,7 +22,11 @@ inductive Err where
 
 structure Store where
   nodes : Array Node
-  table : Std.HashMap Node Id
+  /-- The interning table, a chained hash table kept in two arrays:
+  `heads[k]` is the newest id of bucket `k`, and `next[i]` the next older id in
+  the bucket of `i`. 0 ends a chain (`Stuck` is not in the table). -/
+  heads : Array Id
+  next : Array Id
   /-- Program results, keyed by (program id, argument ids). -/
   cache : Std.HashMap (Nat × List Id) Id
 
@@ -30,7 +34,7 @@ namespace Store
 
 /-- The store with only `Stuck`, at id 0. -/
 def init : Store :=
-  { nodes := #[.Stuck], table := (∅ : Std.HashMap Node Id).insert .Stuck 0, cache := ∅ }
+  { nodes := #[.Stuck], heads := Array.replicate 1024 0, next := #[0], cache := ∅ }
 
 def size (σ : Store) : Nat := σ.nodes.size
 
