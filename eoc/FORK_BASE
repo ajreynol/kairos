@@ -9,6 +9,6 @@
 # lean-meta's: the generated proofs rewrite with the
 # equation lemmas of Logos's definitions, which that layout numbers. Port any
 # upstream change to them.
-ETHOS_COMMIT=649c364ff1e4ec89c43dcfeacad1f2566581b5e6
-plugins/lean_meta/lean_meta_reduce.cpp 2b53d4649e79b685f15e8424af37a38edf27a1d5746e46cd1498b5d365f0f648
-plugins/lean_meta/lean_meta_reduce.h 70e1d45066e957584c3071ba1101b69a9689732201c3958a6716d485cbb94c3d
+ETHOS_COMMIT=c75bebde221718c1b36f9315e2a63cca842b0331
+plugins/lean_meta/lean_meta_reduce.cpp de5505231d2e74375045739787b8e033360860c544e4e3307b93267f1a0047ca
+plugins/lean_meta/lean_meta_reduce.h 17ba36f38550b57db0402c69557f30b6c56a178315dc751d99ceaa4b8d545062

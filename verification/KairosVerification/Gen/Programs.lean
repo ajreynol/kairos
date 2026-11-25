@@ -1912,11 +1912,23 @@ theorem m__eo_is_list_nil_plus_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id}
   intro e; have := decode_stuck_inv hI h1 e; subst this
   simp [m__eo_is_list_nil_plus_1, stuck_of_zero] at h
 
-theorem m__eo_is_list_nil__at__at_TypedList_cons_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {r_T : Id}
+theorem m__eo_is_list_nil__at__at_TypedList_cons_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id}
     (h1 : arg1 < σ.size)
-    (h : m__eo_is_list_nil__at__at_TypedList_cons_1 σ arg1 = some r_T) :
+    (h : m__eo_is_list_nil__at__at_TypedList_cons_1 σ arg1 = some ()) :
+    σ.decode arg1 = Term.Stuck := by
+  obtain ⟨e, -⟩ := stuck_some h; subst e; exact decode_zero hI
+
+theorem m__eo_is_list_nil__at__at_TypedList_cons_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id} (h1 : arg1 < σ.size)
+    (h : m__eo_is_list_nil__at__at_TypedList_cons_1 σ arg1 = none) :
+    σ.decode arg1 = Term.Stuck → False := by
+  intro e; have := decode_stuck_inv hI h1 e; subst this
+  simp [m__eo_is_list_nil__at__at_TypedList_cons_1, stuck_of_zero] at h
+
+theorem m__eo_is_list_nil__at__at_TypedList_cons_2_some {σ : Store} (hI : Inv sem σ) {arg1 : Id} {r_T : Id}
+    (h1 : arg1 < σ.size)
+    (h : m__eo_is_list_nil__at__at_TypedList_cons_2 σ arg1 = some r_T) :
     r_T < σ.size ∧ σ.decode arg1 = (Term.Apply (Term.UOp UserOp._at__at_TypedList_nil) (σ.decode r_T)) := by
-  unfold m__eo_is_list_nil__at__at_TypedList_cons_1 at h
+  unfold m__eo_is_list_nil__at__at_TypedList_cons_2 at h
   obtain ⟨kp0, T, v0, h⟩ := m_Apply_some h
   have w3 := valid_of_view (j := kp0) hI h1 v0 (by simp [Node.children])
   obtain ⟨v1, h⟩ := leaf_some h
@@ -1925,13 +1937,13 @@ theorem m__eo_is_list_nil__at__at_TypedList_cons_1_some {σ : Store} (hI : Inv s
   subst h
   refine ⟨w4, ?_⟩ <;> simp only [decode_of_view hI v0, decode_of_view hI v1, Node.toTerm]
 
-theorem m__eo_is_list_nil__at__at_TypedList_cons_1_none {σ : Store} (hI : Inv sem σ) {arg1 : Id}
-    (h : m__eo_is_list_nil__at__at_TypedList_cons_1 σ arg1 = none) :
+theorem m__eo_is_list_nil__at__at_TypedList_cons_2_none {σ : Store} (hI : Inv sem σ) {arg1 : Id}
+    (h : m__eo_is_list_nil__at__at_TypedList_cons_2 σ arg1 = none) :
     ∀ (T : Term), σ.decode arg1 = (Term.Apply (Term.UOp UserOp._at__at_TypedList_nil) T) → False := by
   intro T eq1
   obtain ⟨kp0, T, v0, e1, e2⟩ := decode_Apply_inv hI eq1
   have v1 := decode_leaf_inv (n := (.UOp UserOp._at__at_TypedList_nil)) (d := σ.decode) hI rfl e1
-  simp [m__eo_is_list_nil__at__at_TypedList_cons_1, kguard, m_Apply_of_view v0, leaf_of_view v1] at h
+  simp [m__eo_is_list_nil__at__at_TypedList_cons_2, kguard, m_Apply_of_view v0, leaf_of_view v1] at h
 
 theorem m__eo_is_list_nil_bvadd_1_some {σ : Store} (hI : Inv sem σ) {arg1 : Id}
     (h1 : arg1 < σ.size)
@@ -78036,16 +78048,23 @@ theorem step__eo_is_list_nil__at__at_TypedList_cons {kn : Nat} : S__eo_is_list_n
   have hΓ := Ctx.arg h1 (Ctx.stuck hI)
   simp only [k__eo_is_list_nil__at__at_TypedList_cons]
   apply Sim.withStore
-  refine kcase_sim (fun T hm1 => ?_) (fun hm1 => ?_)
-  · obtain ⟨hb_T, d1⟩ := m__eo_is_list_nil__at__at_TypedList_cons_1_some hI h1 hm1
-    have hΓb := Ctx.arg hb_T (hΓ)
+  refine kcase_sim (fun _ hm1 => ?_) (fun hm1 => ?_)
+  · have d1 := m__eo_is_list_nil__at__at_TypedList_cons_1_some hI h1 hm1
     try dsimp only
     rw [d1, __eo_is_list_nil__at__at_TypedList_cons.eq_1]; kside
+    exact Sim.stuck hI
+  have kneg1 := m__eo_is_list_nil__at__at_TypedList_cons_1_none hI h1 hm1
+  refine kcase_sim (fun T hm2 => ?_) (fun hm2 => ?_)
+  · obtain ⟨hb_T, d1⟩ := m__eo_is_list_nil__at__at_TypedList_cons_2_some hI h1 hm2
+    have hΓb := Ctx.arg hb_T (hΓ)
+    try dsimp only
+    rw [d1, __eo_is_list_nil__at__at_TypedList_cons.eq_2]; kside
     exact intern_leaf hI rfl
-  have kneg1 := m__eo_is_list_nil__at__at_TypedList_cons_1_none hI hm1
-  have o1 : ∀ (q_T : Term), (σ.decode arg1) = (Term.Apply (Term.UOp UserOp._at__at_TypedList_nil) q_T) → False := fun q_T e1 => kneg1 q_T (by simp only [e1])
-  rw [__eo_is_list_nil__at__at_TypedList_cons.eq_2]; kside
-  exact Sim.stuck hI
+  have kneg2 := m__eo_is_list_nil__at__at_TypedList_cons_2_none hI hm2
+  have o1 : (σ.decode arg1) = Term.Stuck → False := fun e1 => kneg1 (by simp only [e1])
+  have o2 : ∀ (q_T : Term), (σ.decode arg1) = (Term.Apply (Term.UOp UserOp._at__at_TypedList_nil) q_T) → False := fun q_T e1 => kneg2 q_T (by simp only [e1])
+  rw [__eo_is_list_nil__at__at_TypedList_cons.eq_3]; kside
+  exact intern_leaf hI rfl
 
 theorem allS__eo_is_list_nil__at__at_TypedList_cons : ∀ n, S__eo_is_list_nil__at__at_TypedList_cons n
   | 0 => fun _ _ => by simp only [k__eo_is_list_nil__at__at_TypedList_cons]; exact Ok.throw
@@ -145317,7 +145336,7 @@ theorem step__run_evaluate {kn : Nat} (ih : Spec1068 kn) : S__run_evaluate (kn +
     rw [d1, __run_evaluate.eq_41]; kside
     refine Sim.step hΓb (C__run_evaluate ih.s__run_evaluate hI hΓb (.head _)) fun kt1129 σ1130 hI1131 hΓ1132 => ?_
     refine Sim.step hΓ1132 (C__eo_is_z (allS__eo_is_z kn) hI1131 hΓ1132 (.head _)) fun kt1133 σ1134 hI1135 hΓ1136 => ?_
-    exact k_ite_sim hI1135 hΓ1136 (.head _) (by apply Sim.step (m := (k_ite kt1133 (do let kt1137 ← (intern (.Numeral 196608)); let kt1141 ← (k__eo_eq kn kt1137 kt1129); let kt1145 ← (k_ite kt1141 (do intern (.Boolean true)) (do k__eo_gt kn kt1137 kt1129)); k_ite kt1145 (do let kt1149 ← (k__eo_is_neg kn kt1129); k__eo_not kn kt1149) (do intern (.Boolean false))) (do intern (.Boolean false)))) hΓ1136 (k_ite_sim hI1135 hΓ1136 (.head _) (by apply Sim.step hΓ1136 (intern_leaf hI1135 rfl); intro kt1137 σ1138 hI1139 hΓ1140 ; apply Sim.step hΓ1140 (C__eo_eq (allS__eo_eq kn) hI1139 hΓ1140 (.head _) (.tail _ (.tail _ (.head _)))); intro kt1141 σ1142 hI1143 hΓ1144 ; apply Sim.step (m := (k_ite kt1141 (do intern (.Boolean true)) (do k__eo_gt kn kt1137 kt1129))) hΓ1144 (k_ite_sim hI1143 hΓ1144 (.head _) (by exact intern_leaf hI1143 rfl) (by exact C__eo_gt (allS__eo_gt kn) hI1143 hΓ1144 (.tail _ (.head _)) (.tail _ (.tail _ (.tail _ (.head _)))))); intro kt1145 σ1146 hI1147 hΓ1148 ; exact k_ite_sim hI1147 hΓ1148 (.head _) (by apply Sim.step hΓ1148 (C__eo_is_neg (allS__eo_is_neg kn) hI1147 hΓ1148 (.tail _ (.tail _ (.tail _ (.tail _ (.head _)))))); intro kt1149 σ1150 hI1151 hΓ1152 ; exact C__eo_not (allS__eo_not kn) hI1151 hΓ1152 (.head _)) (by exact intern_leaf hI1147 rfl)) (by exact intern_leaf hI1135 rfl)); intro kt1153 σ1154 hI1155 hΓ1156 ; exact k_ite_sim hI1155 hΓ1156 (.head _) (by exact C__eo_to_str (allS__eo_to_str kn) hI1155 hΓ1156 (.tail _ (.tail _ (.tail _ (.head _))))) (by exact intern_leaf hI1155 rfl)) (by apply Sim.step hΓ1136 (intern_leaf hI1135 rfl); intro kt1157 σ1158 hI1159 hΓ1160 ; exact intern_Apply hI1159 hΓ1160 (.head _) (.tail _ (.tail _ (.tail _ (.head _)))))
+    exact k_ite_sim hI1135 hΓ1136 (.head _) (by apply Sim.step (m := (k_ite kt1133 (do let kt1137 ← (intern (.Numeral 196607)); let kt1141 ← (k__eo_eq kn kt1137 kt1129); let kt1145 ← (k_ite kt1141 (do intern (.Boolean true)) (do k__eo_gt kn kt1137 kt1129)); k_ite kt1145 (do let kt1149 ← (k__eo_is_neg kn kt1129); k__eo_not kn kt1149) (do intern (.Boolean false))) (do intern (.Boolean false)))) hΓ1136 (k_ite_sim hI1135 hΓ1136 (.head _) (by apply Sim.step hΓ1136 (intern_leaf hI1135 rfl); intro kt1137 σ1138 hI1139 hΓ1140 ; apply Sim.step hΓ1140 (C__eo_eq (allS__eo_eq kn) hI1139 hΓ1140 (.head _) (.tail _ (.tail _ (.head _)))); intro kt1141 σ1142 hI1143 hΓ1144 ; apply Sim.step (m := (k_ite kt1141 (do intern (.Boolean true)) (do k__eo_gt kn kt1137 kt1129))) hΓ1144 (k_ite_sim hI1143 hΓ1144 (.head _) (by exact intern_leaf hI1143 rfl) (by exact C__eo_gt (allS__eo_gt kn) hI1143 hΓ1144 (.tail _ (.head _)) (.tail _ (.tail _ (.tail _ (.head _)))))); intro kt1145 σ1146 hI1147 hΓ1148 ; exact k_ite_sim hI1147 hΓ1148 (.head _) (by apply Sim.step hΓ1148 (C__eo_is_neg (allS__eo_is_neg kn) hI1147 hΓ1148 (.tail _ (.tail _ (.tail _ (.tail _ (.head _)))))); intro kt1149 σ1150 hI1151 hΓ1152 ; exact C__eo_not (allS__eo_not kn) hI1151 hΓ1152 (.head _)) (by exact intern_leaf hI1147 rfl)) (by exact intern_leaf hI1135 rfl)); intro kt1153 σ1154 hI1155 hΓ1156 ; exact k_ite_sim hI1155 hΓ1156 (.head _) (by exact C__eo_to_str (allS__eo_to_str kn) hI1155 hΓ1156 (.tail _ (.tail _ (.tail _ (.head _))))) (by exact intern_leaf hI1155 rfl)) (by apply Sim.step hΓ1136 (intern_leaf hI1135 rfl); intro kt1157 σ1158 hI1159 hΓ1160 ; exact intern_Apply hI1159 hΓ1160 (.head _) (.tail _ (.tail _ (.tail _ (.head _)))))
   have kneg41 := m__run_evaluate_41_none hI hm41
   refine kcase_sim (fun ssx hm42 => ?_) (fun hm42 => ?_)
   · obtain ⟨hb_ssx, d1⟩ := m__run_evaluate_42_some hI h1 hm42

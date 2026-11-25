@@ -15,7 +15,7 @@ path = "../verification"
 [[require]]
 name = "LogosVerification"
 git = "https://github.com/cvc5/logos"
-rev = "bdcbd95f615627b26b6ebabc0f584e5230b0bf1f"
+rev = "b255319462b94af99364499454a31d92e6f5cc84"
 subDir = "verification"
 
 [[lean_lib]]

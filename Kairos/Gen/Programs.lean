@@ -382,7 +382,10 @@ def m__eo_is_list_nil_mult_1 (σ : Store) (arg1 : Id) : Option Unit :=
 def m__eo_is_list_nil_plus_1 (σ : Store) (arg1 : Id) : Option Unit :=
   Store.stuck arg1 (some ())
 
-def m__eo_is_list_nil__at__at_TypedList_cons_1 (σ : Store) (arg1 : Id) : Option Id :=
+def m__eo_is_list_nil__at__at_TypedList_cons_1 (σ : Store) (arg1 : Id) : Option Unit :=
+  Store.stuck arg1 (some ())
+
+def m__eo_is_list_nil__at__at_TypedList_cons_2 (σ : Store) (arg1 : Id) : Option Id :=
   σ.m_Apply arg1 fun kp0 T => σ.leaf kp0 (.UOp UserOp._at__at_TypedList_nil) (some T)
 
 def m__eo_is_list_nil_bvadd_1 (σ : Store) (arg1 : Id) : Option Unit :=
@@ -10539,7 +10542,7 @@ def k__eo_to_str : Nat → Id → K Id
   | 0, _ => throw .fuel
   | kfuel + 1, arg1 => withStore fun σ =>
     kcase (m__eo_to_str_1 σ arg1) (fun n1 => do
-        if (native_and (native_zleq 0 n1) (native_zlt n1 196608)) then (do intern (.String (native_str_from_code n1))) else (do pure 0))
+        if (native_and (native_zleq 0 n1) (native_zleq n1 native_z_max_code_point)) then (do intern (.String (native_str_from_code n1))) else (do pure 0))
     <|
     kcase (m__eo_to_str_2 σ arg1) (fun s1 => do
         intern (.String s1))
@@ -11117,12 +11120,15 @@ def k__eo_is_list_nil_plus : Nat → Id → K Id
 def k__eo_is_list_nil__at__at_TypedList_cons : Nat → Id → K Id
   | 0, _ => throw .fuel
   | kfuel + 1, arg1 => withStore fun σ =>
-    kcase (m__eo_is_list_nil__at__at_TypedList_cons_1 σ arg1) (fun T => do
+    kcase (m__eo_is_list_nil__at__at_TypedList_cons_1 σ arg1) (fun _ => do
+        pure 0)
+    <|
+    kcase (m__eo_is_list_nil__at__at_TypedList_cons_2 σ arg1) (fun T => do
         intern (.Boolean true))
     <|
-    -- default
+    -- case
      do
-      pure 0
+      intern (.Boolean false)
 
 /-! ### 1 program: __eo_is_list_nil_bvadd -/
 
@@ -42709,7 +42715,7 @@ def k__run_evaluate : Nat → Id → K Id
     kcase (m__run_evaluate_41 σ arg1) (fun n => do
         let kt1129 ← (k__run_evaluate kfuel n)
         let kt1133 ← (k__eo_is_z kfuel kt1129)
-        k_ite kt1133 (do let kt1153 ← (k_ite kt1133 (do let kt1137 ← (intern (.Numeral 196608)); let kt1141 ← (k__eo_eq kfuel kt1137 kt1129); let kt1145 ← (k_ite kt1141 (do intern (.Boolean true)) (do k__eo_gt kfuel kt1137 kt1129)); k_ite kt1145 (do let kt1149 ← (k__eo_is_neg kfuel kt1129); k__eo_not kfuel kt1149) (do intern (.Boolean false))) (do intern (.Boolean false))); k_ite kt1153 (do k__eo_to_str kfuel n) (do intern (.String []))) (do let kt1157 ← (intern (.UOp UserOp.str_from_code)); intern (.Apply kt1157 n)))
+        k_ite kt1133 (do let kt1153 ← (k_ite kt1133 (do let kt1137 ← (intern (.Numeral 196607)); let kt1141 ← (k__eo_eq kfuel kt1137 kt1129); let kt1145 ← (k_ite kt1141 (do intern (.Boolean true)) (do k__eo_gt kfuel kt1137 kt1129)); k_ite kt1145 (do let kt1149 ← (k__eo_is_neg kfuel kt1129); k__eo_not kfuel kt1149) (do intern (.Boolean false))) (do intern (.Boolean false))); k_ite kt1153 (do k__eo_to_str kfuel n) (do intern (.String []))) (do let kt1157 ← (intern (.UOp UserOp.str_from_code)); intern (.Apply kt1157 n)))
     <|
     kcase (m__run_evaluate_42 σ arg1) (fun ssx => do
         let kt1166 ← (k__run_evaluate kfuel ssx)
